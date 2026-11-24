@@ -5,3 +5,69 @@ body {
   color: #1a1a1a;
   min-height: 100vh;
 }
+
+/* 打印 / 导出 PDF 时的排版 */
+@media print {
+  @page {
+    size: A4;
+    margin: 16mm 15mm 18mm 15mm;
+  }
+
+  header,
+  footer,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  h1 {
+    font-size: 20pt !important;
+    margin-bottom: 6mm;
+  }
+
+  h2 {
+    font-size: 13pt !important;
+    margin-top: 8mm !important;
+    break-after: avoid;
+  }
+
+  h3 {
+    font-size: 11pt !important;
+    margin-top: 5mm !important;
+    break-after: avoid;
+  }
+
+  p,
+  li,
+  td {
+    font-size: 10.5pt !important;
+    line-height: 1.75 !important;
+  }
+
+  table,
+  .rounded-xl,
+  .rounded-lg {
+    break-inside: avoid;
+  }
+
+  a {
+    color: #111111 !important;
+    text-decoration: none !important;
+  }
+
+  /* 保留警示框的浅底色 */
+  .bg-amber-50 {
+    background: #fff8ea !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
