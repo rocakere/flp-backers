@@ -2,11 +2,11 @@
 
 export default function Home() {
   const stats = [
-    { label: 'Contract Address', value: 'Go1MhBAQPxN4NZR5JFPVTn7FBPMCZ2oTQ1Y79HSjRVtY', copy: true },
-    { label: 'Price', value: '0.0023 SOL' },
-    { label: 'Total Supply', value: '950,000,000' },
-    { label: 'Burned', value: '12,345,670 FLP' },
-    { label: 'Dividends Paid', value: '43,565 SOL' },
+    { label: 'Contract Address', value: 'TBA', copy: false },
+    { label: 'Price', value: '—' },
+    { label: 'Planned Supply', value: '950,000,000' },
+    { label: 'Burned', value: '—' },
+    { label: 'Dividends Paid', value: '—' },
   ];
 
   const handleCopy = async (val: string) => {
@@ -21,12 +21,15 @@ export default function Home() {
   return (
     <>
       <section className="text-center px-6 pt-10 pb-20">
+        <div className="inline-block mb-6 rounded-full border border-purple-300 bg-purple-50 px-4 py-1 text-xs font-semibold tracking-wide text-purple-700">
+          PRE-LAUNCH · 代币尚未上线
+        </div>
         <h1 className="text-6xl md:text-7xl font-extrabold text-black tracking-tight">FairLaunch Protocol (FLP)</h1>
         <p className="mt-6 text-lg text-black/60">Solana Deflationary Dividend Token Launch Protocol</p>
         <p className="mt-6 max-w-3xl mx-auto text-base text-black/60 leading-relaxed">
           One-click deploy Solana tokens with buy/sell tax, auto-burn and holder dividends. Open source, verifiable permissions, Jito Bundle anti-MEV launch.
         </p>
-        
+
         <div className="mt-12 flex flex-wrap items-start justify-center gap-x-20 gap-y-6">
           {stats.map((s) => (
             <div key={s.label} className="text-center">
@@ -47,6 +50,10 @@ export default function Home() {
             </div>
           ))}
         </div>
+
+        <p className="mt-10 max-w-2xl mx-auto text-xs leading-6 text-black/40">
+          合约地址、价格、销毁量与分红额将在代币正式发射后接入链上实时读取，当前一律开放前状态，不做提前公示。
+        </p>
       </section>
 
       <section id="core" className="text-center pb-24">
@@ -64,8 +71,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-
-      <footer className="border-t border-black/10 py-8 text-center text-sm text-black/50">© 2026 FairLaunch Protocol</footer>
     </>
   );
 }
