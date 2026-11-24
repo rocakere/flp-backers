@@ -80,7 +80,11 @@ const zh = {
       },
       {
         q: '买入税和卖出税的税金怎么分配？',
-        a: '买卖税各为 1%，税金按 4:3:2:1 拆分：40% 进入销毁池、30% 进入持币者分红池、20% 用于流动性回购与加深、10% 用于运营与开发。',
+        a: '买卖税各为 1%，但要分两套看：FLP 母币的税按 4:3:2:1 拆分——40% 进入销毁池、30% 进入持币者分红池、20% 用于流动性回购与加深、10% 用于运营与开发；通过协议发射的新币，税归发币者，90% 结算给创作者，10% 用于回购并销毁 FLP，平台不抽成。',
+      },
+      {
+        q: '税金什么时候会被卖出？',
+        a: '税到账是代币，分红发的是 SOL，所以中间必须卖出。FLP 母币约 50% 的税会卖成 SOL（分红 30%、运营 10%、流动性配对 10%）。为避免形成可预测的砸盘时间点，卖出会拆成 8–12 笔在数小时内完成，harvest 时间在 6–9 天窗口内随机。',
       },
       {
         q: '分红什么时候发放？',
@@ -197,7 +201,11 @@ const en: typeof zh = {
       },
       {
         q: 'How is the buy and sell tax allocated?',
-        a: 'Buy and sell tax are 1% each, split 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations and development.',
+        a: 'Buy and sell tax are 1% each, but there are two separate sets. On the FLP token, fees split 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations. On tokens launched through the protocol, fees belong to the issuer: 90% settles to the creator and 10% buys back and burns FLP, with no platform cut.',
+      },
+      {
+        q: 'When does the tax get sold?',
+        a: 'Tax arrives as tokens while dividends are paid in SOL, so a sale in between is unavoidable. Roughly 50% of the FLP tax is sold for SOL (dividends 30%, operations 10%, liquidity pairing 10%). To avoid a predictable dump schedule, sales are split into 8–12 orders over several hours and the harvest window is randomized across 6–9 days.',
       },
       {
         q: 'When are dividends paid?',

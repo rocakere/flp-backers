@@ -16,8 +16,9 @@ function ZhBody() {
     ['代币名称', 'Fair Token'],
     ['代币符号', 'FAIR'],
     ['总供应量', '1,000,000,000 FAIR（恒定，无增发）'],
-    ['买入税 / 卖出税', '各 1%'],
-    ['税收分配', '销毁 40% / 分红 30% / 流动性 20% / 运营 10%'],
+    ['买入税 / 卖出税', '各 1%（FLP 母币与发射的新币一致）'],
+    ['FLP 母币税收分配', '销毁 40% / 分红 30% / 流动性 20% / 运营 10%'],
+    ['发射新币税收分配', '创作者 90% / 回购并销毁 FLP 10%'],
     ['分红周期', '每 7 天结算一次'],
     ['发行方式', '无预售、无私募、无团队预留，全部注入流动性'],
   ];
@@ -60,14 +61,14 @@ function ZhBody() {
         在 Launch 页面填写名称、符号、总量、税率与税收流向，协议生成一个标准代币合约。所有 FLP 代币共享同一套合约逻辑，只有参数不同，且参数在创建时写死，之后不可修改。
       </p>
 
-      <h3 className="mt-8 font-semibold text-black">2.2 税率结构</h3>
+      <h3 className="mt-8 font-semibold text-black">2.2 税率结构（分两套，别混）</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        买入税与卖出税各 1%，比例固定写入合约，无管理员修改入口。税金实时结算为 SOL，按 40 / 30 / 20 / 10 四档分配至销毁池、持币者分红池、流动性回购与运营开发。
+        买入税与卖出税各 1%，由 Token-2022 的转账费在协议层自动扣除，没有管理员修改入口。<span className="font-semibold text-black">FLP 母币</span>的税按 40 / 30 / 20 / 10 四档分配至销毁池、持币者分红池、流动性回购与运营开发；<span className="font-semibold text-black">通过协议发射的新币</span>，税归发币者本人，平台不从新币的税里抽成，只有 10% 用于回购并销毁 FLP，详见 3.2。
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.3 自动销毁</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        进入销毁池的代币按周期批量打入 Solana 官方销毁地址 <code className="rounded bg-black/5 px-1 py-0.5 text-xs">1nc1nerator11111111111111111111111111111111</code>。销毁由合约执行，任何人可在浏览器上核对该地址余额与总供应量的差值，不存在"团队声称已销毁"这种说法。
+        进入销毁池的代币由金库账户直接调用 Burn 指令销毁（Token-2022 原生支持），链上总供应量立即减少。任何人都可以比对当前总供应量与初始 10 亿枚的差值，核对实际销毁量，不存在"团队声称已销毁"这种说法。
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.4 持币分红</h3>
@@ -91,6 +92,14 @@ function ZhBody() {
         <li className="list-disc">税率与分配参数写入合约后不可变更，无管理员修改入口</li>
         <li className="list-disc">流动性凭证锁仓或直接打入黑洞地址</li>
       </ul>
+
+      <h3 className="mt-8 font-semibold text-black">2.7 税金如何真正到手</h3>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        1% 的税在每一笔代币转账时由协议扣下，但不会自动进任何人的钱包，而是先记录在收款方账户的 withheld 余额里（包括交易池的金库账户）。协议定期执行 harvest，把这些挂着的税一次性搬进税金金库，再按分配比例处理。整个过程由多签地址执行，每一步在浏览器上都能查到指令与金额。
+      </p>
+      <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
+        税是代币，分红是 SOL，中间必须卖出。FLP 母币的税中约 50% 需要卖成 SOL（分红 30% + 运营 10% + 流动性配对 10%）。为避免形成可预测的砸盘时间点，卖出会拆成 8–12 笔在数小时内完成（TWAP），harvest 时间在 6–9 天窗口内随机，而不是死守第 7 天。
+      </div>
 
       <h2 className="mt-12 text-xl font-bold text-black">三、代币经济</h2>
       <div className="mt-4 overflow-x-auto rounded-xl border border-black/10 bg-white/60">
@@ -119,7 +128,31 @@ function ZhBody() {
         ))}
       </div>
 
-      <h3 className="mt-8 font-semibold text-black">3.2 发行原则</h3>
+      <h3 className="mt-8 font-semibold text-black">3.2 通过协议发射的新币：90 / 10</h3>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        任何人在协议上一键发币，该代币的 1% 买卖税归发币者本人，90% 直接结算给创作者，平台不从中抽成。剩下 10% 用于在市场上买入 FLP 并立即销毁。
+      </p>
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="rounded-lg border border-black/10 bg-white/60 p-4">
+          <div className="flex items-baseline justify-between">
+            <span className="text-sm font-semibold text-black">创作者 Creator</span>
+            <span className="text-lg font-bold text-purple-700">90%</span>
+          </div>
+          <p className="mt-1 text-xs leading-5 text-black/50">按周期结算给发币者，这是发币者的主要收入来源</p>
+        </div>
+        <div className="rounded-lg border border-black/10 bg-white/60 p-4">
+          <div className="flex items-baseline justify-between">
+            <span className="text-sm font-semibold text-black">回购并销毁 FLP</span>
+            <span className="text-lg font-bold text-purple-700">10%</span>
+          </div>
+          <p className="mt-1 text-xs leading-5 text-black/50">买入 FLP 后立即 Burn，母币供应持续减少，价值由生态里的新币支撑</p>
+        </div>
+      </div>
+      <div className="mt-3 rounded-lg border border-black/10 bg-white/60 px-4 py-3 text-xs leading-6 text-black/60">
+        这个设计的意思是：生态里每多一个活跃的新币，FLP 就多一份回购销毁的买盘。反过来说，如果没有新币在跑，FLP 就失去支撑——母币的价值与生态活跃度直接绑定，不靠平台从新币抽血维持。
+      </div>
+
+      <h3 className="mt-8 font-semibold text-black">3.3 发行原则</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
         公平发射意味着没有预售轮、没有私募折扣、没有团队预留。全部供应量在发射时一次性注入流动性池，团队与普通买家同价进场、同一时间可交易。协议自身不抽取代币作为费用，运营成本从交易税中的运营部分支出。
       </p>
@@ -144,6 +177,7 @@ function ZhBody() {
       <div className="mt-4 space-y-2 text-sm leading-7 text-black/70">
         <p><span className="font-semibold text-black">税收即滑点。</span>每笔交易都会被扣 1% 的买入税或卖出税，高频交易者的实际损耗显著高于名义税率。</p>
         <p><span className="font-semibold text-black">分红不确定。</span>分红来自交易税，交易冷淡时分红趋近于零。</p>
+        <p><span className="font-semibold text-black">税收卖出压力。</span>母币税中约 50% 需卖出换成 SOL 才能分红，这会持续形成卖出压力；已用 TWAP 拆单与随机窗口削弱影响，但无法消除。</p>
         <p><span className="font-semibold text-black">MEV 无法根除。</span>Bundle 只能降低概率，不能消除。</p>
         <p><span className="font-semibold text-black">合约风险。</span>未经审计的合约存在未知漏洞，可能造成资金损失。</p>
         <p><span className="font-semibold text-black">流动性风险。</span>早期流动性薄弱，大额卖出会严重砸价。</p>
@@ -174,8 +208,9 @@ function EnBody() {
     ['Token Name', 'Fair Token'],
     ['Symbol', 'FAIR'],
     ['Total Supply', '1,000,000,000 FAIR (fixed, no minting)'],
-    ['Buy / Sell Tax', '1% each'],
-    ['Fee Allocation', 'Burn 40% / Dividends 30% / Liquidity 20% / Operations 10%'],
+    ['Buy / Sell Tax', '1% each (same for FLP and launched tokens)'],
+    ['FLP Fee Allocation', 'Burn 40% / Dividends 30% / Liquidity 20% / Operations 10%'],
+    ['Launched Token Fees', 'Creator 90% / FLP buyback-and-burn 10%'],
     ['Dividend Cycle', 'Settled every 7 days'],
     ['Distribution', 'No presale, no private round, no team allocation — all supply goes into liquidity'],
   ];
@@ -218,14 +253,14 @@ function EnBody() {
         On the Launch page you enter name, symbol, supply, tax rates and fee destination, and the protocol produces a standard token contract. All FLP tokens share the same contract logic; only the parameters differ, and those are fixed at creation and cannot be changed later.
       </p>
 
-      <h3 className="mt-8 font-semibold text-black">2.2 Tax Structure</h3>
+      <h3 className="mt-8 font-semibold text-black">2.2 Tax Structure (Two Separate Sets)</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        Buy and sell tax are 1% each, written into the contract with no admin override. Fees settle in SOL in real time and are split 40 / 30 / 20 / 10 across the burn pool, holder dividend pool, liquidity buyback and operations.
+        Buy and sell tax are 1% each, charged at protocol level by the Token-2022 transfer fee, with no admin override. On <span className="font-semibold text-black">the FLP token</span>, fees are split 40 / 30 / 20 / 10 across the burn pool, holder dividend pool, liquidity buyback and operations. On <span className="font-semibold text-black">tokens launched through the protocol</span>, fees belong to the issuer: the platform takes no cut, and only 10% is used to buy back and burn FLP — see 3.2.
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.3 Auto Burn</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        Tokens routed to the burn pool are sent in timed batches to Solana&apos;s official incinerator address <code className="rounded bg-black/5 px-1 py-0.5 text-xs">1nc1nerator11111111111111111111111111111111</code>. The burn is executed by the contract, so anyone can compare that address&apos; balance against total supply instead of taking the team&apos;s word for it.
+        Tokens routed to the burn pool are destroyed by a Burn instruction signed by the treasury account (natively supported by Token-2022), so total supply drops immediately. Anyone can compare current supply against the initial 1,000,000,000 to verify how much has actually been burned — no need to take the team&apos;s word for it.
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.4 Holder Dividends</h3>
@@ -249,6 +284,14 @@ function EnBody() {
         <li className="list-disc">Tax and allocation parameters locked at deployment, no admin entry point</li>
         <li className="list-disc">Liquidity credentials locked or sent to a burn address</li>
       </ul>
+
+      <h3 className="mt-8 font-semibold text-black">2.7 How the Tax Actually Reaches the Treasury</h3>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        The 1% is deducted by the protocol on every token transfer, but it does not land in anyone&apos;s wallet automatically: it is recorded as a withheld balance on the receiving token account, including the pool&apos;s vault accounts. The protocol periodically runs a harvest that sweeps all withheld amounts into the fee treasury, then splits them by the allocation. Every step is signed by a multisig and every instruction and amount is verifiable in a block explorer.
+      </p>
+      <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
+        Tax arrives as tokens, dividends are paid in SOL, so a sale in between is unavoidable: roughly 50% of the FLP tax must be sold for SOL (dividends 30% + operations 10% + liquidity pairing 10%). To avoid handing the market a predictable dump schedule, the sale is split into 8–12 orders over several hours (TWAP) and the harvest window is randomized across 6–9 days rather than fixed on day 7.
+      </div>
 
       <h2 className="mt-12 text-xl font-bold text-black">3. Token Economics</h2>
       <div className="mt-4 overflow-x-auto rounded-xl border border-black/10 bg-white/60">
@@ -277,7 +320,31 @@ function EnBody() {
         ))}
       </div>
 
-      <h3 className="mt-8 font-semibold text-black">3.2 Distribution Principle</h3>
+      <h3 className="mt-8 font-semibold text-black">3.2 Tokens Launched Through the Protocol: 90 / 10</h3>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        Anyone can launch a token here. The 1% buy/sell tax on that token belongs to the issuer: 90% is settled to the creator and the platform takes no cut. The remaining 10% buys FLP on the market and burns it immediately.
+      </p>
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="rounded-lg border border-black/10 bg-white/60 p-4">
+          <div className="flex items-baseline justify-between">
+            <span className="text-sm font-semibold text-black">Creator</span>
+            <span className="text-lg font-bold text-purple-700">90%</span>
+          </div>
+          <p className="mt-1 text-xs leading-5 text-black/50">Settled to the issuer each cycle — the issuer&apos;s main revenue source</p>
+        </div>
+        <div className="rounded-lg border border-black/10 bg-white/60 p-4">
+          <div className="flex items-baseline justify-between">
+            <span className="text-sm font-semibold text-black">FLP Buyback &amp; Burn</span>
+            <span className="text-lg font-bold text-purple-700">10%</span>
+          </div>
+          <p className="mt-1 text-xs leading-5 text-black/50">Buys FLP and burns it immediately, so supply keeps shrinking as the ecosystem grows</p>
+        </div>
+      </div>
+      <div className="mt-3 rounded-lg border border-black/10 bg-white/60 px-4 py-3 text-xs leading-6 text-black/60">
+        The logic: every additional active token in the ecosystem adds a buy-and-burn bid for FLP. Conversely, without tokens running on the protocol FLP has no support — the mother token&apos;s value is tied to ecosystem activity rather than funded by taxing new launches.
+      </div>
+
+      <h3 className="mt-8 font-semibold text-black">3.3 Distribution Principle</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
         A fair launch means no presale, no private-round discount and no team allocation. The entire supply is injected into the liquidity pool at launch, so the team enters at the same price as everyone else and is tradeable at the same moment. The protocol does not skim tokens as a fee; operating costs are paid from the operations share of trading tax.
       </p>
@@ -302,6 +369,7 @@ function EnBody() {
       <div className="mt-4 space-y-2 text-sm leading-7 text-black/70">
         <p><span className="font-semibold text-black">Tax is slippage.</span> Every trade pays 1% on the way in or out; high-frequency traders lose far more than the headline rate suggests.</p>
         <p><span className="font-semibold text-black">Dividends are variable.</span> Payouts come from trading fees, so they approach zero when volume is thin.</p>
+        <p><span className="font-semibold text-black">Fee-driven sell pressure.</span> About 50% of the FLP tax must be sold for SOL to fund dividends, which creates continuous sell pressure. TWAP splitting and a randomized window reduce the impact; they cannot remove it.</p>
         <p><span className="font-semibold text-black">MEV is not removable.</span> Bundles reduce the odds, they do not eliminate it.</p>
         <p><span className="font-semibold text-black">Contract risk.</span> An unaudited contract may hold unknown vulnerabilities that cause loss of funds.</p>
         <p><span className="font-semibold text-black">Liquidity risk.</span> Early liquidity is thin; large sells will move price hard.</p>
