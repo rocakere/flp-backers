@@ -6,6 +6,32 @@ body {
   min-height: 100vh;
 }
 
+/* 钱包弹窗改为浅色，与整站风格一致 */
+.wallet-adapter-modal-wrapper {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.wallet-adapter-modal-title {
+  color: #1a1a1a !important;
+}
+.wallet-adapter-modal-list .wallet-adapter-button {
+  background-color: #f4fbf6 !important;
+  color: #1a1a1a !important;
+}
+.wallet-adapter-modal-list .wallet-adapter-button:hover {
+  background-color: #e8f7ec !important;
+}
+.wallet-adapter-modal-button-close {
+  background: #eef6f0 !important;
+}
+.wallet-adapter-modal-button-close svg {
+  fill: #4b5563 !important;
+}
+.wallet-adapter-modal-list-more {
+  color: #4b5563 !important;
+}
+
 /* 打印 / 导出 PDF 时的排版 */
 @media print {
   @page {
