@@ -63,6 +63,9 @@ export default function Navbar() {
 
       {/* 第二行：菜单。未开放的栏目置灰，不可点击 */}
       <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-7 gap-y-2 border-t border-black/5 bg-white/20 px-4 py-3 text-sm sm:gap-x-20 sm:text-base">
+        <Link href={pathFor(lang)} className="text-purple-700 transition hover:text-purple-900">
+          {t.home}
+        </Link>
         <Link href={`${pathFor(lang)}#core`} className="text-purple-700 transition hover:text-purple-900">
           {t.core}
         </Link>
@@ -75,6 +78,9 @@ export default function Navbar() {
         <span className="cursor-not-allowed text-black/30" title={t.exploreTip}>
           {t.explore}<sup className="ml-0.5 text-[9px]">{t.soon}</sup>
         </span>
+        <Link href={pathFor(lang, '/help')} className="text-purple-700 transition hover:text-purple-900">
+          {t.help}
+        </Link>
       </nav>
     </header>
   );

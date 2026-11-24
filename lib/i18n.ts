@@ -2,10 +2,12 @@ export type Lang = 'zh' | 'en';
 
 const zh = {
   nav: {
+    home: '首页',
     core: '核心理念',
     whitepaper: '白皮书',
     audit: '审计报告',
     explore: '代币广场',
+    help: '帮助',
     launch: 'Launch a Token',
     connect: '连接钱包',
     langZh: '中文',
@@ -64,6 +66,38 @@ const zh = {
     alertConnect: '请先连接钱包',
     alertDone: '配置已校验通过。链上发射功能仍在开发中，暂不会真实创建代币。',
   },
+  help: {
+    title: '帮助中心',
+    lead: '关于 FLP 协议、代币参数与钱包连接的常见问题，都汇总在这里。',
+    faqs: [
+      {
+        q: '代币什么时候上线？',
+        a: '目前处于开放前阶段，合约地址、价格、销毁与分红数据都不会提前公示。正式发射后，首页会直接读取链上数据展示。',
+      },
+      {
+        q: '点“连接钱包”没有反应怎么办？',
+        a: '弹窗里只会列出你浏览器中已安装的钱包插件。如果列表是空的，请先安装 Phantom、OKX Web3 或 Backpack 等 Solana 钱包插件，再刷新页面重试。',
+      },
+      {
+        q: '买入税和卖出税的税金怎么分配？',
+        a: '买卖税各为 1%，税金按 4:3:2:1 拆分：40% 进入销毁池、30% 进入持币者分红池、20% 用于流动性回购与加深、10% 用于运营与开发。',
+      },
+      {
+        q: '分红什么时候发放？',
+        a: '每 7 天对持币地址做一次快照，按持仓比例分配合约收到的 SOL，自动到账，无需手动领取。分红金额取决于税金收入，没有保底。',
+      },
+      {
+        q: '总量会增发吗？',
+        a: '总量恒定 10 亿枚，无增发、无预售、无私募、无团队预留。',
+      },
+      {
+        q: '怎么确认合约是安全的？',
+        a: '审计目前尚未进行，完成后会在此公开全文与审计机构名称。合约将开源，增发与暂停权限会放弃或移交，任何人都能在链上自行核验。',
+      },
+    ],
+    contactTitle: '还有别的问题？',
+    contactDesc: '可以在 X (Twitter) 或 Discord 联系我们，完整参数与风险披露请见白皮书。',
+  },
   note: {
     audit: {
       title: '审计报告',
@@ -85,10 +119,12 @@ const zh = {
 
 const en: typeof zh = {
   nav: {
+    home: 'Home',
     core: 'Core',
     whitepaper: 'Whitepaper',
     audit: 'Audit',
     explore: 'Explore',
+    help: 'Help',
     launch: 'Launch a Token',
     connect: 'Connect Wallet',
     langZh: '中文',
@@ -146,6 +182,38 @@ const en: typeof zh = {
     btnCheck: 'Validate configuration',
     alertConnect: 'Please connect your wallet first',
     alertDone: 'Configuration validated. On-chain launch is still in development — no token is actually created.',
+  },
+  help: {
+    title: 'Help Center',
+    lead: 'Common questions about the FLP protocol, token parameters and wallet connection are collected here.',
+    faqs: [
+      {
+        q: 'When does the token launch?',
+        a: 'We are in the pre-launch stage, so the contract address, price, burn and dividend figures are not published in advance. Once live, the homepage reads these values directly from chain.',
+      },
+      {
+        q: 'Nothing happens when I click "Connect Wallet" — what should I do?',
+        a: 'The dialog only lists wallets actually installed in your browser. If the list is empty, install a Solana wallet extension such as Phantom, OKX Web3 or Backpack, then refresh the page.',
+      },
+      {
+        q: 'How is the buy and sell tax allocated?',
+        a: 'Buy and sell tax are 1% each, split 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations and development.',
+      },
+      {
+        q: 'When are dividends paid?',
+        a: 'A snapshot of holder addresses is taken every 7 days, and SOL received by the contract is distributed by holding ratio automatically — no manual claim needed. Payouts depend on tax revenue and are not guaranteed.',
+      },
+      {
+        q: 'Will supply ever be inflated?',
+        a: 'Total supply is fixed at 1,000,000,000. No inflation, no presale, no private sale, no team allocation.',
+      },
+      {
+        q: 'How can I verify the contract is safe?',
+        a: 'No audit has been completed yet; once it is, the full report and the auditor name will be published here. The contract will be open source, and mint/freeze authorities will be revoked or transferred so anyone can verify on chain.',
+      },
+    ],
+    contactTitle: 'Still have questions?',
+    contactDesc: 'Reach us on X (Twitter) or Discord. Full parameters and risk disclosure are in the whitepaper.',
   },
   note: {
     audit: {
