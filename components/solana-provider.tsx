@@ -69,7 +69,7 @@ export function SolanaProvider({ children }: { children: ReactNode }) {
           addressSelector: m.createDefaultAddressSelector(),
           appIdentity: {
             name: 'FLP Backers',
-            uri: typeof window !== 'undefined' ? window.location.origin : 'https://flp-backers-fjif-mu.vercel.app',
+            uri: typeof window !== 'undefined' ? window.location.origin : 'https://flp-backers.vercel.app',
             icon: '/logo.png',
           },
           authorizationResultCache: m.createDefaultAuthorizationResultCache(),
