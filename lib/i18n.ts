@@ -37,7 +37,7 @@ const zh = {
     note: '合约地址、价格、销毁量与分红额将在代币正式发射后接入链上实时读取，当前一律开放前状态，不做提前公示。',
     coreTitle: '核心优势',
     cards: [
-      { t: '灵活税收分配', d: '买入税与卖出税可分别设置，税金按比例自动拆分到流动性、市场与分红钱包。' },
+      { t: '税收返还', d: '税金按比例自动拆分到流动性、市场与分红钱包。' },
       { t: '自动销毁', d: '按固定比例定时销毁，通缩节奏可控，全部链上可验证。' },
       { t: '持币分红', d: '按持仓比例自动分发 SOL，无需手动领取。' },
     ],
@@ -162,7 +162,7 @@ const en: typeof zh = {
     note: 'Contract address, price, burn and dividend figures will be read live from chain once the token launches. All values stay pre-launch for now and are not published in advance.',
     coreTitle: 'Core Advantages',
     cards: [
-      { t: 'Flexible Tax Allocation', d: 'Buy and sell tax are configured separately, and the collected tax is auto-split to liquidity, marketing and the dividend wallet.' },
+      { t: 'Fee Recycling', d: 'Collected tax is auto-split to liquidity, marketing and the dividend wallet.' },
       { t: 'Auto Burn', d: 'Timed burns at a fixed ratio keep deflation controllable and fully verifiable on chain.' },
       { t: 'Holder Dividends', d: 'SOL is distributed automatically by holding ratio — no manual claim required.' },
     ],
