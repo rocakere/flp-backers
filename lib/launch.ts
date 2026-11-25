@@ -13,15 +13,19 @@ import {
   getMintLen,
   createInitializeTransferFeeConfigInstruction,
   createInitializeMintInstruction,
+  createInitializeMetadataPointerInstruction,
   createMintToInstruction,
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
+import { createInitializeInstruction } from '@solana/spl-token-metadata';
 import { createHash } from 'crypto';
 
-const META_PROGRAM = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
 const ASSOC = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 const WSOL_MINT = new PublicKey('So11111111111111111111111111111111111111112');
+
+/** 元数据存在 mint 自己的 Token-2022 Metadata 扩展里（旧版 Metaplex 不支持 Token-2022 mint）。 */
+const META_BUFFER_LAMPORTS = 10_000_000; // 0.01 SOL，给 metadata 扩展 realloc 留租金
 
 /** Fixed launch parameters: 9 decimals, 1% transfer tax, supply 1,000,000,000. */
 export const LAUNCH_DECIMALS = 9;
@@ -34,8 +38,6 @@ const u32 = (n: number) => {
   b.writeUInt32LE(n);
   return b;
 };
-const borshStr = (s: string) => Buffer.concat([u32(Buffer.byteLength(s)), Buffer.from(s, 'utf8')]);
-const none = () => Buffer.from([0]);
 const ixDisc = (name: string) =>
   Buffer.from(createHash('sha256').update(`global:${name}`).digest().subarray(0, 8));
 
@@ -82,39 +84,21 @@ export async function launchToken(
   );
   const [config] = PublicKey.findProgramAddressSync([Buffer.from('config')], programId);
   const [stats] = PublicKey.findProgramAddressSync([Buffer.from('stats')], programId);
-  const [metaPda] = PublicKey.findProgramAddressSync(
-    [Buffer.from('metadata'), META_PROGRAM.toBuffer(), mintKp.publicKey.toBuffer()],
-    META_PROGRAM,
-  );
 
-  // ---- transaction 1: mint with the 1% transfer fee, creator ATA, supply, metadata
-  const mintSpace = getMintLen([ExtensionType.TransferFeeConfig]);
-  const mintRent = await connection.getMinimumBalanceForRentExemption(mintSpace);
+  // ---- transaction 1: mint with the 1% transfer fee + T22 metadata extension, creator ATA, supply
+  const mintSpace = getMintLen([ExtensionType.TransferFeeConfig, ExtensionType.MetadataPointer]);
+  const mintRent = await connection.getMinimumBalanceForRentExemption(mintSpace) + META_BUFFER_LAMPORTS;
   const creatorAta = getAssociatedTokenAddressSync(mintKp.publicKey, payer, true, TOKEN_2022_PROGRAM_ID);
 
-  const metaData = Buffer.concat([
-    Buffer.from([33]), // MetadataInstruction::CreateMetadataAccountV3
-    borshStr(params.name),
-    borshStr(params.symbol),
-    borshStr(params.uri),
-    Buffer.from([0, 0]), // seller_fee_basis_points = 0
-    none(), // creators
-    none(), // collection
-    none(), // uses
-    Buffer.from([1]), // is_mutable
-    none(), // collection_details
-  ]);
-  const metaIx = new TransactionInstruction({
-    programId: META_PROGRAM,
-    keys: [
-      { pubkey: metaPda, isSigner: false, isWritable: true },
-      { pubkey: mintKp.publicKey, isSigner: false, isWritable: false },
-      { pubkey: payer, isSigner: true, isWritable: false },
-      { pubkey: payer, isSigner: true, isWritable: true },
-      { pubkey: payer, isSigner: true, isWritable: false },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-    ],
-    data: metaData,
+  const metaIx = createInitializeInstruction({
+    programId: TOKEN_2022_PROGRAM_ID,
+    metadata: mintKp.publicKey,
+    updateAuthority: payer,
+    mint: mintKp.publicKey,
+    mintAuthority: payer,
+    name: params.name,
+    symbol: params.symbol,
+    uri: params.uri,
   });
 
   const tx1 = new Transaction().add(
@@ -125,6 +109,13 @@ export async function launchToken(
       lamports: mintRent,
       programId: TOKEN_2022_PROGRAM_ID,
     }),
+    // 元数据指针指向 mint 自己（T22 Metadata 扩展内嵌，旧版 Metaplex 不支持 Token-2022）
+    createInitializeMetadataPointerInstruction(
+      mintKp.publicKey,
+      payer,
+      mintKp.publicKey,
+      TOKEN_2022_PROGRAM_ID,
+    ),
     // the fee authority is the token_config PDA, so only the protocol can ever touch the fee
     createInitializeTransferFeeConfigInstruction(
       mintKp.publicKey,
@@ -135,6 +126,8 @@ export async function launchToken(
       TOKEN_2022_PROGRAM_ID,
     ),
     createInitializeMintInstruction(mintKp.publicKey, LAUNCH_DECIMALS, payer, null, TOKEN_2022_PROGRAM_ID),
+    // mint 初始化之后才能写 metadata（同笔交易内顺序执行）
+    metaIx,
     createAssociatedTokenAccountInstruction(payer, creatorAta, payer, mintKp.publicKey, TOKEN_2022_PROGRAM_ID),
     createMintToInstruction(
       mintKp.publicKey,
@@ -144,7 +137,6 @@ export async function launchToken(
       [],
       TOKEN_2022_PROGRAM_ID,
     ),
-    metaIx,
   );
   params.onStep?.('mint');
   tx1.partialSign(mintKp);

@@ -57,7 +57,7 @@ const zh = {
   launch: {
     title: '发起代币',
     sub: '在 Solana 上一键部署内置 1% 税、85 / 10 / 5 分账与自动加池的代币',
-    notice: '发射会真实创建 Token-2022 代币：9 位小数、1% 转账税、总量 10 亿，账户租金与手续费由你的钱包支付。建池与首次买入在同一笔交易内原子执行（需配置 DBC partner config）。',
+    notice: '发射会真实创建 Token-2022 代币：9 位小数、1% 转账税、总量 10 亿，名称/符号/URI 写在代币自身的 Metadata 扩展里，账户租金与手续费由你的钱包支付。建池与首次买入在同一笔交易内原子执行（需配置 DBC partner config）。',
     fName: '代币名称 Name',
     phName: '例如 Fair Token',
     fSymbol: '代币符号 Symbol',
@@ -232,7 +232,7 @@ const en: typeof zh = {
   launch: {
     title: 'Launch a Token',
     sub: 'Deploy a Solana token with a fixed 1% tax, 85 / 10 / 5 split and auto-liquidity',
-    notice: 'This launch really creates a Token-2022 token: 9 decimals, 1% transfer tax, 1 billion supply. Rent and fees are paid by your wallet. Pool creation and the first buy run atomically in one transaction (requires a DBC partner config).',
+    notice: 'This launch really creates a Token-2022 token: 9 decimals, 1% transfer tax, 1 billion supply, with name/symbol/URI stored in the token\'s own Metadata extension. Rent and fees are paid by your wallet. Pool creation and the first buy run atomically in one transaction (requires a DBC partner config).',
     fName: 'Token Name',
     phName: 'e.g. Fair Token',
     fSymbol: 'Token Symbol',
