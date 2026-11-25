@@ -219,7 +219,7 @@ const en: typeof zh = {
       },
       {
         q: 'When does the tax get sold?',
-        a: 'Tax arrives as tokens while dividends are paid in SOL, so a sale in between is unavoidable. Roughly 50% of the FLP tax is sold for SOL (dividends 30%, operations 10%, liquidity pairing 10%). To avoid a predictable dump schedule, sales are split into 8–12 orders over several hours and the harvest window is randomized across 6–9 days.',
+        a: 'Tax arrives as tokens while dividends are paid in SOL, so a sale in between is unavoidable. Roughly 50% of the FAIR tax is sold for SOL (dividends 30%, operations 10%, liquidity pairing 10%). To avoid a predictable dump schedule, sales are split into 8–12 orders over several hours and the harvest window is randomized across 6–9 days.',
       },
       {
         q: 'When are dividends paid?',
