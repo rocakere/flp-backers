@@ -218,7 +218,13 @@ function ZhBody() {
         <li className="list-disc">合约源码开源，使用 Solana 可验证构建，构建结果与链上字节一致</li>
         <li className="list-disc">审计尚未进行；完成后公开机构名称、报告全文与发现的问题（含未修复项），不选择性披露</li>
         <li className="list-disc">所有权限放弃动作在发射交易中完成，任何人可在浏览器回溯该笔交易</li>
+        <li className="list-disc">
+          不可变性清单（第 4 条）：所有比例与阈值以编译期常量写死——母币税 40 / 30 / 20 / 10，子币税 85 / 10 / 5，20 SOL 的分红与加池下限，5 亿枚的加池上限；全部 15 条指令逐条列明签名门槛；全仓不存在 <span className="font-mono text-xs">set_</span>、暂停、关闭、迁移入口。上线时升级权永久置空，链上显示 <span className="font-mono text-xs">Upgrade Authority: none</span>，此后程序与规则均不可替换。
+        </li>
       </ul>
+      <div className="mt-3 rounded-lg border border-black/10 bg-black/[0.02] px-4 py-3 text-xs leading-6 text-black/60">
+        逐条清单与可复现的核验命令见仓库 <span className="font-mono text-[11px]">IMMUTABILITY.md</span>：<span className="font-mono text-[11px]">grep -rn &quot;pub fn set_&quot; programs/flp-treasury/src/lib.rs</span> 无任何输出；<span className="font-mono text-[11px]">close_account</span> 仅出现在 4 处临时 WSOL 账户；不存在的指令包括 set_params、pause、migrate、close、set_upgrade_authority。
+      </div>
 
       <h2 className="mt-12 text-xl font-bold text-black">五、路线图</h2>
       <ol className="mt-4 space-y-2 text-sm leading-7 text-black/70">
@@ -469,7 +475,13 @@ function EnBody() {
         <li className="list-disc">Contract source is open, built with Solana&apos;s verifiable build so the artifact matches the on-chain bytes</li>
         <li className="list-disc">No audit has been performed yet; once done, the auditor, the full report and every finding (including unresolved ones) will be published with no selective disclosure</li>
         <li className="list-disc">All authority revocations happen inside the launch transaction and can be traced by anyone in a block explorer</li>
+        <li className="list-disc">
+          Immutability clause (item 4): every ratio and threshold is a compile-time constant — FAIR tax 40 / 30 / 20 / 10, launch tax 85 / 10 / 5, the 20 SOL dividend and liquidity floors, the 500M FAIR add-to-pool cap; all 15 instructions list their signer requirement explicitly; the repository contains no <span className="font-mono text-xs">set_</span> instruction and no pause, close or migrate entry point. At launch the upgrade authority is permanently dropped and the chain shows <span className="font-mono text-xs">Upgrade Authority: none</span> — the program and its rules can no longer be replaced.
+        </li>
       </ul>
+      <div className="mt-3 rounded-lg border border-black/10 bg-black/[0.02] px-4 py-3 text-xs leading-6 text-black/60">
+        The itemized list and reproducible checks live in <span className="font-mono text-[11px]">IMMUTABILITY.md</span>: <span className="font-mono text-[11px]">grep -rn &quot;pub fn set_&quot; programs/flp-treasury/src/lib.rs</span> returns nothing; <span className="font-mono text-[11px]">close_account</span> appears only on four temporary WSOL accounts; set_params, pause, migrate, close and set_upgrade_authority do not exist.
+      </div>
 
       <h2 className="mt-12 text-xl font-bold text-black">5. Roadmap</h2>
       <ol className="mt-4 space-y-2 text-sm leading-7 text-black/70">
