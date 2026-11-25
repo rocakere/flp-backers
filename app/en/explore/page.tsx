@@ -1,10 +1,5 @@
-import type { Metadata } from 'next';
-import NotePage from '@/components/pages/note';
-
-export const metadata: Metadata = {
-  title: 'Token Explorer | FLP',
-};
+import ExplorePage from '@/components/pages/explore';
 
 export default function Page() {
-  return <NotePage lang="en" kind="explore" />;
+  return <ExplorePage lang="en" />;
 }

@@ -72,12 +72,12 @@ export default function Navbar() {
         <Link href={pathFor(lang, '/whitepaper')} className="text-purple-700 transition hover:text-purple-900">
           {t.whitepaper}
         </Link>
-        <span className="cursor-not-allowed text-black/30" title={t.auditTip}>
-          {t.audit}<sup className="ml-0.5 text-[9px]">{t.soon}</sup>
-        </span>
-        <span className="cursor-not-allowed text-black/30" title={t.exploreTip}>
-          {t.explore}<sup className="ml-0.5 text-[9px]">{t.soon}</sup>
-        </span>
+        <Link href={pathFor(lang, '/audit')} className="text-purple-700 transition hover:text-purple-900">
+          {t.audit}
+        </Link>
+        <Link href={pathFor(lang, '/explore')} className="text-purple-700 transition hover:text-purple-900">
+          {t.explore}
+        </Link>
         <Link href={pathFor(lang, '/help')} className="text-purple-700 transition hover:text-purple-900">
           {t.help}
         </Link>

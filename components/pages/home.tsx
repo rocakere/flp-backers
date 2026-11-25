@@ -1,12 +1,19 @@
 'use client';
+import { useEffect, useState } from 'react';
 import { dict, type Lang } from '@/lib/i18n';
+import { VAULTS } from '@/lib/addresses';
 
 export default function HomeContent({ lang }: { lang: Lang }) {
   const t = dict[lang].home;
+  const [launched, setLaunched] = useState<number | null>(null);
+  useEffect(() => {
+    fetch('/api/stats').then((r) => r.json()).then((d) => { if (typeof d.launched === 'number') setLaunched(d.launched); }).catch(() => {});
+  }, []);
 
   const stats = [
     { label: t.statCa, value: 'TBA', copy: false },
     { label: t.statPrice, value: '—' },
+    { label: t.statLaunched, value: launched === null ? '—' : launched.toLocaleString() },
     { label: t.statSupply, value: '1,000,000,000' },
     { label: t.statBurned, value: '—' },
     { label: t.statDividend, value: '—' },
@@ -64,6 +71,37 @@ export default function HomeContent({ lang }: { lang: Lang }) {
               <p className="mt-2 text-black/70 text-sm leading-6">{c.d}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section id="vaults" className="pb-24 max-w-4xl mx-auto px-6">
+        <h2 className="text-3xl font-bold text-black text-center">{t.vaultTitle}</h2>
+        <p className="mt-4 text-sm leading-7 text-black/60 text-center max-w-2xl mx-auto">{t.vaultDesc}</p>
+        <div className="mt-8 rounded-xl border border-black/10 bg-white/60 divide-y divide-black/5">
+          {[
+            { label: t.vaultDividend, addr: VAULTS.dividend },
+            { label: t.vaultOps, addr: VAULTS.ops },
+          ].map((v) => (
+            <div key={v.label} className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="text-sm font-semibold text-black">{v.label}</div>
+              <div className="flex items-center gap-2">
+                <span className={`font-mono text-xs ${v.addr ? 'text-black/70' : 'text-black/40'} max-w-[260px] truncate`} title={v.addr || t.vaultTba}>
+                  {v.addr || t.vaultTba}
+                </span>
+                {v.addr && (
+                  <>
+                    <button onClick={() => handleCopy(v.addr)} className="text-[10px] px-1.5 py-0.5 border border-black/20 rounded bg-white/50 hover:bg-white text-black/60">
+                      {t.copy}
+                    </button>
+                    <a href={`https://solscan.io/account/${v.addr}`} target="_blank" rel="noreferrer" className="text-[10px] px-1.5 py-0.5 border border-black/20 rounded bg-white/50 hover:bg-white text-black/60">
+                      {t.view}
+                    </a>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+          <div className="px-5 py-4 text-xs text-black/45">{t.vaultHidden}</div>
         </div>
       </section>
     </>

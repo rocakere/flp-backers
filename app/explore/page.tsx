@@ -1,5 +1,5 @@
-import NotePage from '@/components/pages/note';
+import ExplorePage from '@/components/pages/explore';
 
 export default function Page() {
-  return <NotePage lang="zh" kind="explore" />;
+  return <ExplorePage lang="zh" />;
 }
