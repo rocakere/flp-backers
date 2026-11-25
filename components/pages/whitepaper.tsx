@@ -18,9 +18,10 @@ function ZhBody() {
     ['总供应量', '1,000,000,000 FAIR（恒定，无增发）'],
     ['买入税 / 卖出税', '各 1%（FLP 母币与发射的新币一致）'],
     ['FLP 母币税收分配', '销毁 40% / 分红 30% / 流动性 20% / 运营 10%'],
-    ['发射新币税收分配', '创作者 90% / 回购并销毁 FLP 10%'],
+    ['发射新币税收分配', '创作者 85% / 回购并销毁 FLP 10% / 加池金库 5%'],
+    ['交易池手续费', '0.25%（与 1% 转账税叠加，一次往返合计约 2.5%）'],
     ['分红周期', '每 7 天结算一次'],
-    ['发行方式', '无预售、无私募、无团队预留，全部注入流动性'],
+    ['发行方式', '链上曲线首发：35% 供应用于曲线定价销售，无预售、无私募、无团队预留'],
   ];
 
   return (
@@ -63,7 +64,10 @@ function ZhBody() {
 
       <h3 className="mt-8 font-semibold text-black">2.2 税率结构（分两套，别混）</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        买入税与卖出税各 1%，由 Token-2022 的转账费在协议层自动扣除，没有管理员修改入口。<span className="font-semibold text-black">FLP 母币</span>的税按 40 / 30 / 20 / 10 四档分配至销毁池、持币者分红池、流动性回购与运营开发；<span className="font-semibold text-black">通过协议发射的新币</span>，税归发币者本人，平台不从新币的税里抽成，只有 10% 用于回购并销毁 FLP，详见 3.2。
+        买入税与卖出税各 1%，由 Token-2022 的转账费在协议层自动扣除，没有管理员修改入口。<span className="font-semibold text-black">FLP 母币</span>的税按 40 / 30 / 20 / 10 四档分配至销毁池、持币者分红池、流动性回购与运营开发；<span className="font-semibold text-black">通过协议发射的新币</span>，税归发币者本人，平台不从新币的税里抽成，其中 10% 用于回购并销毁 FLP、5% 进入加池金库（给该币的池子持续加深流动性），详见 3.2。
+      </p>
+      <p className="mt-3 text-sm leading-7 text-black/70">
+        交易池本身另收 0.25% 手续费，由做市程序在 swap 里直接扣，计入池内供 LP 提取。这笔钱和 1% 转账税是两套独立机制，会叠加：一次买入再卖出，用户实际损耗约 1% + 1% + 0.25% + 0.25% ≈ 2.5%，另加滑点。手续费之所以压在 0.25%，是因为税已经收了 1%，再往上加会直接压掉交易量，而交易量是税收的唯一来源。
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.3 自动销毁</h3>
@@ -81,7 +85,7 @@ function ZhBody() {
 
       <h3 className="mt-8 font-semibold text-black">2.5 防 MEV 发射</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        流动性注入与首批买单通过 Jito Bundle 打包提交，在同一区块内完成，避免开盘瞬间被夹。这降低抢跑概率，但不能消除 MEV——公开流动性池始终存在被机器人套利的可能。
+        曲线首发阶段，开盘第一笔定价由合约决定，不存在"抢先进池"这个动作；迁移建池与首批买单通过 Jito Bundle 打包提交，在同一区块内完成，避免迁移瞬间被夹。这降低抢跑概率，但不能消除 MEV——公开交易池始终存在被机器人套利的可能。
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.6 权限模型</h3>
@@ -128,15 +132,15 @@ function ZhBody() {
         ))}
       </div>
 
-      <h3 className="mt-8 font-semibold text-black">3.2 通过协议发射的新币：90 / 10</h3>
+      <h3 className="mt-8 font-semibold text-black">3.2 通过协议发射的新币：85 / 10 / 5</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        任何人在协议上一键发币，该代币的 1% 买卖税归发币者本人，90% 直接结算给创作者，平台不从中抽成。剩下 10% 用于在市场上买入 FLP 并立即销毁。
+        任何人在协议上一键发币，该代币的 1% 买卖税归发币者本人，平台不从中抽成。85% 直接结算给创作者，10% 用于在市场上买入 FLP 并立即销毁，剩下 5% 进入该币自己的加池金库，只能用于给它加深流动性，不可挪用。
       </p>
-      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-lg border border-black/10 bg-white/60 p-4">
           <div className="flex items-baseline justify-between">
             <span className="text-sm font-semibold text-black">创作者 Creator</span>
-            <span className="text-lg font-bold text-purple-700">90%</span>
+            <span className="text-lg font-bold text-purple-700">85%</span>
           </div>
           <p className="mt-1 text-xs leading-5 text-black/50">按周期结算给发币者，这是发币者的主要收入来源</p>
         </div>
@@ -147,15 +151,57 @@ function ZhBody() {
           </div>
           <p className="mt-1 text-xs leading-5 text-black/50">买入 FLP 后立即 Burn，母币供应持续减少，价值由生态里的新币支撑</p>
         </div>
+        <div className="rounded-lg border border-black/10 bg-white/60 p-4">
+          <div className="flex items-baseline justify-between">
+            <span className="text-sm font-semibold text-black">加池金库</span>
+            <span className="text-lg font-bold text-purple-700">5%</span>
+          </div>
+          <p className="mt-1 text-xs leading-5 text-black/50">换成 SOL 后与预留代币配对加池，加完立即销毁 LP，池子只增不减</p>
+        </div>
       </div>
       <div className="mt-3 rounded-lg border border-black/10 bg-white/60 px-4 py-3 text-xs leading-6 text-black/60">
-        这个设计的意思是：生态里每多一个活跃的新币，FLP 就多一份回购销毁的买盘。反过来说，如果没有新币在跑，FLP 就失去支撑——母币的价值与生态活跃度直接绑定，不靠平台从新币抽血维持。
+        这个设计的意思是：生态里每多一个活跃的新币，FLP 就多一份回购销毁的买盘；新币自己也在持续变厚——税里的 5% 专门用来加池，池子越深、滑点越小、能承载的交易量越大。反过来说，如果没有新币在跑，FLP 就失去支撑——母币的价值与生态活跃度直接绑定，不靠平台从新币抽血维持。
       </div>
 
       <h3 className="mt-8 font-semibold text-black">3.3 发行原则</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        公平发射意味着没有预售轮、没有私募折扣、没有团队预留。全部供应量在发射时一次性注入流动性池，团队与普通买家同价进场、同一时间可交易。协议自身不抽取代币作为费用，运营成本从交易税中的运营部分支出。
+        公平发射意味着没有预售轮、没有私募折扣、没有团队预留。首发不设白名单、不设额度、不设内部价：任何人在同一时刻、以同一个起点价格买入，价格由链上曲线按买入量自动抬升，规则写死在合约里，发币方无法在过程中改价或插队。
       </p>
+      <p className="mt-3 text-sm leading-7 text-black/70">
+        协议自身不抽取代币作为费用，运营成本从交易税中的运营部分支出。团队不预留份额，也不参与曲线首发的前排购买。
+      </p>
+
+      <h3 className="mt-8 font-semibold text-black">3.4 首发机制与流动性安排</h3>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        首发走链上曲线（bonding curve），而不是自建公募、也不是一次性把全部供应砸进池子。原因是流动性深度只取决于池子里的 SOL 一侧：供应全倒进池子只会把单价压到极低，一个大额买单就能吃掉几个百分点。曲线把定价过程公开化，也让筹措到的 SOL 直接成为池子的深度。
+      </p>
+      <div className="mt-3 overflow-x-auto rounded-xl border border-black/10 bg-white/60">
+        <table className="w-full text-sm">
+          <tbody>
+            {[
+              ['曲线发售数量', '350,000,000 枚（35%）'],
+              ['起始 FDV', '100 SOL'],
+              ['迁移 FDV', '400 SOL（起始的 4 倍）'],
+              ['曲线总募资', '约 87.5 SOL（3.5 亿 × 起始价 × 平均倍数 2.5）'],
+              ['主池注入', '200,000,000 枚 + 全部 87.5 SOL'],
+              ['主池开盘价', '约起始价的 4.4 倍，与曲线迁移价基本连续'],
+              ['深度储备', '450,000,000 枚（45%），按里程碑分批加池并销毁 LP'],
+              ['交易池手续费', '0.25%'],
+            ].map(([k, v]) => (
+              <tr key={k} className="border-b border-black/5 last:border-0">
+                <td className="w-40 px-4 py-3 align-top text-black/50">{k}</td>
+                <td className="px-4 py-3 font-semibold text-black">{v}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 text-sm leading-7 text-black/70">
+        曲线卖满后自动迁移成交易池，流动性就是曲线筹到的 SOL，发币方不需要先垫付建池资金。剩下的 45% 不进销毁池、也不一次性灌进池子（因为配对所需的 SOL 不存在），而是作为深度储备：每攒够一批 SOL，就按当期市价配对加池，加完立即把该批 LP 凭证销毁，池子永久不可撤。
+      </p>
+      <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
+        两个必须知道的细节。第一，1% 转账税在往池子转账时同样会扣，所以"注入 2 亿枚"实际到账约 1.98 亿，对池价的影响可以忽略，但账要对得上。第二，池子金库账户自己也在被收税（买入时进金库扣一次、卖出时出金库再扣一次），这部分同样记在金库的 withheld 余额里，必须纳入 harvest 扫描名单，否则池子的实际余额与做市程序的记账会对不上。
+      </div>
 
       <h2 className="mt-12 text-xl font-bold text-black">四、可验证性与审计</h2>
       <ul className="mt-4 space-y-1.5 pl-5 text-sm leading-7 text-black/70">
@@ -175,12 +221,13 @@ function ZhBody() {
 
       <h2 className="mt-12 text-xl font-bold text-black">六、风险披露</h2>
       <div className="mt-4 space-y-2 text-sm leading-7 text-black/70">
-        <p><span className="font-semibold text-black">税收即滑点。</span>每笔交易都会被扣 1% 的买入税或卖出税，高频交易者的实际损耗显著高于名义税率。</p>
+        <p><span className="font-semibold text-black">税收即滑点。</span>每笔交易都会被扣 1% 的买入税或卖出税，高频交易者的实际损耗显著高于名义税率。加上 0.25% 池子手续费，一次往返的综合损耗约 2.5%，另加滑点。</p>
         <p><span className="font-semibold text-black">分红不确定。</span>分红来自交易税，交易冷淡时分红趋近于零。</p>
         <p><span className="font-semibold text-black">税收卖出压力。</span>母币税中约 50% 需卖出换成 SOL 才能分红，这会持续形成卖出压力；已用 TWAP 拆单与随机窗口削弱影响，但无法消除。</p>
         <p><span className="font-semibold text-black">MEV 无法根除。</span>Bundle 只能降低概率，不能消除。</p>
         <p><span className="font-semibold text-black">合约风险。</span>未经审计的合约存在未知漏洞，可能造成资金损失。</p>
-        <p><span className="font-semibold text-black">流动性风险。</span>早期流动性薄弱，大额卖出会严重砸价。</p>
+        <p><span className="font-semibold text-black">流动性风险。</span>曲线阶段池子尚不存在，价格由曲线决定；迁移初期深度有限，大额卖出仍会严重砸价。深度储备靠加池逐步增厚，需要时间。</p>
+        <p><span className="font-semibold text-black">首发阶段的税。</span>曲线买入同样扣 1% 税，买家实际到手为成交量的 99%，这部分税金在发射日就开始累积，需要同步启动 harvest。</p>
         <p><span className="font-semibold text-black">监管风险。</span>各司法辖区对代币发行与分红的定性不同，可能影响可用性。</p>
       </div>
 
@@ -210,9 +257,10 @@ function EnBody() {
     ['Total Supply', '1,000,000,000 FAIR (fixed, no minting)'],
     ['Buy / Sell Tax', '1% each (same for FLP and launched tokens)'],
     ['FLP Fee Allocation', 'Burn 40% / Dividends 30% / Liquidity 20% / Operations 10%'],
-    ['Launched Token Fees', 'Creator 90% / FLP buyback-and-burn 10%'],
+    ['Launched Token Fees', 'Creator 85% / FLP buyback-and-burn 10% / Liquidity vault 5%'],
+    ['Pool Swap Fee', '0.25% (stacks on the 1% transfer tax — round trip is about 2.5%)'],
     ['Dividend Cycle', 'Settled every 7 days'],
-    ['Distribution', 'No presale, no private round, no team allocation — all supply goes into liquidity'],
+    ['Distribution', 'On-chain bonding curve launch: 35% of supply sold on the curve. No presale, no private round, no team allocation'],
   ];
 
   return (
@@ -255,7 +303,10 @@ function EnBody() {
 
       <h3 className="mt-8 font-semibold text-black">2.2 Tax Structure (Two Separate Sets)</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        Buy and sell tax are 1% each, charged at protocol level by the Token-2022 transfer fee, with no admin override. On <span className="font-semibold text-black">the FLP token</span>, fees are split 40 / 30 / 20 / 10 across the burn pool, holder dividend pool, liquidity buyback and operations. On <span className="font-semibold text-black">tokens launched through the protocol</span>, fees belong to the issuer: the platform takes no cut, and only 10% is used to buy back and burn FLP — see 3.2.
+        Buy and sell tax are 1% each, charged at protocol level by the Token-2022 transfer fee, with no admin override. On <span className="font-semibold text-black">the FLP token</span>, fees are split 40 / 30 / 20 / 10 across the burn pool, holder dividend pool, liquidity buyback and operations. On <span className="font-semibold text-black">tokens launched through the protocol</span>, fees belong to the issuer: the platform takes no cut, with 10% used to buy back and burn FLP and 5% routed to a liquidity vault that can only be used to deepen that token&apos;s own pool — see 3.2.
+      </p>
+      <p className="mt-3 text-sm leading-7 text-black/70">
+        The trading pool charges an additional 0.25% swap fee, deducted by the AMM inside the swap and retained in the pool for LPs. These are two independent mechanisms and they stack: a buy followed by a sell costs roughly 1% + 1% + 0.25% + 0.25% ≈ 2.5%, plus slippage. The swap fee is held at 0.25% precisely because the tax already takes 1%; pushing it higher would suppress volume, and volume is the only source of fee revenue.
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.3 Auto Burn</h3>
@@ -273,7 +324,7 @@ function EnBody() {
 
       <h3 className="mt-8 font-semibold text-black">2.5 Anti-MEV Launch</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        Liquidity injection and the first buys are submitted together as a Jito Bundle in the same block, which makes opening-snipe sandwiches much harder. It lowers the probability of being front-run; it does not eliminate MEV, because any public liquidity pool can still be arbitraged by bots.
+        On the curve, the opening price is set by the contract, so there is no "be first into the pool" race; the migration pool creation and first buys are submitted as a Jito Bundle in the same block, which makes sandwiching the migration much harder. It lowers the probability of being front-run; it does not eliminate MEV, because any public liquidity pool can still be arbitraged by bots.
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.6 Permission Model</h3>
@@ -320,15 +371,15 @@ function EnBody() {
         ))}
       </div>
 
-      <h3 className="mt-8 font-semibold text-black">3.2 Tokens Launched Through the Protocol: 90 / 10</h3>
+      <h3 className="mt-8 font-semibold text-black">3.2 Tokens Launched Through the Protocol: 85 / 10 / 5</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        Anyone can launch a token here. The 1% buy/sell tax on that token belongs to the issuer: 90% is settled to the creator and the platform takes no cut. The remaining 10% buys FLP on the market and burns it immediately.
+        Anyone can launch a token here. The 1% buy/sell tax on that token belongs to the issuer and the platform takes no cut: 85% is settled to the creator, 10% buys FLP on the market and burns it immediately, and 5% goes into that token&apos;s own liquidity vault, which can only be used to deepen its pool.
       </p>
-      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-lg border border-black/10 bg-white/60 p-4">
           <div className="flex items-baseline justify-between">
             <span className="text-sm font-semibold text-black">Creator</span>
-            <span className="text-lg font-bold text-purple-700">90%</span>
+            <span className="text-lg font-bold text-purple-700">85%</span>
           </div>
           <p className="mt-1 text-xs leading-5 text-black/50">Settled to the issuer each cycle — the issuer&apos;s main revenue source</p>
         </div>
@@ -339,15 +390,57 @@ function EnBody() {
           </div>
           <p className="mt-1 text-xs leading-5 text-black/50">Buys FLP and burns it immediately, so supply keeps shrinking as the ecosystem grows</p>
         </div>
+        <div className="rounded-lg border border-black/10 bg-white/60 p-4">
+          <div className="flex items-baseline justify-between">
+            <span className="text-sm font-semibold text-black">Liquidity Vault</span>
+            <span className="text-lg font-bold text-purple-700">5%</span>
+          </div>
+          <p className="mt-1 text-xs leading-5 text-black/50">Swapped to SOL and paired with reserved tokens to add liquidity; the LP is burned immediately, so the pool only grows</p>
+        </div>
       </div>
       <div className="mt-3 rounded-lg border border-black/10 bg-white/60 px-4 py-3 text-xs leading-6 text-black/60">
-        The logic: every additional active token in the ecosystem adds a buy-and-burn bid for FLP. Conversely, without tokens running on the protocol FLP has no support — the mother token&apos;s value is tied to ecosystem activity rather than funded by taxing new launches.
+        The logic: every additional active token in the ecosystem adds a buy-and-burn bid for FLP, and the new token gets thicker on its own — 5% of its fee is earmarked for liquidity, so depth grows, slippage falls and the volume it can absorb rises. Conversely, without tokens running on the protocol FLP has no support — the mother token&apos;s value is tied to ecosystem activity rather than funded by taxing new launches.
       </div>
 
       <h3 className="mt-8 font-semibold text-black">3.3 Distribution Principle</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        A fair launch means no presale, no private-round discount and no team allocation. The entire supply is injected into the liquidity pool at launch, so the team enters at the same price as everyone else and is tradeable at the same moment. The protocol does not skim tokens as a fee; operating costs are paid from the operations share of trading tax.
+        A fair launch means no presale round, no private discount and no team allocation. There is no allowlist, no cap and no insider price: everyone buys at the same starting price at the same moment, and the price rises with purchases along an on-chain curve whose rules are fixed in the contract, so the issuer cannot reprice mid-way or jump the queue.
       </p>
+      <p className="mt-3 text-sm leading-7 text-black/70">
+        The protocol does not skim tokens as a fee; operating costs are paid from the operations share of trading tax. The team reserves no allocation and does not take a position at the front of the curve.
+      </p>
+
+      <h3 className="mt-8 font-semibold text-black">3.4 Launch Mechanics and Liquidity Plan</h3>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        The launch runs through an on-chain bonding curve — not a self-hosted public sale, and not dumping all supply into a pool at once. The reason is that pool depth depends only on the SOL side: pouring in all the supply just pushes the unit price to a very low level, where a single large buy takes several percent of supply. A curve makes pricing public and turns the SOL it raises directly into pool depth.
+      </p>
+      <div className="mt-3 overflow-x-auto rounded-xl border border-black/10 bg-white/60">
+        <table className="w-full text-sm">
+          <tbody>
+            {[
+              ['Supply sold on curve', '350,000,000 (35%)'],
+              ['Starting FDV', '100 SOL'],
+              ['Migration FDV', '400 SOL (4× the start)'],
+              ['Total raised on curve', '≈ 87.5 SOL (350M × start price × average multiple 2.5)'],
+              ['Main pool injection', '200,000,000 tokens + the full 87.5 SOL'],
+              ['Main pool opening price', '≈ 4.4× the start price, continuous with the migration price'],
+              ['Depth reserve', '450,000,000 (45%), added to the pool in milestones with LP burned each time'],
+              ['Pool swap fee', '0.25%'],
+            ].map(([k, v]) => (
+              <tr key={k} className="border-b border-black/5 last:border-0">
+                <td className="w-44 px-4 py-3 align-top text-black/50">{k}</td>
+                <td className="px-4 py-3 font-semibold text-black">{v}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 text-sm leading-7 text-black/70">
+        When the curve sells out it migrates into a trading pool automatically, and that liquidity is the SOL the curve raised — the issuer never has to fund the pool upfront. The remaining 45% is neither burned nor dumped into the pool (the SOL to pair it does not exist); it is a depth reserve: each time enough SOL accrues, a batch is paired into the pool at the prevailing price and its LP is burned immediately, making the pool permanently unwithdrawable.
+      </p>
+      <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
+        Two details worth knowing. First, the 1% transfer tax is also charged when tokens move into the pool, so &quot;injecting 200M&quot; arrives as about 198M — negligible for the price, but the accounting has to match. Second, the pool vault itself pays the tax (charged on the way in and again on the way out), and that amount sits in the vault&apos;s withheld balance too; the vault must be included in the harvest scan, otherwise the AMM accounting no longer matches the real balance.
+      </div>
 
       <h2 className="mt-12 text-xl font-bold text-black">4. Verifiability and Audit</h2>
       <ul className="mt-4 space-y-1.5 pl-5 text-sm leading-7 text-black/70">
@@ -367,12 +460,13 @@ function EnBody() {
 
       <h2 className="mt-12 text-xl font-bold text-black">6. Risk Disclosure</h2>
       <div className="mt-4 space-y-2 text-sm leading-7 text-black/70">
-        <p><span className="font-semibold text-black">Tax is slippage.</span> Every trade pays 1% on the way in or out; high-frequency traders lose far more than the headline rate suggests.</p>
+        <p><span className="font-semibold text-black">Tax is slippage.</span> Every trade pays 1% on the way in or out; high-frequency traders lose far more than the headline rate suggests. With the 0.25% swap fee, a full round trip costs about 2.5% plus slippage.</p>
         <p><span className="font-semibold text-black">Dividends are variable.</span> Payouts come from trading fees, so they approach zero when volume is thin.</p>
         <p><span className="font-semibold text-black">Fee-driven sell pressure.</span> About 50% of the FLP tax must be sold for SOL to fund dividends, which creates continuous sell pressure. TWAP splitting and a randomized window reduce the impact; they cannot remove it.</p>
         <p><span className="font-semibold text-black">MEV is not removable.</span> Bundles reduce the odds, they do not eliminate it.</p>
         <p><span className="font-semibold text-black">Contract risk.</span> An unaudited contract may hold unknown vulnerabilities that cause loss of funds.</p>
-        <p><span className="font-semibold text-black">Liquidity risk.</span> Early liquidity is thin; large sells will move price hard.</p>
+        <p><span className="font-semibold text-black">Liquidity risk.</span> During the curve there is no pool at all and the price is set by the curve; early after migration depth is still thin and large sells will move price hard. Depth grows only as the reserve is added over time.</p>
+        <p><span className="font-semibold text-black">Tax during launch.</span> Curve buys also pay the 1% tax, so buyers receive 99% of their fill. That tax starts accruing on launch day and harvesting must start at the same time.</p>
         <p><span className="font-semibold text-black">Regulatory risk.</span> Jurisdictions treat token issuance and dividends differently, which may limit availability.</p>
       </div>
 

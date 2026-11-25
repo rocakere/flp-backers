@@ -80,7 +80,11 @@ const zh = {
       },
       {
         q: '买入税和卖出税的税金怎么分配？',
-        a: '买卖税各为 1%，但要分两套看：FLP 母币的税按 4:3:2:1 拆分——40% 进入销毁池、30% 进入持币者分红池、20% 用于流动性回购与加深、10% 用于运营与开发；通过协议发射的新币，税归发币者，90% 结算给创作者，10% 用于回购并销毁 FLP，平台不抽成。',
+        a: '买卖税各为 1%，但要分两套看：FLP 母币的税按 4:3:2:1 拆分——40% 进入销毁池、30% 进入持币者分红池、20% 用于流动性回购与加深、10% 用于运营与开发；通过协议发射的新币，税归发币者，85% 结算给创作者、10% 用于回购并销毁 FLP、5% 进入该币自己的加池金库，平台不抽成。交易池另收 0.25% 手续费，与税叠加，一次往返综合损耗约 2.5%。',
+      },
+      {
+        q: '新币是怎么发的？要不要先买？',
+        a: '走链上曲线首发，不设预售、白名单、额度或内部价。35% 的供应在曲线上公开定价，价格随买入自动抬升，规则写死在合约里；曲线卖满后自动迁移成交易池，流动性就是曲线筹到的 SOL，发币方不需要先垫建池资金。',
       },
       {
         q: '税金什么时候会被卖出？',
@@ -92,7 +96,7 @@ const zh = {
       },
       {
         q: '总量会增发吗？',
-        a: '总量恒定 10 亿枚，无增发、无预售、无私募、无团队预留。',
+        a: '总量恒定 10 亿枚，无增发、无预售、无私募、无团队预留。首发时 35% 在链上曲线公开定价销售，20% 与曲线筹集到的 SOL 组成主交易池，其余 45% 作为深度储备分批加池，加完即销毁 LP。',
       },
       {
         q: '怎么确认合约是安全的？',
@@ -201,7 +205,11 @@ const en: typeof zh = {
       },
       {
         q: 'How is the buy and sell tax allocated?',
-        a: 'Buy and sell tax are 1% each, but there are two separate sets. On the FLP token, fees split 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations. On tokens launched through the protocol, fees belong to the issuer: 90% settles to the creator and 10% buys back and burns FLP, with no platform cut.',
+        a: 'Buy and sell tax are 1% each, but there are two separate sets. On the FLP token, fees split 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations. On tokens launched through the protocol, fees belong to the issuer: 85% settles to the creator, 10% buys back and burns FLP and 5% goes to that token&apos;s own liquidity vault, with no platform cut. The pool charges a further 0.25% swap fee, so a full round trip costs about 2.5%.',
+      },
+      {
+        q: 'How is a new token launched? Do I need to buy first?',
+        a: 'Through an on-chain bonding curve — no presale, allowlist, cap or insider price. 35% of supply is priced publicly on the curve and the price rises automatically with purchases, with the rules fixed in the contract. When the curve sells out it migrates into a trading pool automatically, and that liquidity is the SOL the curve raised, so the issuer never has to fund the pool upfront.',
       },
       {
         q: 'When does the tax get sold?',
@@ -213,7 +221,7 @@ const en: typeof zh = {
       },
       {
         q: 'Will supply ever be inflated?',
-        a: 'Total supply is fixed at 1,000,000,000. No inflation, no presale, no private sale, no team allocation.',
+        a: 'Total supply is fixed at 1,000,000,000. No inflation, no presale, no private sale, no team allocation. At launch 35% is sold on the on-chain curve, 20% forms the main pool together with the SOL raised, and the remaining 45% is a depth reserve added to the pool in batches with the LP burned each time.',
       },
       {
         q: 'How can I verify the contract is safe?',
