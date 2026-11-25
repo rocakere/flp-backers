@@ -18,7 +18,6 @@ import {
   getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
 import { createHash } from 'crypto';
-import { DBC_CONFIG, PROGRAM_ID } from '@/lib/addresses';
 
 const META_PROGRAM = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
 const ASSOC = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
@@ -47,7 +46,15 @@ export type LaunchParams = {
   taxDest: 0 | 1;
   /** 首次买入（SOL）。0 = 不买；与建池在同一笔交易内原子执行。 */
   devBuySol?: number;
+  /** 当前网络上的程序地址（随网络切换传入）。 */
+  programId: string;
+  /** 当前网络的 DBC partner config；空 = 跳过建池与首买。 */
+  dbcConfig: string;
+  /** 进度回调，给页面显示当前在做哪一步。 */
+  onStep?: (step: LaunchStep) => void;
 };
+
+export type LaunchStep = 'mint' | 'register' | 'pool';
 
 export type LaunchResult = {
   mint: string;
@@ -67,7 +74,7 @@ export async function launchToken(
   signTransaction: (tx: Transaction) => Promise<Transaction>,
   params: LaunchParams,
 ): Promise<LaunchResult> {
-  const programId = new PublicKey(PROGRAM_ID);
+  const programId = new PublicKey(params.programId);
   const mintKp = Keypair.generate();
   const [tokenConfig] = PublicKey.findProgramAddressSync(
     [Buffer.from('token_cfg'), mintKp.publicKey.toBuffer()],
@@ -86,7 +93,7 @@ export async function launchToken(
   const creatorAta = getAssociatedTokenAddressSync(mintKp.publicKey, payer, true, TOKEN_2022_PROGRAM_ID);
 
   const metaData = Buffer.concat([
-    ixDisc('create_metadata_account_v3'),
+    Buffer.from([33]), // MetadataInstruction::CreateMetadataAccountV3
     borshStr(params.name),
     borshStr(params.symbol),
     borshStr(params.uri),
@@ -139,6 +146,7 @@ export async function launchToken(
     ),
     metaIx,
   );
+  params.onStep?.('mint');
   tx1.partialSign(mintKp);
   const signed1 = await signTransaction(tx1);
   const signature = await connection.sendRawTransaction(signed1.serialize(), { maxRetries: 3 });
@@ -185,6 +193,7 @@ export async function launchToken(
       })(),
     ]),
   });
+  params.onStep?.('register');
   const tx2 = new Transaction().add(initIx, recordIx);
   const signed2 = await signTransaction(tx2);
   const sig2 = await connection.sendRawTransaction(signed2.serialize(), { maxRetries: 3 });
@@ -197,7 +206,7 @@ export async function launchToken(
   let poolSkipped = false;
 
   if (devBuyLamports > 0) {
-    if (!DBC_CONFIG) {
+    if (!params.dbcConfig) {
       // 没配 partner config（本地集群）时只跑 UI，不碰链上建池
       poolSkipped = true;
     } else {
@@ -207,8 +216,9 @@ export async function launchToken(
         import('@meteora-ag/dynamic-bonding-curve-sdk'),
       ]);
       const BN = (anchorMod as unknown as { BN: new (n: number | string) => unknown }).BN as new (n: number | string) => { toString(): string };
+      params.onStep?.('pool');
       const dbc = new dbcSdk.DynamicBondingCurveClient(connection, 'confirmed');
-      const dbcConfig = new PublicKey(DBC_CONFIG);
+      const dbcConfig = new PublicKey(params.dbcConfig);
       const tx3 = await dbc.creator.createPoolWithFirstBuy({
         createPoolParam: {
           name: params.name,

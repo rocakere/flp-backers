@@ -2,17 +2,22 @@
 import { useRef, useState } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { dict, type Lang } from '@/lib/i18n';
-import { launchToken } from '@/lib/launch';
+import { launchToken, type LaunchStep } from '@/lib/launch';
+import { useNetwork } from '@/components/solana-provider';
 
 type TaxDest = 'creator' | 'fair_vault';
+type Stage = 'upload' | LaunchStep;
 
 export default function LaunchContent({ lang }: { lang: Lang }) {
   const t = dict[lang].launch;
+  const { network } = useNetwork();
   const { connection } = useConnection();
   const { connected, publicKey, signTransaction } = useWallet();
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [mint, setMint] = useState('');
+  const [stage, setStage] = useState<Stage | null>(null);
+  const [error, setError] = useState('');
   const [info, setInfo] = useState<{ pool?: string; buySignature?: string; skipped?: boolean }>({});
   const [form, setForm] = useState({
     name: '',
@@ -36,21 +41,43 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
 
   const pickImage = (file?: File | null) => {
     if (!file) return;
-    if (!file.type.startsWith('image/')) return alert(t.alertImageType);
-    if (file.size > 2 * 1024 * 1024) return alert(t.alertImageSize);
+    if (!file.type.startsWith('image/')) return setError(t.alertImageType);
+    if (file.size > 2 * 1024 * 1024) return setError(t.alertImageSize);
+    setError('');
     const reader = new FileReader();
     reader.onload = () => setForm((prev) => ({ ...prev, image: String(reader.result) }));
     reader.readAsDataURL(file);
   };
 
+  const stageText = (s: Stage | null) => {
+    switch (s) {
+      case 'upload':
+        return t.stepUpload;
+      case 'mint':
+        return t.stepMint;
+      case 'register':
+        return t.stepRegister;
+      case 'pool':
+        return t.stepPool;
+      default:
+        return t.stepPrepare;
+    }
+  };
+
   const submit = async () => {
-    if (!connected || !publicKey || !signTransaction) return alert(t.alertConnect);
-    if (!form.name.trim() || !form.symbol.trim()) return alert(t.alertName);
-    if (!form.image) return alert(t.alertImage);
+    setError('');
+    if (!connected || !publicKey || !signTransaction) return setError(t.alertConnect);
+    if (!network.programId) return setError(t.alertNoProgram.replace('{net}', network.label));
+    if (!form.name.trim() || !form.symbol.trim()) return setError(t.alertName);
+    if (!form.image) return setError(t.alertImage);
     const devBuy = form.devBuy.trim() === '' ? 0 : Number(form.devBuy);
-    if (!Number.isFinite(devBuy) || devBuy < 0) return alert(t.alertDevBuy);
+    if (!Number.isFinite(devBuy) || devBuy < 0) return setError(t.alertDevBuy);
     if (busy) return;
+
     setBusy(true);
+    setMint('');
+    setInfo({});
+    setStage('upload');
     try {
       const blob = await (await fetch(form.image)).blob();
       const fd = new FormData();
@@ -62,7 +89,10 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
       fd.append('x', form.x);
       fd.append('telegram', form.telegram);
       const res = await fetch('/api/upload', { method: 'POST', body: fd });
-      if (!res.ok) throw new Error((await res.json()).error ?? 'upload failed');
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error ?? `upload failed (${res.status})`);
+      }
       const { uri } = await res.json();
 
       const out = await launchToken(connection, publicKey, signTransaction, {
@@ -71,12 +101,17 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
         uri,
         taxDest: form.taxDestination === 'fair_vault' ? 1 : 0,
         devBuySol: devBuy,
+        programId: network.programId,
+        dbcConfig: network.dbcConfig,
+        onStep: (s) => setStage(s),
       });
       setMint(out.mint);
       setInfo({ pool: out.pool, buySignature: out.buySignature, skipped: out.poolSkipped });
     } catch (e) {
-      alert(`${t.alertFail}: ${(e as Error).message}`);
+      const msg = (e as Error).message ?? String(e);
+      setError(`${t.alertFail}: ${msg}`);
     } finally {
+      setStage(null);
       setBusy(false);
     }
   };
@@ -86,15 +121,15 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
   const label = 'mb-1 block text-sm text-black/60';
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="text-center text-3xl font-bold text-black">{t.title}</h1>
-      <p className="mt-2 text-center text-sm text-black/50">{t.sub}</p>
+    <main className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-16">
+      <h1 className="text-center text-2xl font-bold text-black sm:text-3xl">{t.title}</h1>
+      <p className="mt-2 px-2 text-center text-sm text-black/50">{t.sub}</p>
 
-      <div className="mt-6 rounded border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-800">
+      <div className="mt-6 rounded border border-amber-300 bg-amber-50 px-3 py-3 text-xs leading-5 text-amber-800 sm:px-4">
         {t.notice}
       </div>
 
-      <div className="mt-6 space-y-4 rounded-xl border border-black/10 bg-white/60 p-6">
+      <div className="mt-6 space-y-4 rounded-xl border border-black/10 bg-white/60 p-4 sm:p-6">
         <div>
           <label className={label}>{t.fName}</label>
           <input name="name" value={form.name} onChange={handleChange} className={field} placeholder={t.phName} />
@@ -143,17 +178,17 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
               e.preventDefault();
               pickImage(e.dataTransfer.files?.[0]);
             }}
-            className="flex cursor-pointer items-center gap-4 rounded border border-dashed border-black/20 bg-white px-4 py-4 transition hover:border-purple-500"
+            className="flex cursor-pointer items-center gap-3 rounded border border-dashed border-black/20 bg-white px-3 py-3 transition hover:border-purple-500 sm:gap-4 sm:px-4 sm:py-4"
           >
             {form.image ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={form.image} alt="token" className="h-16 w-16 rounded object-cover" />
+              <img src={form.image} alt="token" className="h-14 w-14 shrink-0 rounded object-cover sm:h-16 sm:w-16" />
             ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded bg-black/5 text-2xl text-black/30">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded bg-black/5 text-2xl text-black/30 sm:h-16 sm:w-16">
                 +
               </div>
             )}
-            <div className="text-xs leading-5 text-black/50">
+            <div className="min-w-0 text-xs leading-5 text-black/50">
               <div className="text-sm text-black/70">{form.image ? t.uploadChange : t.uploadPick}</div>
               <div>{t.uploadHint}</div>
             </div>
@@ -164,7 +199,7 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
                   e.stopPropagation();
                   setForm((prev) => ({ ...prev, image: '' }));
                 }}
-                className="ml-auto rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50"
+                className="ml-auto shrink-0 rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50"
               >
                 {t.uploadRemove}
               </button>
@@ -192,7 +227,7 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
           </div>
         </div>
 
-        <div className="rounded border border-black/10 bg-black/5 px-4 py-3 text-xs leading-6 text-black/60">
+        <div className="rounded border border-black/10 bg-black/5 px-3 py-3 text-xs leading-6 text-black/60 sm:px-4">
           <div className="text-sm font-semibold text-black/80">{t.taxTitle}</div>
           <div>{t.taxLine}</div>
         </div>
@@ -206,14 +241,29 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
           <div className="mt-1 text-xs leading-5 text-black/45">{t.dirHint}</div>
         </div>
 
-        <div className="rounded-xl border border-purple-200 bg-purple-50 px-4 py-4 text-xs leading-6 text-purple-900">
+        <div className="rounded-xl border border-purple-200 bg-purple-50 px-3 py-3 text-xs leading-6 text-purple-900 sm:px-4 sm:py-4">
           <div className="text-sm font-semibold">{t.jitoTitle}</div>
           <div>{t.jitoBody}</div>
           <div className="mt-1 text-purple-700/80">{t.jitoTip}</div>
         </div>
 
+        {/* 状态区：进度 + 内联错误，不弹原生 alert，也不会只剩转圈 */}
+        {busy && (
+          <div className="rounded border border-blue-200 bg-blue-50 px-3 py-3 text-xs leading-5 text-blue-800">
+            <div className="font-semibold">{stageText(stage)}</div>
+            <div className="mt-1 text-blue-700/70">{t.stepHint}</div>
+          </div>
+        )}
+        {!busy && error && (
+          <div className="rounded border border-red-200 bg-red-50 px-3 py-3 text-xs leading-5 text-red-800">
+            <div className="font-semibold">{t.errTitle}</div>
+            <div className="mt-1 break-all">{error}</div>
+            <div className="mt-1 text-red-700/70">{t.errHint}</div>
+          </div>
+        )}
+
         {mint && (
-          <div className="rounded border border-green-200 bg-green-50 px-4 py-3 text-xs leading-5 text-green-800">
+          <div className="rounded border border-green-200 bg-green-50 px-3 py-3 text-xs leading-5 text-green-800">
             <div className="font-semibold">{t.launched}</div>
             <div className="mt-1 break-all font-mono">{mint}</div>
             {info.pool && (
@@ -238,6 +288,7 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
         >
           {busy ? t.btnBusy : connected ? t.btnLaunch : t.btnConnect}
         </button>
+        <div className="text-center text-[11px] text-black/40">{t.netLine.replace('{net}', network.label)}</div>
       </div>
     </main>
   );

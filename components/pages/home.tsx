@@ -2,13 +2,18 @@
 import { useEffect, useState } from 'react';
 import { dict, type Lang } from '@/lib/i18n';
 import { VAULTS } from '@/lib/addresses';
+import { useNetwork } from '@/components/solana-provider';
 
 export default function HomeContent({ lang }: { lang: Lang }) {
   const t = dict[lang].home;
+  const { network } = useNetwork();
   const [launched, setLaunched] = useState<number | null>(null);
   useEffect(() => {
-    fetch('/api/stats').then((r) => r.json()).then((d) => { if (typeof d.launched === 'number') setLaunched(d.launched); }).catch(() => {});
-  }, []);
+    fetch(`/api/stats?net=${network.id}`)
+      .then((r) => r.json())
+      .then((d) => { if (typeof d.launched === 'number') setLaunched(d.launched); })
+      .catch(() => {});
+  }, [network.id]);
 
   const stats = [
     { label: t.statCa, value: 'TBA', copy: false },
