@@ -13,6 +13,7 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [mint, setMint] = useState('');
+  const [info, setInfo] = useState<{ pool?: string; buySignature?: string; skipped?: boolean }>({});
   const [form, setForm] = useState({
     name: '',
     symbol: '',
@@ -22,6 +23,7 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
     x: '',
     telegram: '',
     description: '',
+    devBuy: '',
     taxDestination: 'creator' as TaxDest,
   });
 
@@ -45,6 +47,8 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
     if (!connected || !publicKey || !signTransaction) return alert(t.alertConnect);
     if (!form.name.trim() || !form.symbol.trim()) return alert(t.alertName);
     if (!form.image) return alert(t.alertImage);
+    const devBuy = form.devBuy.trim() === '' ? 0 : Number(form.devBuy);
+    if (!Number.isFinite(devBuy) || devBuy < 0) return alert(t.alertDevBuy);
     if (busy) return;
     setBusy(true);
     try {
@@ -66,8 +70,10 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
         symbol: form.symbol.trim(),
         uri,
         taxDest: form.taxDestination === 'fair_vault' ? 1 : 0,
+        devBuySol: devBuy,
       });
       setMint(out.mint);
+      setInfo({ pool: out.pool, buySignature: out.buySignature, skipped: out.poolSkipped });
     } catch (e) {
       alert(`${t.alertFail}: ${(e as Error).message}`);
     } finally {
@@ -106,6 +112,19 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
             <label className={label}>{t.fDecimals}</label>
             <div className="rounded border border-black/10 bg-black/5 px-3 py-2 text-sm text-black/50">9</div>
           </div>
+        </div>
+
+        <div>
+          <label className={label}>{t.fDev}</label>
+          <input
+            name="devBuy"
+            value={form.devBuy}
+            onChange={handleChange}
+            className={field}
+            placeholder={t.phDev}
+            inputMode="decimal"
+          />
+          <div className="mt-1 text-xs leading-5 text-black/45">{t.devHint}</div>
         </div>
 
         <div>
@@ -197,6 +216,18 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
           <div className="rounded border border-green-200 bg-green-50 px-4 py-3 text-xs leading-5 text-green-800">
             <div className="font-semibold">{t.launched}</div>
             <div className="mt-1 break-all font-mono">{mint}</div>
+            {info.pool && (
+              <div className="mt-2">
+                <div className="font-semibold">{t.poolAddr}</div>
+                <div className="break-all font-mono">{info.pool}</div>
+              </div>
+            )}
+            {info.buySignature && (
+              <div className="mt-1 break-all font-mono text-green-700/80">
+                {t.buySig}: {info.buySignature}
+              </div>
+            )}
+            {info.skipped && <div className="mt-2 text-amber-700">{t.poolSkipped}</div>}
           </div>
         )}
 

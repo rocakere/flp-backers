@@ -18,10 +18,11 @@ import {
   getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
 import { createHash } from 'crypto';
-import { PROGRAM_ID } from '@/lib/addresses';
+import { DBC_CONFIG, PROGRAM_ID } from '@/lib/addresses';
 
 const META_PROGRAM = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
 const ASSOC = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
+const WSOL_MINT = new PublicKey('So11111111111111111111111111111111111111112');
 
 /** Fixed launch parameters: 9 decimals, 1% transfer tax, supply 1,000,000,000. */
 export const LAUNCH_DECIMALS = 9;
@@ -44,6 +45,20 @@ export type LaunchParams = {
   symbol: string;
   uri: string;
   taxDest: 0 | 1;
+  /** 首次买入（SOL）。0 = 不买；与建池在同一笔交易内原子执行。 */
+  devBuySol?: number;
+};
+
+export type LaunchResult = {
+  mint: string;
+  signature: string;
+  tokenConfig: string;
+  /** 曲线池地址（配了 DBC config 才有）。 */
+  pool?: string;
+  /** 建池 + 首次买入那一笔的签名。 */
+  buySignature?: string;
+  /** 用户填了首次买入，但没配 DBC config（本地跑 UI）时置 true。 */
+  poolSkipped?: boolean;
 };
 
 export async function launchToken(
@@ -51,7 +66,7 @@ export async function launchToken(
   payer: PublicKey,
   signTransaction: (tx: Transaction) => Promise<Transaction>,
   params: LaunchParams,
-): Promise<{ mint: string; signature: string; tokenConfig: string }> {
+): Promise<LaunchResult> {
   const programId = new PublicKey(PROGRAM_ID);
   const mintKp = Keypair.generate();
   const [tokenConfig] = PublicKey.findProgramAddressSync(
@@ -175,7 +190,59 @@ export async function launchToken(
   const sig2 = await connection.sendRawTransaction(signed2.serialize(), { maxRetries: 3 });
   await connection.confirmTransaction(sig2, 'confirmed');
 
-  return { mint: mintKp.publicKey.toBase58(), signature, tokenConfig: tokenConfig.toBase58() };
+  // ---- transaction 3: 建曲线池 + 首次买入，同一笔交易内原子（要么都成，要么都败）
+  const devBuyLamports = lamports(params.devBuySol ?? 0);
+  let pool: string | undefined;
+  let buySignature: string | undefined;
+  let poolSkipped = false;
+
+  if (devBuyLamports > 0) {
+    if (!DBC_CONFIG) {
+      // 没配 partner config（本地集群）时只跑 UI，不碰链上建池
+      poolSkipped = true;
+    } else {
+      // DBC SDK 是 CJS 包，动态引入以免在 SSR 阶段执行
+      const [anchorMod, dbcSdk] = await Promise.all([
+        import('@coral-xyz/anchor'),
+        import('@meteora-ag/dynamic-bonding-curve-sdk'),
+      ]);
+      const BN = (anchorMod as unknown as { BN: new (n: number | string) => unknown }).BN as new (n: number | string) => { toString(): string };
+      const dbc = new dbcSdk.DynamicBondingCurveClient(connection, 'confirmed');
+      const dbcConfig = new PublicKey(DBC_CONFIG);
+      const tx3 = await dbc.creator.createPoolWithFirstBuy({
+        createPoolParam: {
+          name: params.name,
+          symbol: params.symbol,
+          uri: params.uri,
+          payer,
+          poolCreator: payer,
+          config: dbcConfig,
+          baseMint: mintKp.publicKey,
+        },
+        firstBuyParam: {
+          buyer: payer,
+          receiver: payer,
+          buyAmount: new BN(devBuyLamports),
+          // 建池与首买同一笔成交，池价还是开盘价，没有可被抢跑的窗口
+          minimumAmountOut: new BN(0),
+          referralTokenAccount: null,
+        },
+      });
+      const signed3 = await signTransaction(tx3);
+      buySignature = await connection.sendRawTransaction(signed3.serialize(), { maxRetries: 3 });
+      await connection.confirmTransaction(buySignature, 'confirmed');
+      pool = dbcSdk.deriveDbcPoolAddress(WSOL_MINT, mintKp.publicKey, dbcConfig).toBase58();
+    }
+  }
+
+  return {
+    mint: mintKp.publicKey.toBase58(),
+    signature,
+    tokenConfig: tokenConfig.toBase58(),
+    pool,
+    buySignature,
+    poolSkipped,
+  };
 }
 
 export const lamports = (sol: number) => Math.round(sol * LAMPORTS_PER_SOL);

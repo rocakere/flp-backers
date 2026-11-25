@@ -13,3 +13,8 @@ export const STATS_PDA =
 
 // 前端连的 RPC。生产换成自己的 Helius 端点。
 export const RPC_ENDPOINT = process.env.NEXT_PUBLIC_RPC_ENDPOINT || 'https://api.devnet.solana.com';
+
+// DBC（Meteora 动态曲线）的 partner config：建池与首次买入都由它派生。
+// 留空则发币只建 mint、跳过建池与首次买入（本地集群就是这样跑 UI 的）。
+export const DBC_CONFIG = process.env.NEXT_PUBLIC_DBC_CONFIG || '';
+
