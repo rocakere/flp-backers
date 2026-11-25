@@ -179,12 +179,12 @@ function ZhBody() {
         <table className="w-full text-sm">
           <tbody>
             {[
-              ['曲线发售数量', '350,000,000 枚（35%）'],
+              ['曲线发售数量', '约 349,000,000 枚（34.9%）'],
               ['起始 FDV', '100 SOL'],
-              ['迁移 FDV', '400 SOL（起始的 4 倍）'],
-              ['曲线总募资', '约 87.5 SOL（3.5 亿 × 起始价 × 平均倍数 2.5）'],
-              ['主池注入', '200,000,000 枚 + 全部 87.5 SOL'],
-              ['主池开盘价', '约起始价的 4.4 倍，与曲线迁移价基本连续'],
+              ['迁移 FDV', '300 SOL（起始的 3 倍）'],
+              ['曲线总募资', '约 60.4 SOL（由曲线数学决定，非人为设定）'],
+              ['主池注入', '约 201,000,000 枚 + 全部 60.4 SOL'],
+              ['主池开盘价', '恰为起始价的 3 倍，与曲线迁移价完全连续'],
               ['深度储备', '450,000,000 枚（45%），按里程碑分批加池并销毁 LP'],
               ['交易池手续费', '0.25%'],
             ].map(([k, v]) => (
@@ -197,7 +197,7 @@ function ZhBody() {
         </table>
       </div>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        曲线卖满后自动迁移成交易池，流动性就是曲线筹到的 SOL，发币方不需要先垫付建池资金。剩下的 45% 不进销毁池、也不一次性灌进池子（因为配对所需的 SOL 不存在），而是作为深度储备：每攒够一批 SOL，就按当期市价配对加池，加完立即把该批 LP 凭证销毁，池子永久不可撤。
+        曲线卖满后自动迁移成交易池，流动性就是曲线筹到的 SOL，发币方不需要先垫付建池资金。曲线卖出多少、进池多少不是拍脑袋定的，而是由起始/迁移市值按曲线数学自动推出：起始 100 SOL、迁移 300 SOL，对应约 34.9% 在曲线卖出、20.1% 进入主池。剩下的 45% 不进销毁池、也不一次性灌进池子（因为配对所需的 SOL 不存在），而是作为深度储备：每攒够一批 SOL，就按当期市价配对加池，加完立即把该批 LP 凭证销毁，池子永久不可撤。
       </p>
       <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
         两个必须知道的细节。第一，1% 转账税在往池子转账时同样会扣，所以"注入 2 亿枚"实际到账约 1.98 亿，对池价的影响可以忽略，但账要对得上。第二，池子金库账户自己也在被收税（买入时进金库扣一次、卖出时出金库再扣一次），这部分同样记在金库的 withheld 余额里，必须纳入 harvest 扫描名单，否则池子的实际余额与做市程序的记账会对不上。
@@ -418,12 +418,12 @@ function EnBody() {
         <table className="w-full text-sm">
           <tbody>
             {[
-              ['Supply sold on curve', '350,000,000 (35%)'],
+              ['Supply sold on curve', '≈ 349,000,000 (34.9%)'],
               ['Starting FDV', '100 SOL'],
-              ['Migration FDV', '400 SOL (4× the start)'],
-              ['Total raised on curve', '≈ 87.5 SOL (350M × start price × average multiple 2.5)'],
-              ['Main pool injection', '200,000,000 tokens + the full 87.5 SOL'],
-              ['Main pool opening price', '≈ 4.4× the start price, continuous with the migration price'],
+              ['Migration FDV', '300 SOL (3× the start)'],
+              ['Total raised on curve', '≈ 60.4 SOL (determined by curve math, not set by hand)'],
+              ['Main pool injection', '≈ 201,000,000 tokens + the full 60.4 SOL'],
+              ['Main pool opening price', 'Exactly 3× the start price, fully continuous with the migration price'],
               ['Depth reserve', '450,000,000 (45%), added to the pool in milestones with LP burned each time'],
               ['Pool swap fee', '0.25%'],
             ].map(([k, v]) => (
@@ -436,7 +436,7 @@ function EnBody() {
         </table>
       </div>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        When the curve sells out it migrates into a trading pool automatically, and that liquidity is the SOL the curve raised — the issuer never has to fund the pool upfront. The remaining 45% is neither burned nor dumped into the pool (the SOL to pair it does not exist); it is a depth reserve: each time enough SOL accrues, a batch is paired into the pool at the prevailing price and its LP is burned immediately, making the pool permanently unwithdrawable.
+        When the curve sells out it migrates into a trading pool automatically, and that liquidity is the SOL the curve raised — the issuer never has to fund the pool upfront. How much is sold on the curve versus migrated into the pool is not a hand-picked number: with a start FDV of 100 SOL and a migration FDV of 300 SOL, the curve math yields roughly 34.9% sold on the curve and 20.1% entering the main pool. The remaining 45% is neither burned nor dumped into the pool (the SOL to pair it does not exist); it is a depth reserve: each time enough SOL accrues, a batch is paired into the pool at the prevailing price and its LP is burned immediately, making the pool permanently unwithdrawable.
       </p>
       <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
         Two details worth knowing. First, the 1% transfer tax is also charged when tokens move into the pool, so &quot;injecting 200M&quot; arrives as about 198M — negligible for the price, but the accounting has to match. Second, the pool vault itself pays the tax (charged on the way in and again on the way out), and that amount sits in the vault&apos;s withheld balance too; the vault must be included in the harvest scan, otherwise the AMM accounting no longer matches the real balance.
