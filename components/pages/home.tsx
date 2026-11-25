@@ -57,7 +57,7 @@ export default function HomeContent({ lang }: { lang: Lang }) {
 
       <section id="core" className="text-center pb-24">
         <h2 className="text-3xl font-bold text-black">{t.coreTitle}</h2>
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto px-6">
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto px-6">
           {t.cards.map((c) => (
             <div key={c.t} className="bg-white/60 border border-black/10 rounded-xl p-6 text-left">
               <div className="font-bold text-black text-lg">{c.t}</div>

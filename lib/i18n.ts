@@ -21,6 +21,8 @@ const zh = {
     docs: '文档',
     x: 'X (Twitter)',
     discord: 'Discord',
+    dev: '开发者：FLP 开发团队',
+    contact: '联系方式：@rocake118（Telegram）',
     risk: '⚠️ 加密货币高风险。请自行研究，不构成投资建议。',
   },
   home: {
@@ -40,6 +42,7 @@ const zh = {
       { t: '税收返还', d: '税金按比例自动拆分到流动性、市场与分红钱包。' },
       { t: '自动销毁', d: '按固定比例定时销毁，通缩节奏可控，全部链上可验证。' },
       { t: '持币分红', d: '按持仓比例自动分发 SOL，无需手动领取。' },
+      { t: 'LP 永久烧毁', d: '首发建池与后续加池的 LP 一律永久烧毁，无撤回、改配或转移流动性的风险。' },
     ],
   },
   launch: {
@@ -80,7 +83,7 @@ const zh = {
       },
       {
         q: '买入税和卖出税的税金怎么分配？',
-        a: '买卖税各为 1%，但要分两套看：FLP 母币的税按 4:3:2:1 拆分——40% 进入销毁池、30% 进入持币者分红池、20% 用于流动性回购与加深、10% 用于运营与开发；通过协议发射的新币，税按 40 / 10 / 50 分配——40% 的本币直接销毁、10% 的本币进该币加池金库、剩下 50% 卖出换成 SOL 后按 10%（加池）/ 10%（运营）/ 30%（分红）结算。交易池另收 0.25% 手续费，曲线阶段另收 1% swap 手续费（其中 80% 归创作者、20% 归协议），与 1% 转账税叠加，曲线阶段买入成本约 2%。',
+        a: '买卖税各为 1%，但要分两套看：FAIR 母币的税按 4:3:2:1 拆分——40% 进入销毁池、30% 进入持币者分红池、20% 用于流动性回购与加深、10% 用于运营与开发；通过协议发射的新币，税归发币者、平台不抽成，按 85 / 10 / 5 分配——85% 结算给创作者、10% 用于回购并销毁 FAIR、5% 进入该币自己的加池金库。交易池另收 0.25% 手续费，曲线阶段另收 1% swap 手续费（其中 80% 归创作者、20% 归协议），与 1% 转账税叠加，曲线阶段买入成本约 2%。',
       },
       {
         q: '新币是怎么发的？要不要先买？',
@@ -88,7 +91,7 @@ const zh = {
       },
       {
         q: '税金什么时候会被卖出？',
-        a: '税到账是代币，分红发的是 SOL，所以中间必须卖出。FLP 母币约 50% 的税会卖成 SOL（分红 30%、运营 10%、流动性配对 10%）。为避免形成可预测的砸盘时间点，卖出会拆成 8–12 笔在数小时内完成，harvest 时间在 6–9 天窗口内随机。',
+        a: '税到账是代币，分红发的是 SOL，所以中间必须卖出。FAIR 母币约 50% 的税会卖成 SOL（分红 30%、运营 10%、流动性配对 10%）。为避免形成可预测的砸盘时间点，卖出会拆成 8–12 笔在数小时内完成，harvest 时间在 6–9 天窗口内随机。',
       },
       {
         q: '分红什么时候发放？',
@@ -146,6 +149,8 @@ const en: typeof zh = {
     docs: 'Documentation',
     x: 'X (Twitter)',
     discord: 'Discord',
+    dev: 'Developed by: FLP Dev Team',
+    contact: 'Contact: @rocake118 (Telegram)',
     risk: '⚠️ Crypto is high risk. DYOR. Not investment advice.',
   },
   home: {
@@ -165,6 +170,7 @@ const en: typeof zh = {
       { t: 'Fee Recycling', d: 'Collected tax is auto-split to liquidity, marketing and the dividend wallet.' },
       { t: 'Auto Burn', d: 'Timed burns at a fixed ratio keep deflation controllable and fully verifiable on chain.' },
       { t: 'Holder Dividends', d: 'SOL is distributed automatically by holding ratio — no manual claim required.' },
+      { t: 'LP Burned Forever', d: 'LP from the initial pool and every later top-up is permanently burned — liquidity can never be pulled, repriced or moved.' },
     ],
   },
   launch: {
@@ -205,7 +211,7 @@ const en: typeof zh = {
       },
       {
         q: 'How is the buy and sell tax allocated?',
-        a: 'Buy and sell tax are 1% each, but there are two separate sets. On the FLP token, fees split 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations. On tokens launched through the protocol, fees split 40 / 10 / 50: 40% of the token is burned, 10% stays in that token&apos;s liquidity vault, and the remaining 50% is sold for SOL and split 10% (liquidity) / 10% (operations) / 30% (dividends). The pool charges a further 0.25% swap fee, and the curve charges a 1% swap fee (80% to the creator, 20% to the protocol), which stacks on the 1% transfer tax — a curve buy costs about 2%.',
+        a: 'Buy and sell tax are 1% each, but there are two separate sets. On the FAIR token, fees split 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations. On tokens launched through the protocol, fees belong to the issuer with no platform cut, split 85 / 10 / 5: 85% settles to the creator, 10% buys back and burns FAIR, and 5% goes to that token&apos;s own liquidity vault. The pool charges a further 0.25% swap fee, and the curve charges a 1% swap fee (80% to the creator, 20% to the protocol), which stacks on the 1% transfer tax — a curve buy costs about 2%.',
       },
       {
         q: 'How is a new token launched? Do I need to buy first?',

@@ -17,6 +17,10 @@ export default function Footer() {
         </div>
         <div className="text-xs text-black/40">{t.risk}</div>
       </div>
+      <div className="mx-auto mt-6 flex max-w-7xl flex-col items-center gap-1 border-t border-black/10 pt-6 text-xs text-black/40 md:flex-row md:justify-center md:gap-6">
+        <span>{t.dev}</span>
+        <span>{t.contact}</span>
+      </div>
     </footer>
   );
 }
