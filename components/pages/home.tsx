@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { dict, type Lang } from '@/lib/i18n';
 import { VAULTS } from '@/lib/addresses';
 import { useNetwork } from '@/components/solana-provider';
+import LaunchCountdown from '@/components/launch-countdown';
 
 export default function HomeContent({ lang }: { lang: Lang }) {
   const t = dict[lang].home;
@@ -42,6 +43,8 @@ export default function HomeContent({ lang }: { lang: Lang }) {
         <h1 className="text-6xl md:text-7xl font-extrabold text-black tracking-tight">{t.title}</h1>
         <p className="mt-6 text-lg text-black/60">{t.subtitle}</p>
         <p className="mt-6 max-w-3xl mx-auto text-base text-black/60 leading-relaxed">{t.desc}</p>
+
+        <LaunchCountdown lang={lang} />
 
         <div className="mt-12 flex flex-wrap items-start justify-center gap-x-20 gap-y-6">
           {stats.map((s) => (
