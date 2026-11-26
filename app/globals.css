@@ -115,6 +115,14 @@ body {
     margin-bottom: 6mm;
   }
 
+  /* 标题里的分行 span 在纸上要收回成一行，并补回词间空隙 */
+  h1 span {
+    display: inline !important;
+  }
+  h1 span + span {
+    margin-left: 0.25em !important;
+  }
+
   h2 {
     font-size: 13pt !important;
     margin-top: 8mm !important;

@@ -28,7 +28,10 @@ function ZhBody() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
       <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-purple-700">WHITEPAPER · v0.3</p>
-      <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">FairLaunch Protocol 白皮书</h1>
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
+        <span className="block sm:inline">FairLaunch Protocol</span>
+        <span className="block sm:ml-2 sm:inline">白皮书</span>
+      </h1>
       <p className="mt-4 text-sm text-gray-500">
         Solana 上的公平发射协议 · 设计说明草案，主网发射前持续修订
       </p>
@@ -306,7 +309,10 @@ function EnBody() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
       <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-purple-700">WHITEPAPER · v0.3</p>
-      <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">FairLaunch Protocol Whitepaper</h1>
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
+        <span className="block sm:inline">FairLaunch Protocol</span>
+        <span className="block sm:ml-2 sm:inline">Whitepaper</span>
+      </h1>
       <p className="mt-4 text-sm text-gray-500">
         A fair launch protocol on Solana · design draft, revised continuously until mainnet launch
       </p>
