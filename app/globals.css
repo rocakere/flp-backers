@@ -1,9 +1,56 @@
 @import "tailwindcss";
+
 body {
-  background: linear-gradient(180deg, #b9f6ca 0%, #d9f7e4 35%, #f2fbf5 70%, #ffffff 100%);
-  background-attachment: fixed;
-  color: #1a1a1a;
+  background: #f8fafc;
+  color: #111827;
   min-height: 100vh;
+  scroll-behavior: smooth;
+}
+
+/* 锚点跳转时给 sticky 导航留出高度，标题不被压住 */
+[id] {
+  scroll-margin-top: 6rem;
+}
+
+/* 入场动画：只在屏幕生效，打印/导出 PDF 时禁用（否则 puppeteer 会截到 opacity:0 的中间态） */
+@media screen {
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .anim-fade-up {
+    animation: fadeInUp 0.7s ease-out both;
+  }
+}
+
+/* 白皮书卡片：无边框 + 极淡阴影，替代生硬描边 */
+.wp-card {
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}
+
+/* 钱包按钮：品牌渐变胶囊（弹窗内按钮仍用上面的浅色覆盖） */
+.wallet-adapter-button-trigger {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6) !important;
+  border-radius: 9999px !important;
+  height: 38px !important;
+  padding: 0 16px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.wallet-adapter-button-trigger:hover {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.28) !important;
 }
 
 /* 钱包弹窗改为浅色，与整站风格一致 */
@@ -16,14 +63,14 @@ body {
   color: #1a1a1a !important;
 }
 .wallet-adapter-modal-list .wallet-adapter-button {
-  background-color: #f4fbf6 !important;
+  background-color: #f8fafc !important;
   color: #1a1a1a !important;
 }
 .wallet-adapter-modal-list .wallet-adapter-button:hover {
-  background-color: #e8f7ec !important;
+  background-color: #f1f5f9 !important;
 }
 .wallet-adapter-modal-button-close {
-  background: #eef6f0 !important;
+  background: #f1f5f9 !important;
 }
 .wallet-adapter-modal-button-close svg {
   fill: #4b5563 !important;
@@ -48,6 +95,14 @@ body {
   body {
     background: #ffffff !important;
     color: #111111 !important;
+  }
+
+  /* 关键：动画一律关掉，保证导出时内容完全可见 */
+  * {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   main {
@@ -95,5 +150,11 @@ body {
     background: #fff8ea !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+  }
+
+  /* 打印时卡片回到朴素边框，不依赖阴影 */
+  .wp-card {
+    box-shadow: none !important;
+    border: 1px solid #e5e7eb !important;
   }
 }

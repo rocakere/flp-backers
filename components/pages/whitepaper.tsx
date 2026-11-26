@@ -27,23 +27,24 @@ function ZhBody() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
-      <p className="text-xs font-semibold tracking-widest text-purple-700">WHITEPAPER · v0.2</p>
-      <h1 className="mt-3 text-3xl font-bold text-black sm:text-4xl">FairLaunch Protocol 白皮书</h1>
-      <p className="mt-4 text-sm text-black/50">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-purple-700">WHITEPAPER · v0.3</p>
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">FairLaunch Protocol 白皮书</h1>
+      <p className="mt-4 text-sm text-gray-500">
         Solana 上的公平发射协议 · 设计说明草案，主网发射前持续修订
       </p>
       <div className="mt-6 print:hidden">
         <a
           href="/whitepaper.pdf"
-          download="FLP-Whitepaper-zh-v0.2.pdf"
-          className="inline-flex items-center gap-2 rounded border border-purple-300 bg-white/70 px-4 py-2 text-sm font-semibold text-purple-700 transition hover:bg-white"
+          download="FLP-Whitepaper-zh-v0.3.pdf"
+          className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-purple-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-purple-500/25 active:translate-y-0 active:scale-[0.98]"
         >
           ↓ 下载 PDF 版本
+          <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wide">v0.3 最新</span>
         </a>
       </div>
 
-      <div className="mt-8 rounded-xl border border-black/10 bg-white/60 p-6 text-sm leading-7 text-black/70">
-        <span className="font-semibold text-black">摘要　</span>
+      <div className="wp-card anim-fade-up mt-8 p-6 text-sm leading-7 text-gray-600">
+        <span className="font-semibold text-gray-900">摘要　</span>
         FLP 是部署在 Solana 上的发币协议。它要做的事只有一件：把"公平发射"从营销词变成由合约强制执行的规则集合。任何人用同一套模板发币，税收到销毁到分红的路径全部写死在链上，发币方在发射后无法修改税率、无法增发、无法抽走流动性。任何人拿到合约地址，都能自己核对规则，无需相信官网的说法。
       </div>
 
@@ -121,7 +122,7 @@ function ZhBody() {
       </div>
 
       <h2 className="mt-12 text-xl font-bold text-black">三、代币经济</h2>
-      <div className="mt-4 overflow-x-auto rounded-xl border border-black/10 bg-white/60">
+      <div className="mt-4 overflow-x-auto wp-card">
         <table className="w-full text-sm">
           <tbody>
             {rows.map(([k, v]) => (
@@ -194,7 +195,7 @@ function ZhBody() {
       <p className="mt-2 text-sm leading-7 text-black/70">
         首发走链上曲线（bonding curve），而不是自建公募、也不是一次性把全部供应砸进池子。原因是流动性深度只取决于池子里的 SOL 一侧：供应全倒进池子只会把单价压到极低，一个大额买单就能吃掉几个百分点。曲线把定价过程公开化，也让筹措到的 SOL 直接成为池子的深度。
       </p>
-      <div className="mt-3 overflow-x-auto rounded-xl border border-black/10 bg-white/60">
+      <div className="mt-3 overflow-x-auto wp-card">
         <table className="w-full text-sm">
           <tbody>
             {[
@@ -304,23 +305,24 @@ function EnBody() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
-      <p className="text-xs font-semibold tracking-widest text-purple-700">WHITEPAPER · v0.2</p>
-      <h1 className="mt-3 text-3xl font-bold text-black sm:text-4xl">FairLaunch Protocol Whitepaper</h1>
-      <p className="mt-4 text-sm text-black/50">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-purple-700">WHITEPAPER · v0.3</p>
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">FairLaunch Protocol Whitepaper</h1>
+      <p className="mt-4 text-sm text-gray-500">
         A fair launch protocol on Solana · design draft, revised continuously until mainnet launch
       </p>
       <div className="mt-6 print:hidden">
         <a
           href="/whitepaper-en.pdf"
-          download="FLP-Whitepaper-en-v0.2.pdf"
-          className="inline-flex items-center gap-2 rounded border border-purple-300 bg-white/70 px-4 py-2 text-sm font-semibold text-purple-700 transition hover:bg-white"
+          download="FLP-Whitepaper-en-v0.3.pdf"
+          className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-purple-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-purple-500/25 active:translate-y-0 active:scale-[0.98]"
         >
           ↓ Download PDF
+          <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wide">v0.3 latest</span>
         </a>
       </div>
 
-      <div className="mt-8 rounded-xl border border-black/10 bg-white/60 p-6 text-sm leading-7 text-black/70">
-        <span className="font-semibold text-black">Abstract　</span>
+      <div className="wp-card anim-fade-up mt-8 p-6 text-sm leading-7 text-gray-600">
+        <span className="font-semibold text-gray-900">Abstract　</span>
         FLP is a token launch protocol deployed on Solana. It does one thing: turn "fair launch" from a marketing phrase into a set of rules enforced by smart contracts. Anyone can launch a token with the same template. The path from trading fees to burns to dividends is written into the contract, and issuers cannot change tax rates, mint new supply or pull liquidity after launch. Anyone who has the contract address can verify the rules themselves instead of trusting the website.
       </div>
 
@@ -398,7 +400,7 @@ function EnBody() {
       </div>
 
       <h2 className="mt-12 text-xl font-bold text-black">3. Token Economics</h2>
-      <div className="mt-4 overflow-x-auto rounded-xl border border-black/10 bg-white/60">
+      <div className="mt-4 overflow-x-auto wp-card">
         <table className="w-full text-sm">
           <tbody>
             {rows.map(([k, v]) => (
@@ -471,7 +473,7 @@ function EnBody() {
       <p className="mt-2 text-sm leading-7 text-black/70">
         The launch runs through an on-chain bonding curve — not a self-hosted public sale, and not dumping all supply into a pool at once. The reason is that pool depth depends only on the SOL side: pouring in all the supply just pushes the unit price to a very low level, where a single large buy takes several percent of supply. A curve makes pricing public and turns the SOL it raises directly into pool depth.
       </p>
-      <div className="mt-3 overflow-x-auto rounded-xl border border-black/10 bg-white/60">
+      <div className="mt-3 overflow-x-auto wp-card">
         <table className="w-full text-sm">
           <tbody>
             {[
