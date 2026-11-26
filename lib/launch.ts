@@ -33,9 +33,22 @@ export const LAUNCH_FEE_BPS = 100;
 const MAX_FEE = (BigInt(10) ** BigInt(12));
 export const LAUNCH_SUPPLY = 1_000_000_000;
 
-const u32 = (n: number) => {
-  const b = Buffer.alloc(4);
-  b.writeUInt32LE(n);
+// 浏览器里的 Buffer 是旧版 polyfill，没有 writeBigUInt64LE / writeUInt16LE 这类实例方法
+// （Node 有，所以本地 harness 能跑通、一站到页面上就报 "b.writeBigUInt64LE is not a function"）。
+// 这里统一改用 Uint8Array + DataView 写小端整数，不依赖 Buffer 的写方法。
+const u32le = (n: number) => {
+  const b = new Uint8Array(4);
+  new DataView(b.buffer, b.byteOffset, b.byteLength).setUint32(0, n, true);
+  return b;
+};
+const u16le = (n: number) => {
+  const b = new Uint8Array(2);
+  new DataView(b.buffer, b.byteOffset, b.byteLength).setUint16(0, n, true);
+  return b;
+};
+const u64le = (v: bigint) => {
+  const b = new Uint8Array(8);
+  new DataView(b.buffer, b.byteOffset, b.byteLength).setBigUint64(0, v, true);
   return b;
 };
 const ixDisc = (name: string) =>
@@ -83,7 +96,6 @@ export async function launchToken(
     programId,
   );
   const [config] = PublicKey.findProgramAddressSync([Buffer.from('config')], programId);
-  const [stats] = PublicKey.findProgramAddressSync([Buffer.from('stats')], programId);
 
   // ============ 第一步：建池（配了 DBC config 时，mint 由 DBC 创建） ============
   //
@@ -202,37 +214,16 @@ export async function launchToken(
     ],
     data: Buffer.concat([
       ixDisc('init_token_config'),
-      Buffer.from([params.taxDest]),
-      (() => {
-        const b = Buffer.alloc(2);
-        b.writeUInt16LE(LAUNCH_FEE_BPS);
-        return b;
-      })(),
-      (() => {
-        const b = Buffer.alloc(8);
-        b.writeBigUInt64LE(MAX_FEE);
-        return b;
-      })(),
+      new Uint8Array([params.taxDest]),
+      u16le(LAUNCH_FEE_BPS),
+      u64le(MAX_FEE),
     ]),
   });
-  const recordIx = new TransactionInstruction({
-    programId,
-    keys: [
-      { pubkey: config, isSigner: false, isWritable: false },
-      { pubkey: stats, isSigner: false, isWritable: true },
-      { pubkey: payer, isSigner: true, isWritable: false },
-    ],
-    data: Buffer.concat([
-      ixDisc('record_launch'),
-      (() => {
-        const b = Buffer.alloc(8);
-        b.writeBigUInt64LE(BigInt(0));
-        return b;
-      })(),
-    ]),
-  });
+  // record_launch 只允许 config.distributor 调用（programs/flp-treasury/src/lib.rs:140
+  // require!(authority == config.distributor)），普通发币人必然 Unauthorized(0x177b)。
+  // 所以用户这笔只发 init_token_config；发币统计由 distributor/keeper 另行记账。
   params.onStep?.('register');
-  const tx2 = new Transaction().add(initIx, recordIx);
+  const tx2 = new Transaction().add(initIx);
   await prepareTransaction(connection, tx2, payer);
   const signed2 = await signTransaction(tx2);
   const sig2 = await connection.sendRawTransaction(signed2.serialize(), { maxRetries: 3 });
