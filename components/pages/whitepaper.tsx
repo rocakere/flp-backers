@@ -237,6 +237,11 @@ function ZhBody() {
         曲线的容量严格等于迁移阈值——实测四条已毕业主网配置，容量与阈值的差值均为 0 lamports，这不是参数错误而是生产常态。因此最后一笔买入必然撞上容量边界，单笔精确输入永远跨不过去。收尾必须用 PartialFill 循环补单，直到迁移进度 ≥ 2；超出容量的部分按原额退回，买家不承担额外成本。
       </p>
 
+      <h4 className="mt-6 font-semibold text-black">3.4.3 锁仓 LP 与池费归属</h4>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        迁移锁仓 LP 的 position NFT 由协议 config PDA 持有，0.25% 池费结算后进入 <span className="font-mono text-xs">sol_buffer</span>，不归项目方或任何私人钱包；LP 份额永久锁定，费用收益同步归协议所有。
+      </p>
+
       <h2 className="mt-12 text-xl font-bold text-black">四、可验证性与审计</h2>
       <ul className="mt-4 space-y-1.5 pl-5 text-sm leading-7 text-black/70">
         <li className="list-disc">合约源码开源，使用 Solana 可验证构建，构建结果与链上字节一致</li>
@@ -516,6 +521,11 @@ function EnBody() {
       <h4 className="mt-6 font-semibold text-black">3.4.2 The Curve Must Be Finished with PartialFill</h4>
       <p className="mt-2 text-sm leading-7 text-black/70">
         Curve capacity equals the migration threshold exactly — across four graduated mainnet configs the capacity/threshold difference was 0 lamports, which is normal production behaviour rather than a misconfigured parameter. The final buy therefore always hits the capacity ceiling and a single exact-in swap can never cross it. Completion requires looping PartialFill fills until migration progress ≥ 2; anything above capacity is returned in full and the buyer pays nothing extra.
+      </p>
+
+      <h4 className="mt-6 font-semibold text-black">3.4.3 Locked LP and Who Receives the Pool Fee</h4>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        The locked LP position NFT created at migration is held by the protocol&apos;s config PDA; the 0.25% pool fee, once settled, is paid into <span className="font-mono text-xs">sol_buffer</span> and belongs to neither the project team nor any private wallet — the LP share stays permanently locked and the fee income belongs to the protocol as well.
       </p>
 
       <h2 className="mt-12 text-xl font-bold text-black">4. Verifiability and Audit</h2>
