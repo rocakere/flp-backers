@@ -22,7 +22,7 @@ function ZhBody() {
     ['交易池手续费', '0.25%（与 1% 转账税叠加，一次往返合计约 2.5%）'],
     ['曲线手续费', '1%（协议固定抽 20%，其余 80% 归创作者）'],
     ['分红触发', '分红金库累计 20 SOL，到线即触发，与时间周期无关；单次金额取决于当期交易量与税收规模'],
-    ['发行方式', '链上曲线首发：曲线卖出 36.7%、迁移进池 18.3%、45% 作为深度储备；无预售、无私募、无团队预留'],
+    ['发行方式', '链上曲线首发：曲线可售 70%、迁移进池 30%、无深度储备（项目方不持币）；无预售、无私募、无团队预留'],
   ];
 
   return (
@@ -106,6 +106,16 @@ function ZhBody() {
       <p className="mt-2 text-sm leading-7 text-black/70">
         1% 的税在每一笔代币转账时由协议扣下，但不会自动进任何人的钱包，而是先记录在收款方账户的 withheld 余额里（包括交易池的金库账户）。协议定期执行 harvest，把这些挂着的税一次性搬进税金金库，再按分配比例处理。整个过程由多签地址执行，每一步在浏览器上都能查到指令与金额。
       </p>
+      <h4 className="mt-6 font-semibold text-black">2.7.1 税权只有一把钥匙</h4>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        每枚带税币的 <span className="font-mono text-xs">feeClaimer</span> 必须是该 mint 自己的 token_config PDA：
+        <span className="font-mono text-xs">feeClaimer = PDA([b&quot;token_cfg&quot;, mint_pubkey], program_id)</span>，并与 mint 的
+        <span className="font-mono text-xs">withdrawWithheldAuthority</span> 是同一地址。全局 config PDA（由 <span className="font-mono text-xs">[b&quot;config&quot;]</span> 派生）与它是两把不同的钥匙，混用会出现&quot;能填进去、提不出来&quot;：代币照常建池、税照常累积，但结算时 <span className="font-mono text-xs">invoke_signed</span> 签不过，税金永远锁在 withheld 余额里。审计方用上式即可独立验算，无需读合约源码。
+      </p>
+      <h4 className="mt-6 font-semibold text-black">2.7.2 提现环节的 1% 与 99%</h4>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        Token-2022 的费率变更按 epoch 生效，所以结算当轮仍按 1% 计税：每轮实际回收源账户 withheld 余额的 99%，剩余 1% 留在源账户，下一轮自动滚入。实测衰减为 8,088,300 → 80,883 → 808.83 → 8.0883 枚（每轮严格 ×1%）。这是提现通道的属性，不改变 85 / 10 / 5 的分配比例——三腿到账恒等于&quot;本轮抽入中转金额&quot;的 85% / 10% / 5%，内部再分配不再被扣费。
+      </p>
       <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
         税是代币，分红是 SOL，中间必须卖出。发射新币的税中约 15% 需要卖成 SOL（10% 回购 FAIR、5% 卖成 SOL 进 FAIR 加池金库）；FAIR 母币的税中约 50% 同样需要卖出。为避免形成可预测的砸盘时间点，卖出会拆成 8–12 笔在数小时内完成（TWAP），harvest 触发同样看余额阈值，不按固定日结算。
       </div>
@@ -188,14 +198,15 @@ function ZhBody() {
         <table className="w-full text-sm">
           <tbody>
             {[
-              ['曲线发售数量', '约 367,000,000 枚（36.7%）'],
-              ['起始 FDV', '约 220 SOL（按 SOL = $68 计约 $15,000，开盘单价 $0.000015）'],
-              ['迁移 FDV', '约 880 SOL（起始的 4 倍，单价 $0.00006）'],
-              ['曲线总募资', '约 161.8 SOL（由曲线数学决定，非人为设定）'],
-              ['主池注入', '约 183,000,000 枚 + 全部 161.8 SOL'],
-              ['主池开盘价', '恰为起始价的 4 倍，与曲线迁移价完全连续'],
+              ['曲线发售数量', '约 700,000,000 枚（70%）'],
+              ['起始 FDV', '约 241 SOL（按 SOL = $68 计约 $16,400，开盘单价 $0.0000164）'],
+              ['曲线总募资', '394.0619 SOL（等于迁移阈值，达到即毕业，非人为设定）'],
+              ['迁移进池数量', '300,000,000 枚（30%）+ 全部 394.0619 SOL'],
+              ['主池实收', '约 296,406,000 枚（先扣 1% 转账税、再扣 0.2% 协议迁移费）+ 约 389.34 SOL'],
+              ['协议迁移费', '0.2%，约 594,000 枚，以独立锁仓 LP 头寸留存，不归项目方'],
+              ['主池开盘价', '约 1.3135e-6 SOL/枚（≈ $0.000089，FDV ≈ 1,314 SOL），为起始价的 5.44 倍，与曲线迁移价完全连续'],
               ['曲线手续费', '1%（协议固定抽 20%，其余 80% 归创作者）'],
-              ['深度储备', '450,000,000 枚（45%），按里程碑加池并永久锁定 LP'],
+              ['深度储备', '0 枚（不设储备条款，项目方不持币）'],
               ['交易池手续费', '0.25%'],
             ].map(([k, v]) => (
               <tr key={k} className="border-b border-black/5 last:border-0">
@@ -207,11 +218,20 @@ function ZhBody() {
         </table>
       </div>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        曲线卖满后自动迁移成交易池，流动性就是曲线筹到的 SOL，发币方不需要先垫付建池资金。曲线卖出多少、进池多少不是拍脑袋定的，而是由起始/迁移市值按曲线数学自动推出：起始约 220 SOL、迁移约 880 SOL（4 倍），对应约 36.7% 在曲线卖出、18.3% 进入主池。剩下的 45% 不进销毁池、也不一次性灌进池子（因为配对所需的 SOL 不存在），而是作为深度储备：每攒够一批 SOL，就按当期市价配对加池，加完立即把该批 LP 凭证永久锁定，池子永久不可撤。
+        曲线卖满后自动迁移成交易池，流动性就是曲线筹到的 SOL，发币方不需要先垫付建池资金。供给怎么切由参数写死，不靠人定：<span className="font-semibold text-black">percentageSupplyOnMigration = 30</span> 的含义是&quot;迁移进 DAMM 的供给比例&quot;，曲线可售部分自动互补到 70%，两者严格相加等于 100%，没有 leftover、也没有第三方预留。实测（本地测试网毕业快照）：swapBaseAmount = 700,000,000 枚（70%）、migrationBaseThreshold = 300,000,000 枚（30%），两者相加恰等于总量 10 亿枚；migrationQuoteThreshold = 394.0619 SOL。注入侧不会全额到账，扣减是可复算的：先经 1% 转账税（Token-2022 在转账时扣）剩 297,000,000 枚，再扣 0.2% 协议流动性迁移费 594,000 枚，主池金库实收 296,406,000 枚。两笔合计 3,594,000 枚都不归任何人——1% 进税权分账，0.2% 以独立锁仓 LP 头寸留存，不在任何人可撤回的账户中。
       </p>
       <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
-        两个必须知道的细节。第一，1% 转账税在往池子转账时同样会扣，所以"注入 1.83 亿枚"实际到账约 1.81 亿（约 1.2% 损耗），对池价的影响可以忽略，但账要对得上。第二，池子金库账户自己也在被收税（买入时进金库扣一次、卖出时出金库再扣一次），这部分同样记在金库的 withheld 余额里，必须纳入 harvest 扫描名单，否则池子的实际余额与做市程序的记账会对不上。
+        两个必须知道的细节。第一，0.2% 协议迁移费与 1% 转账税是两套独立机制，但在迁移这笔转账上会叠加：1% 转账税在代币转入池子的那一刻由 Token-2022 扣掉（300,000,000 → 297,000,000），0.2% 协议迁移费再从到账额里扣（297,000,000 → 296,406,000），实测金库实收 296,406,000 枚，与两级扣减完全对得上。第二，池子金库账户自己也在被收税（买入时进金库扣一次、卖出时出金库再扣一次），这部分记在金库的 withheld 余额里，必须纳入 harvest 扫描名单，否则池子的实际余额与做市程序的记账会对不上。
       </div>
+
+      <h4 className="mt-6 font-semibold text-black">3.4.1 迁移阶段的四条硬约束（实测）</h4>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        第一，迁移费档位必须是 <span className="font-mono text-xs">Customizable</span>，它对应官方常量 <span className="font-mono text-xs break-all">A8gMrEPJkacWkcb3DGwtJwTe16HktSEfvwtuDh2MCtck</span>；档位与该地址强绑定，换成 FixedBps100 会被链上直接拒绝（<span className="font-mono text-xs">InvalidMigrationFeeOption</span>）。第二，带税币迁移后的池费必须用 <span className="font-mono text-xs">Compounding</span> 计费模式，否则 SDK 在创建 config 阶段即报错。第三，协议固定抽 0.2% 的流动性迁移费，从注入池子的代币侧扣除，且这笔转账同时受 1% 转账税约束：实测注入 300,000,000 枚，转账时先扣 1% 税剩 297,000,000 枚，再扣 0.2% 迁移费 594,000 枚，金库实收 296,406,000 枚，与两级扣减逐枚对得上（差额 3,594,000 = 3,000,000 转账税 + 594,000 迁移费），与供给分配比例无关。第四，迁移前必须给曲线池的 pool authority PDA 预充 ≥0.2 SOL 支付新建池账户的租金；付款钱包只付交易费，漏充会在建池那一步以 <span className="font-mono text-xs">insufficient lamports</span> 中断。
+      </p>
+      <h4 className="mt-6 font-semibold text-black">3.4.2 曲线收尾必须用 PartialFill</h4>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        曲线的容量严格等于迁移阈值——实测四条已毕业主网配置，容量与阈值的差值均为 0 lamports，这不是参数错误而是生产常态。因此最后一笔买入必然撞上容量边界，单笔精确输入永远跨不过去。收尾必须用 PartialFill 循环补单，直到迁移进度 ≥ 2；超出容量的部分按原额退回，买家不承担额外成本。
+      </p>
 
       <h2 className="mt-12 text-xl font-bold text-black">四、可验证性与审计</h2>
       <ul className="mt-4 space-y-1.5 pl-5 text-sm leading-7 text-black/70">
@@ -279,7 +299,7 @@ function EnBody() {
     ['Pool Swap Fee', '0.25% (stacks on the 1% transfer tax — round trip is about 2.5%)'],
     ['Curve Swap Fee', '1% (protocol takes a fixed 20%, the other 80% goes to the creator)'],
     ['Dividend Trigger', '20 SOL in the dividend vault; payout size depends on the tax collected that period'],
-    ['Distribution', 'On-chain bonding curve launch: 36.7% sold on the curve, 18.3% migrated into the pool, 45% kept as depth reserve. No presale, no private round, no team allocation'],
+    ['Distribution', 'On-chain bonding curve launch: 70% sellable on the curve, 30% migrated into the pool, no depth reserve (the issuer holds no tokens). No presale, no private round, no team allocation'],
   ];
 
   return (
@@ -363,6 +383,16 @@ function EnBody() {
       <p className="mt-2 text-sm leading-7 text-black/70">
         The 1% is deducted by the protocol on every token transfer, but it does not land in anyone&apos;s wallet automatically: it is recorded as a withheld balance on the receiving token account, including the pool&apos;s vault accounts. The protocol periodically runs a harvest that sweeps all withheld amounts into the fee treasury, then splits them by the allocation. Every step is signed by a multisig and every instruction and amount is verifiable in a block explorer.
       </p>
+      <h4 className="mt-6 font-semibold text-black">2.7.1 There Is Exactly One Key to the Tax</h4>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        For every taxed token the <span className="font-mono text-xs">feeClaimer</span> must be that mint&apos;s own token_config PDA:
+        <span className="font-mono text-xs">feeClaimer = PDA([b&quot;token_cfg&quot;, mint_pubkey], program_id)</span>, the same address as the mint&apos;s
+        <span className="font-mono text-xs">withdrawWithheldAuthority</span>. The global config PDA (derived from <span className="font-mono text-xs">[b&quot;config&quot;]</span>) is a different key, and mixing them produces &quot;accepted but never withdrawable&quot;: the pool is created and the tax accrues, yet settlement fails at <span className="font-mono text-xs">invoke_signed</span> and the withheld balance stays locked forever. Auditors can verify the formula themselves without reading the contract.
+      </p>
+      <h4 className="mt-6 font-semibold text-black">2.7.2 The 1% That Stays Behind on Withdrawal</h4>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        Token-2022 applies fee changes only at the next epoch, so the withdrawal still pays the 1% rate in force: each round sweeps 99% of the withheld balance from the source accounts and leaves 1% behind for the next round. Measured decay: 8,088,300 → 80,883 → 808.83 → 8.0883 tokens, exactly ×1% each round. This is a property of the withdrawal path, not of the split: the three legs always receive 85% / 10% / 5% of what the round actually pulled in, and the internal redistribution is never taxed again.
+      </p>
       <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
         Tax arrives as tokens, dividends are paid in SOL, so a sale in between is unavoidable: about 15% of a launched token&apos;s tax and roughly 50% of the FAIR tax must be sold for SOL (10% FAIR buyback, 5% sold into the FAIR liquidity vault). To avoid handing the market a predictable dump schedule, the sale is split into 8–12 orders over several hours (TWAP) and the harvest window is randomized across 6–9 days rather than fixed on day 7.
       </div>
@@ -445,14 +475,15 @@ function EnBody() {
         <table className="w-full text-sm">
           <tbody>
             {[
-              ['Supply sold on curve', '≈ 367,000,000 (36.7%)'],
-              ['Starting FDV', '≈ 220 SOL (≈ $15,000 at SOL = $68, opening price $0.000015)'],
-              ['Migration FDV', '≈ 880 SOL (4× the start, unit price $0.00006)'],
-              ['Total raised on curve', '≈ 161.8 SOL (determined by curve math, not set by hand)'],
-              ['Main pool injection', '≈ 183,000,000 tokens + the full 161.8 SOL'],
-              ['Main pool opening price', 'Exactly 4× the start price, fully continuous with the migration price'],
+              ['Supply sellable on curve', '≈ 700,000,000 (70%)'],
+              ['Starting FDV', '≈ 241 SOL (≈ $16,400 at SOL = $68, opening price $0.0000164)'],
+              ['Total raised on curve', '394.0619 SOL (equal to the migration threshold — reaching it graduates the token)'],
+              ['Migrated into pool', '300,000,000 tokens (30%) + the full 394.0619 SOL'],
+              ['Received by the pool', '≈ 296,406,000 tokens (1% transfer tax first, then the 0.2% protocol fee) + ≈ 389.34 SOL'],
+              ['Protocol migration fee', '0.2%, ≈ 594,000 tokens, retained as a separate locked LP position — not issuer revenue'],
+              ['Main pool opening price', '≈ 1.3135e-6 SOL/token (≈ $0.000089, FDV ≈ 1,314 SOL) — 5.44× the start price, fully continuous with the migration price'],
               ['Curve swap fee', '1% (protocol takes a fixed 20%, the other 80% goes to the creator)'],
-              ['Depth reserve', '450,000,000 (45%), added to the pool in milestones with LP permanently locked each time'],
+              ['Depth reserve', '0 tokens (no reserve clause; the issuer holds no supply)'],
               ['Pool swap fee', '0.25%'],
             ].map(([k, v]) => (
               <tr key={k} className="border-b border-black/5 last:border-0">
@@ -464,11 +495,20 @@ function EnBody() {
         </table>
       </div>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        When the curve sells out it migrates into a trading pool automatically, and that liquidity is the SOL the curve raised — the issuer never has to fund the pool upfront. How much is sold on the curve versus migrated into the pool is not a hand-picked number: with a start FDV of about 220 SOL and a migration FDV of about 880 SOL (4x), the curve math yields roughly 36.7% sold on the curve and 18.3% entering the main pool. The remaining 45% is neither burned nor dumped into the pool (the SOL to pair it does not exist); it is a depth reserve: each time enough SOL accrues, a batch is paired into the pool at the prevailing price and that batch of LP is permanently locked immediately, making the pool permanently unwithdrawable.
+        When the curve sells out it migrates into a trading pool automatically, and that liquidity is the SOL the curve raised — the issuer never has to fund the pool upfront. The supply split is fixed by a parameter, not by hand: <span className="font-semibold text-black">percentageSupplyOnMigration = 30</span> means &quot;share of supply migrated into DAMM v2&quot;, and the curve sellable side is the complement, 70% — the two sum to exactly 100%, with no leftover and no third-party allocation. Measured on a graduated testnet pool: swapBaseAmount = 700,000,000 tokens (70%) and migrationBaseThreshold = 300,000,000 tokens (30%), summing to the full 1B supply, with migrationQuoteThreshold = 394.0619 SOL. The injected side does not arrive in full, and the deduction is reproducible: the 1% transfer tax is taken by Token-2022 as the tokens enter the pool (300,000,000 → 297,000,000), then the 0.2% protocol liquidity migration fee is deducted (594,000 tokens), so the main vault receives 296,406,000 tokens. Both deductions — 3,594,000 tokens in total — belong to no one: the 1% goes to the tax split, the 0.2% is retained as a separate locked LP position.
       </p>
       <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
-        Two details worth knowing. First, the 1% transfer tax is also charged when tokens move into the pool, so &quot;injecting 183M&quot; arrives as about 181M (roughly 1.2%) — negligible for the price, but the accounting has to match. Second, the pool vault itself pays the tax (charged on the way in and again on the way out), and that amount sits in the vault&apos;s withheld balance too; the vault must be included in the harvest scan, otherwise the AMM accounting no longer matches the real balance.
+        Two details worth knowing. First, the 0.2% protocol migration fee and the 1% transfer tax are separate mechanisms, but they stack on this one transfer: the 1% is charged by Token-2022 as the tokens enter the pool (300,000,000 → 297,000,000) and the 0.2% protocol fee is then taken from the received amount (297,000,000 → 296,406,000); the measured vault balance of 296,406,000 reconciles exactly against that two-stage deduction. Second, the pool vault itself pays the tax (charged on the way in and again on the way out), and that amount sits in the vault&apos;s withheld balance too; the vault must be included in the harvest scan, otherwise the AMM accounting no longer matches the real balance.
       </div>
+
+      <h4 className="mt-6 font-semibold text-black">3.4.1 Four Hard Constraints at Migration (measured)</h4>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        First, the migration fee tier must be <span className="font-mono text-xs">Customizable</span>, whose official constant is <span className="font-mono text-xs break-all">A8gMrEPJkacWkcb3DGwtJwTe16HktSEfvwtuDh2MCtck</span>; the tier is bound to that address, and FixedBps100 is rejected on chain (<span className="font-mono text-xs">InvalidMigrationFeeOption</span>). Second, a taxed token&apos;s post-migration pool fee must use the <span className="font-mono text-xs">Compounding</span> collect mode, otherwise the SDK rejects the config at creation time. Third, the protocol charges a fixed 0.2% liquidity migration fee deducted from the token side entering the pool, and this transfer also pays the 1% transfer tax: measured 300,000,000 injected, 1% tax taken on transfer leaving 297,000,000, then the 0.2% fee of 594,000 leaving 296,406,000 received — a 3,594,000 difference that reconciles token-for-token (3,000,000 tax + 594,000 fee) and is unrelated to the supply split. Fourth, the curve pool&apos;s authority PDA must be pre-funded with ≥0.2 SOL before migration to pay rent for the accounts created during pool initialisation; the paying wallet only covers the transaction fee, and skipping this aborts the migration with <span className="font-mono text-xs">insufficient lamports</span>.
+      </p>
+      <h4 className="mt-6 font-semibold text-black">3.4.2 The Curve Must Be Finished with PartialFill</h4>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        Curve capacity equals the migration threshold exactly — across four graduated mainnet configs the capacity/threshold difference was 0 lamports, which is normal production behaviour rather than a misconfigured parameter. The final buy therefore always hits the capacity ceiling and a single exact-in swap can never cross it. Completion requires looping PartialFill fills until migration progress ≥ 2; anything above capacity is returned in full and the buyer pays nothing extra.
+      </p>
 
       <h2 className="mt-12 text-xl font-bold text-black">4. Verifiability and Audit</h2>
       <ul className="mt-4 space-y-1.5 pl-5 text-sm leading-7 text-black/70">

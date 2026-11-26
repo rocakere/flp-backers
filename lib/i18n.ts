@@ -132,7 +132,7 @@ const zh = {
       },
       {
         q: '新币是怎么发的？要不要先买？',
-        a: '走链上曲线首发，不设预售、白名单、额度或内部价。约 36.7% 的供应在曲线上公开定价，价格随买入自动抬升，规则写死在合约里；曲线卖满后自动迁移成交易池，流动性就是曲线筹到的 SOL（约 161.8 SOL），发币方不需要先垫建池资金。',
+        a: '走链上曲线首发，不设预售、白名单、额度或内部价。70% 的供应（7 亿枚）在曲线上公开定价，价格随买入自动抬升，规则写死在合约里；曲线卖满（募资达 394.0619 SOL 迁移阈值）后自动迁移成交易池，流动性就是曲线筹到的 SOL，发币方不需要先垫建池资金。',
       },
       {
         q: '税金什么时候会被卖出？',
@@ -144,7 +144,7 @@ const zh = {
       },
       {
         q: '总量会增发吗？会通缩吗？',
-        a: '总量上限 10 亿枚，发射时即置空 mint 权限、参数写死不可修改，任何人都无法增发；销毁会让总量单向减少，所以是"上限固定、逐步通缩"。首发时约 36.7% 在曲线上卖出、约 18.3% 与曲线筹集到的 SOL 组成主交易池，其余 45% 作为深度储备分批加池，加完即永久锁定 LP。',
+        a: '总量上限 10 亿枚，发射时即置空 mint 权限、参数写死不可修改，任何人都无法增发；销毁会让总量单向减少，所以是"上限固定、逐步通缩"。首发时 70% 在曲线上卖出、30% 与曲线筹集到的 394.0619 SOL 组成主交易池，无深度储备、项目方不持币；迁移时协议另抽 0.2% 流动性迁移费（以独立锁仓 LP 留存）。',
       },
       {
         q: '怎么确认合约是安全的？',
@@ -307,7 +307,7 @@ const en: typeof zh = {
       },
       {
         q: 'How is a new token launched? Do I need to buy first?',
-        a: 'Through an on-chain bonding curve — no presale, allowlist, cap or insider price. About 36.7% of supply is priced publicly on the curve and the price rises automatically with purchases, with the rules fixed in the contract. When the curve sells out it migrates into a trading pool automatically, and that liquidity is the SOL the curve raised (about 161.8 SOL), so the issuer never has to fund the pool upfront.',
+        a: 'Through an on-chain bonding curve — no presale, allowlist, cap or insider price. 70% of supply (700 million tokens) is priced publicly on the curve and the price rises automatically with purchases, with the rules fixed in the contract. Once the curve fills and 394.0619 SOL has been raised — the migration threshold — it graduates into a trading pool automatically, and that liquidity is the SOL the curve raised, so the issuer never has to fund the pool upfront.',
       },
       {
         q: 'When does the tax get sold?',
@@ -319,7 +319,7 @@ const en: typeof zh = {
       },
       {
         q: 'Will supply ever be inflated, or burned?',
-        a: 'Supply is hard-capped at 1,000,000,000: the mint authority is revoked at launch and all parameters are hard-coded with no admin entry point, so nobody can ever mint more. Burns make total supply move down only, so the cap is fixed but the supply is deflationary. At launch about 36.7% is sold on the curve, about 18.3% forms the main pool together with the SOL raised, and the remaining 45% is a depth reserve added to the pool in batches with the LP permanently locked each time.',
+        a: 'Supply is hard-capped at 1,000,000,000: the mint authority is revoked at launch and all parameters are hard-coded with no admin entry point, so nobody can ever mint more. Burns make total supply move down only, so the cap is fixed but the supply is deflationary. At launch 70% is sold on the curve and 30% forms the main pool together with the 394.0619 SOL raised — there is no depth reserve and the issuer holds no supply; migration also carries a 0.2% protocol fee retained as a separate locked LP position.',
       },
       {
         q: 'How can I verify the contract is safe?',

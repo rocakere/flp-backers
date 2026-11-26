@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer-core';
 
-const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
+const CHROME = '/mnt/c/Program Files/Google/Chrome/Application/chrome.exe';
 const browser = await puppeteer.launch({
   executablePath: CHROME,
   headless: 'new',
@@ -22,7 +22,7 @@ async function printIt(url, out) {
   await page.close();
 }
 
-await printIt('http://127.0.0.1:3000/whitepaper', 'D:/flpwe3/flp-backers/public/whitepaper.pdf');
-await printIt('http://127.0.0.1:3000/en/whitepaper', 'D:/flpwe3/flp-backers/public/whitepaper-en.pdf');
+await printIt('http://127.0.0.1:3000/whitepaper', '/mnt/d/flpwe3/flp-backers/public/whitepaper.pdf');
+await printIt('http://127.0.0.1:3000/en/whitepaper', '/mnt/d/flpwe3/flp-backers/public/whitepaper-en.pdf');
 
 await browser.close();
