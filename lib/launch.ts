@@ -85,21 +85,72 @@ export async function launchToken(
   const [config] = PublicKey.findProgramAddressSync([Buffer.from('config')], programId);
   const [stats] = PublicKey.findProgramAddressSync([Buffer.from('stats')], programId);
 
-  // ---- transaction 1: mint with the 1% transfer fee + T22 metadata extension, creator ATA, supply
-  const mintSpace = getMintLen([ExtensionType.TransferFeeConfig, ExtensionType.MetadataPointer]);
-  const mintRent = await connection.getMinimumBalanceForRentExemption(mintSpace) + META_BUFFER_LAMPORTS;
-  const creatorAta = getAssociatedTokenAddressSync(mintKp.publicKey, payer, true, TOKEN_2022_PROGRAM_ID);
+  // ============ 第一步：建池（配了 DBC config 时，mint 由 DBC 创建） ============
+  //
+  // 关键事实（DBC 源码 InitializeVirtualPoolWithToken2022Ctx 注释：
+  // "Unique token mint address, initialized in the handler"）：
+  // DBC 的 initialize_virtual_pool_with_token2022 会在 handler 内部调用
+  // create_token_2022_base_mint(payer, base_mint, pool_authority, ...)，即 **由 DBC 自己
+  // createAccount + InitializeMint + 写 metadata + 加 1% transferFeeConfig**。
+  // 所以 baseMint 必须是"链上尚不存在"的 keypair（也正因如此 DBC 把它列为 signer）。
+  // 我们如果先 createAccount 这个 mint，DBC 的 system allocate 会报
+  // "Allocate: account … already in use"（实测 custom error 0x0，三次）。
+    // decimals / 1% fee / maxFee / metadata 全部取自 DBC config（实测复现：9 位、
+  // 100bps、u64::MAX、withdrawWithheldAuthority = 协议 config PDA）。
+  const useDbc = Boolean(params.dbcConfig);
+  let signature = '';
+  let pool: string | undefined;
+  let buySignature: string | undefined;
+  let poolSkipped = false;
 
-  const metaIx = createInitializeInstruction({
-    programId: TOKEN_2022_PROGRAM_ID,
-    metadata: mintKp.publicKey,
-    updateAuthority: payer,
-    mint: mintKp.publicKey,
-    mintAuthority: payer,
-    name: params.name,
-    symbol: params.symbol,
-    uri: params.uri,
-  });
+  if (useDbc) {
+    params.onStep?.('pool');
+    const [anchorMod, dbcSdk] = await Promise.all([
+      import('@coral-xyz/anchor'),
+      import('@meteora-ag/dynamic-bonding-curve-sdk'),
+    ]);
+    const BN = (anchorMod as unknown as { BN: new (n: number | string) => unknown }).BN as new (
+      n: number | string,
+    ) => { toString(): string };
+    const dbc = new dbcSdk.DynamicBondingCurveClient(connection, 'confirmed');
+    const dbcConfig = new PublicKey(params.dbcConfig);
+    const devBuyLamports = lamports(params.devBuySol ?? 0);
+    // 建池与首买同一笔成交，池价还是开盘价，没有可被抢跑的窗口
+    const tx = await dbc.creator.createPoolWithFirstBuy({
+      createPoolParam: {
+        name: params.name,
+        symbol: params.symbol,
+        uri: params.uri,
+        payer,
+        poolCreator: payer,
+        config: dbcConfig,
+        baseMint: mintKp.publicKey,
+      },
+      firstBuyParam: devBuyLamports > 0
+        ? {
+            buyer: payer,
+            receiver: payer,
+            buyAmount: new BN(devBuyLamports),
+            minimumAmountOut: new BN(0),
+            referralTokenAccount: null,
+          }
+        : undefined,
+    });
+    await prepareTransaction(connection, tx, payer);
+    // DBC 建池指令把 baseMint 列为 signer（createAccount 需要新账户签名），
+    // mint 私钥只在本地，必须在这笔交易里补签名，否则 serialize 报 Missing signature。
+    tx.partialSign(mintKp);
+    const signed = await signTransaction(tx);
+    const sig = await connection.sendRawTransaction(signed.serialize(), { maxRetries: 3 });
+    await confirmByPolling(connection, sig);
+    signature = sig;
+    buySignature = sig;
+    pool = dbcSdk.deriveDbcPoolAddress(WSOL_MINT, mintKp.publicKey, dbcConfig).toBase58();
+  } else {
+    // ---- 无 DBC config（本地无池模式）：自己建 mint，行为与旧版一致
+  const mintSpace = getMintLen([ExtensionType.TransferFeeConfig]);
+  const mintRent = await connection.getMinimumBalanceForRentExemption(mintSpace);
+  const creatorAta = getAssociatedTokenAddressSync(mintKp.publicKey, payer, true, TOKEN_2022_PROGRAM_ID);
 
   const tx1 = new Transaction().add(
     SystemProgram.createAccount({
@@ -109,13 +160,6 @@ export async function launchToken(
       lamports: mintRent,
       programId: TOKEN_2022_PROGRAM_ID,
     }),
-    // 元数据指针指向 mint 自己（T22 Metadata 扩展内嵌，旧版 Metaplex 不支持 Token-2022）
-    createInitializeMetadataPointerInstruction(
-      mintKp.publicKey,
-      payer,
-      mintKp.publicKey,
-      TOKEN_2022_PROGRAM_ID,
-    ),
     // the fee authority is the token_config PDA, so only the protocol can ever touch the fee
     createInitializeTransferFeeConfigInstruction(
       mintKp.publicKey,
@@ -126,8 +170,6 @@ export async function launchToken(
       TOKEN_2022_PROGRAM_ID,
     ),
     createInitializeMintInstruction(mintKp.publicKey, LAUNCH_DECIMALS, payer, null, TOKEN_2022_PROGRAM_ID),
-    // mint 初始化之后才能写 metadata（同笔交易内顺序执行）
-    metaIx,
     createAssociatedTokenAccountInstruction(payer, creatorAta, payer, mintKp.publicKey, TOKEN_2022_PROGRAM_ID),
     createMintToInstruction(
       mintKp.publicKey,
@@ -139,10 +181,14 @@ export async function launchToken(
     ),
   );
   params.onStep?.('mint');
+  await prepareTransaction(connection, tx1, payer);
   tx1.partialSign(mintKp);
   const signed1 = await signTransaction(tx1);
-  const signature = await connection.sendRawTransaction(signed1.serialize(), { maxRetries: 3 });
-  await connection.confirmTransaction(signature, 'confirmed');
+  signature = await connection.sendRawTransaction(signed1.serialize(), { maxRetries: 3 });
+  await confirmByPolling(connection, signature);
+  // 用户填了首买但没有池可建：把这一笔降级为"只发币"
+  if (lamports(params.devBuySol ?? 0) > 0) poolSkipped = true;
+  }
 
   // ---- transaction 2: register the token on the protocol
   const initIx = new TransactionInstruction({
@@ -187,55 +233,10 @@ export async function launchToken(
   });
   params.onStep?.('register');
   const tx2 = new Transaction().add(initIx, recordIx);
+  await prepareTransaction(connection, tx2, payer);
   const signed2 = await signTransaction(tx2);
   const sig2 = await connection.sendRawTransaction(signed2.serialize(), { maxRetries: 3 });
-  await connection.confirmTransaction(sig2, 'confirmed');
-
-  // ---- transaction 3: 建曲线池 + 首次买入，同一笔交易内原子（要么都成，要么都败）
-  const devBuyLamports = lamports(params.devBuySol ?? 0);
-  let pool: string | undefined;
-  let buySignature: string | undefined;
-  let poolSkipped = false;
-
-  if (devBuyLamports > 0) {
-    if (!params.dbcConfig) {
-      // 没配 partner config（本地集群）时只跑 UI，不碰链上建池
-      poolSkipped = true;
-    } else {
-      // DBC SDK 是 CJS 包，动态引入以免在 SSR 阶段执行
-      const [anchorMod, dbcSdk] = await Promise.all([
-        import('@coral-xyz/anchor'),
-        import('@meteora-ag/dynamic-bonding-curve-sdk'),
-      ]);
-      const BN = (anchorMod as unknown as { BN: new (n: number | string) => unknown }).BN as new (n: number | string) => { toString(): string };
-      params.onStep?.('pool');
-      const dbc = new dbcSdk.DynamicBondingCurveClient(connection, 'confirmed');
-      const dbcConfig = new PublicKey(params.dbcConfig);
-      const tx3 = await dbc.creator.createPoolWithFirstBuy({
-        createPoolParam: {
-          name: params.name,
-          symbol: params.symbol,
-          uri: params.uri,
-          payer,
-          poolCreator: payer,
-          config: dbcConfig,
-          baseMint: mintKp.publicKey,
-        },
-        firstBuyParam: {
-          buyer: payer,
-          receiver: payer,
-          buyAmount: new BN(devBuyLamports),
-          // 建池与首买同一笔成交，池价还是开盘价，没有可被抢跑的窗口
-          minimumAmountOut: new BN(0),
-          referralTokenAccount: null,
-        },
-      });
-      const signed3 = await signTransaction(tx3);
-      buySignature = await connection.sendRawTransaction(signed3.serialize(), { maxRetries: 3 });
-      await connection.confirmTransaction(buySignature, 'confirmed');
-      pool = dbcSdk.deriveDbcPoolAddress(WSOL_MINT, mintKp.publicKey, dbcConfig).toBase58();
-    }
-  }
+  await confirmByPolling(connection, sig2);
 
   return {
     mint: mintKp.publicKey.toBase58(),
@@ -248,3 +249,26 @@ export async function launchToken(
 }
 
 export const lamports = (sol: number) => Math.round(sol * LAMPORTS_PER_SOL);
+
+/**
+ * 轮询确认交易。
+ * 本地 / 部分 RPC 的 websocket 订阅不可用，connection.confirmTransaction 会一直等到超时
+ * （交易其实已经 finalized）。这里统一用 getSignatureStatuses 轮询。
+ */
+async function confirmByPolling(connection: Connection, signature: string) {
+  for (let i = 0; i < 90; i++) {
+    const status = (await connection.getSignatureStatus(signature, { searchTransactionHistory: true }))?.value;
+    if (status?.err) throw new Error(`transaction failed: ${JSON.stringify(status.err)} sig=${signature}`);
+    if (status && (status.confirmationStatus === 'confirmed' || status.confirmationStatus === 'finalized')) return;
+    await new Promise((r) => setTimeout(r, 800));
+  }
+  throw new Error(`transaction not confirmed in time: ${signature}`);
+}
+
+/** 补齐 feePayer + recentBlockhash：钱包适配器不会替我们补，缺失时 partialSign 会直接报错。 */
+async function prepareTransaction(connection: Connection, tx: Transaction, feePayer: PublicKey) {
+  if (!tx.feePayer) tx.feePayer = feePayer;
+  if (!tx.recentBlockhash) {
+    tx.recentBlockhash = (await connection.getLatestBlockhash('confirmed')).blockhash;
+  }
+}

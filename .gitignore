@@ -43,3 +43,6 @@ next-env.d.ts
 # runtime uploads (ephemeral, not source)
 /public/uploads/
 /public/meta/
+
+# TS launch harness build output
+/.tmp-launch/
