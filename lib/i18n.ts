@@ -57,13 +57,12 @@ const zh = {
   launch: {
     title: '发起代币',
     sub: '在 Solana 上一键部署内置 1% 税、85 / 10 / 5 分账与自动加池的代币',
-    notice: '发射会真实创建 Token-2022 代币：9 位小数、1% 转账税、总量 10 亿，名称/符号/URI 写在代币自身的 Metadata 扩展里，账户租金与手续费由你的钱包支付。建池与首次买入在同一笔交易内原子执行（需配置 DBC partner config）。',
+    notice: '发射会真实创建 Token-2022 代币：9 位小数、1% 转账税、总量 10 亿。这三项由协议模板固定，页面上不可修改；名称/符号/URI 与税权归属由你填，写在代币自身的 Metadata 扩展里，账户租金与手续费由你的钱包支付。建池与首次买入在同一笔交易内原子执行（需配置 DBC partner config）。',
     fName: '代币名称 Name',
     phName: '例如 Fair Token',
     fSymbol: '代币符号 Symbol',
     phSymbol: '例如 FAIR',
-    fSupply: '总供应量 Total Supply',
-    phSupply: '1000000000',
+    fSupply: '总供应量 Total Supply（固定不可改）',
     fDecimals: '小数位 Decimals（固定）',
     fDev: '首次买入（可选，SOL）',
     phDev: '留空 = 不买入',
@@ -108,7 +107,6 @@ const zh = {
     netLine: '当前网络：{net}',
     alertConnect: '请先连接钱包',
     alertName: '请填写代币名称与符号',
-    alertSupply: '请填写总供应量（建议 10 亿）',
     alertImage: '请上传代币图片',
     alertImageType: '只支持图片文件（PNG / JPG）',
     alertImageSize: '图片不能超过 2MB',
@@ -132,7 +130,7 @@ const zh = {
       },
       {
         q: '新币是怎么发的？要不要先买？',
-        a: '走链上曲线首发，不设预售、白名单、额度或内部价。70% 的供应（7 亿枚）在曲线上公开定价，价格随买入自动抬升，规则写死在合约里；曲线卖满（募资达 394.0619 SOL 迁移阈值）后自动迁移成交易池，流动性就是曲线筹到的 SOL，发币方不需要先垫建池资金。',
+        a: '走链上曲线首发，不设预售、白名单、额度或内部价。总量固定 10 亿枚、不可调，其中 70%（7 亿枚）在曲线上公开定价，价格随买入自动抬升，规则写死在合约里；曲线卖满（募资达 394.0619 SOL 迁移阈值）后自动迁移成交易池，流动性就是曲线筹到的 SOL，发币方不需要先垫建池资金。',
       },
       {
         q: '税金什么时候会被卖出？',
@@ -144,7 +142,7 @@ const zh = {
       },
       {
         q: '总量会增发吗？会通缩吗？',
-        a: '总量上限 10 亿枚，发射时即置空 mint 权限、参数写死不可修改，任何人都无法增发；销毁会让总量单向减少，所以是"上限固定、逐步通缩"。首发时 70% 在曲线上卖出、30% 与曲线筹集到的 394.0619 SOL 组成主交易池，无深度储备、项目方不持币；迁移时协议另抽 0.2% 流动性迁移费（以独立锁仓 LP 留存）。',
+        a: '总量固定 10 亿枚、不可调：发射时即置空 mint 权限、参数写死不可修改，任何人都无法增发；销毁会让总量单向减少，所以是"总量固定、逐步通缩"。首发时 70% 在曲线上卖出、30% 与曲线筹集到的 394.0619 SOL 组成主交易池，无深度储备、项目方不持币；迁移时协议另抽 0.2% 流动性迁移费（以独立锁仓 LP 留存）。',
       },
       {
         q: '怎么确认合约是安全的？',
@@ -232,13 +230,12 @@ const en: typeof zh = {
   launch: {
     title: 'Launch a Token',
     sub: 'Deploy a Solana token with a fixed 1% tax, 85 / 10 / 5 split and auto-liquidity',
-    notice: 'This launch really creates a Token-2022 token: 9 decimals, 1% transfer tax, 1 billion supply, with name/symbol/URI stored in the token\'s own Metadata extension. Rent and fees are paid by your wallet. Pool creation and the first buy run atomically in one transaction (requires a DBC partner config).',
+    notice: 'This launch really creates a Token-2022 token: 9 decimals, 1% transfer tax, 1 billion supply. All three are fixed by the protocol template and cannot be edited on this page. You choose the name/symbol/URI and the tax destination; they are stored in the token\'s own Metadata extension. Rent and fees are paid by your wallet. Pool creation and the first buy run atomically in one transaction (requires a DBC partner config).',
     fName: 'Token Name',
     phName: 'e.g. Fair Token',
     fSymbol: 'Token Symbol',
     phSymbol: 'e.g. FAIR',
-    fSupply: 'Total Supply',
-    phSupply: '1000000000',
+    fSupply: 'Total Supply (fixed, not editable)',
     fDecimals: 'Decimals (fixed)',
     fDev: 'First buy (optional, SOL)',
     phDev: 'Leave empty = no buy',
@@ -283,7 +280,6 @@ const en: typeof zh = {
     netLine: 'Network: {net}',
     alertConnect: 'Please connect your wallet first',
     alertName: 'Please enter the token name and symbol',
-    alertSupply: 'Please enter the total supply (1 billion recommended)',
     alertImage: 'Please upload a token image',
     alertImageType: 'Image files only (PNG / JPG)',
     alertImageSize: 'Image must be under 2MB',
@@ -307,7 +303,7 @@ const en: typeof zh = {
       },
       {
         q: 'How is a new token launched? Do I need to buy first?',
-        a: 'Through an on-chain bonding curve — no presale, allowlist, cap or insider price. 70% of supply (700 million tokens) is priced publicly on the curve and the price rises automatically with purchases, with the rules fixed in the contract. Once the curve fills and 394.0619 SOL has been raised — the migration threshold — it graduates into a trading pool automatically, and that liquidity is the SOL the curve raised, so the issuer never has to fund the pool upfront.',
+        a: 'Through an on-chain bonding curve — no presale, allowlist, cap or insider price. Total supply is fixed at 1,000,000,000 and cannot be changed; 70% of it (700 million tokens) is priced publicly on the curve and the price rises automatically with purchases, with the rules fixed in the contract. Once the curve fills and 394.0619 SOL has been raised — the migration threshold — it graduates into a trading pool automatically, and that liquidity is the SOL the curve raised, so the issuer never has to fund the pool upfront.',
       },
       {
         q: 'When does the tax get sold?',

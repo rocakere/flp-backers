@@ -15,7 +15,7 @@ function ZhBody() {
   const rows = [
     ['代币名称', 'FAIR'],
     ['代币符号', 'FAIR'],
-    ['总供应量', '1,000,000,000 FAIR（总量上限，权限锁死、不可增发，随销毁逐步通缩）'],
+    ['总供应量', '1,000,000,000 FAIR（总量固定、不可调；权限锁死、不可增发，随销毁逐步通缩）'],
     ['买入税 / 卖出税', '各 1%（FAIR 母币与发射的新币一致）'],
     ['FAIR 母币税收分配', '销毁 40% / 分红 30% / 流动性 20% / 运营 10%'],
     ['发射新币税收分配', '创作者 85% / 回购并销毁 FAIR 10% / 卖成 SOL 进 FAIR 加池金库 5%'],
@@ -61,7 +61,7 @@ function ZhBody() {
 
       <h3 className="mt-8 font-semibold text-black">2.1 一键部署</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        在 Launch 页面填写名称、符号、总量、税率与税收流向，协议生成一个标准代币合约。所有通过协议发射的代币共享同一套合约逻辑，参数在创建时写死，之后不可修改。
+        在 Launch 页面只需填写名称、符号、图片与元数据、税权归属，以及可选的首次买入。总量（10 亿枚）、税率（买卖各 1%）与曲线参数（70/30、394.0619 SOL 迁移阈值）由协议模板固定，页面上没有可改的输入框——不是"填了不许改"，是"从一开始就没有可填的地方"。所有通过协议发射的代币共享同一套合约逻辑，参数写死在模板里，之后不可修改。
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.2 税率结构（分两套，别混）</h3>
@@ -292,7 +292,7 @@ function EnBody() {
   const rows = [
     ['Token Name', 'FAIR'],
     ['Symbol', 'FAIR'],
-    ['Total Supply', '1,000,000,000 FAIR (hard cap; authorities locked, no minting, supply shrinks only through burns)'],
+    ['Total Supply', '1,000,000,000 FAIR (fixed, not adjustable; authorities locked, no minting, supply shrinks only through burns)'],
     ['Buy / Sell Tax', '1% each (same for FAIR and launched tokens)'],
     ['FAIR Fee Allocation', 'Burn 40% / Dividends 30% / Liquidity 20% / Operations 10%'],
     ['Launched Token Fees', 'Creator 85% / FAIR buyback-and-burn 10% / 5% sold to SOL into the FAIR liquidity vault'],
@@ -338,7 +338,7 @@ function EnBody() {
 
       <h3 className="mt-8 font-semibold text-black">2.1 One-Click Deployment</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        On the Launch page you enter name, symbol, supply, tax rates and fee destination, and the protocol produces a standard token contract. All tokens launched through the protocol share the same contract logic; the parameters are fixed at creation and cannot be changed later.
+        On the Launch page you only enter the name, symbol, image and metadata, the tax destination, and an optional first buy. Total supply (1,000,000,000), tax rates (1% each side) and the curve parameters (70/30, 394.0619 SOL migration threshold) are fixed by the protocol template, and there is no editable input for them on the page — not &quot;filled in and then locked&quot;, but &quot;there was never anything to fill in&quot;. All tokens launched through the protocol share the same contract logic, with the parameters hard-coded in the template and unchangeable afterwards.
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.2 Tax Structure (Two Separate Sets)</h3>

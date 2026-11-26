@@ -22,7 +22,6 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
   const [form, setForm] = useState({
     name: '',
     symbol: '',
-    supply: '',
     image: '',
     website: '',
     x: '',
@@ -141,7 +140,7 @@ export default function LaunchContent({ lang }: { lang: Lang }) {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className={label}>{t.fSupply}</label>
-            <input name="supply" value={form.supply} onChange={handleChange} className={field} placeholder={t.phSupply} />
+            <div className="rounded border border-black/10 bg-black/5 px-3 py-2 text-sm text-black/50">1,000,000,000</div>
           </div>
           <div>
             <label className={label}>{t.fDecimals}</label>
