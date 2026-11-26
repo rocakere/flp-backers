@@ -179,7 +179,7 @@ function ZhBody() {
       </div>
 
       <div className="mt-3 rounded-lg border border-black/10 bg-white/60 px-4 py-3 text-xs leading-6 text-black/60">
-        加池金库里的 SOL 有两路来源：一是 FAIR 母币税流动性档（20%）里的一半——即占全部税收的 10%——卖出换回的 SOL，二是平台发射的新币税里 5% 卖掉换回的 SOL。两路进的是同一个加池金库，累计超过 20 SOL 就自动触发一次加池并立即永久锁定该批 LP——低于 20 SOL 时加池对盘口的改善没有意义，所以不触发。<br />加池用的 FAIR 本币侧优先取母币税流动性档里留存的那一半，不够时从迁移时的 4.5 亿深度储备里补。累计投入加池的 FAIR 设 5 亿枚硬上限（占总量一半），到顶之后流动性档不再加池，该档 FAIR 直接转入销毁地址——池子深度有一个够用的上限，越过这个上限继续堆流动性只会白锁供应，不如让它通缩。
+        加池金库里的 SOL 有两路来源：一是 FAIR 母币税流动性档（20%）里的一半——即占全部税收的 10%——卖出换回的 SOL，二是平台发射的新币税里 5% 卖掉换回的 SOL。两路进的是同一个加池金库，累计超过 20 SOL 就自动触发一次加池并立即永久锁定该批 LP——低于 20 SOL 时加池对盘口的改善没有意义，所以不触发。<br />加池用的 FAIR 本币侧只来自母币税流动性档里留存的那一半，不存在任何额外储备账户可动。链上对累计投入加池的 FAIR 设了硬上限（常量 <span className="font-mono text-xs">FAIR_ADD_CAP_TOKENS = 500,000,000</span>，计数在 <span className="font-mono text-xs">config.fair_added_to_pools</span>），到顶后加池指令直接被链上拒绝（<span className="font-mono text-xs">CapReached</span>），加池停止；此时流动性档里留存的 FAIR 仍按税权拆分留在对应桶里，不会自动销毁。
       </div>
 
       <h3 className="mt-8 font-semibold text-black">3.3 发行原则</h3>
@@ -264,7 +264,7 @@ function ZhBody() {
         <p><span className="font-semibold text-black">曲线手续费抽成。</span>曲线阶段 1% 的 swap 手续费中，协议固定抽 20%，创作者拿 80%，这部分成本与 1% 转账税叠加。</p>
         <p><span className="font-semibold text-black">MEV 无法根除。</span>Bundle 只能降低概率，不能消除。</p>
         <p><span className="font-semibold text-black">合约风险。</span>未经审计的合约存在未知漏洞，可能造成资金损失。</p>
-        <p><span className="font-semibold text-black">流动性风险。</span>曲线阶段池子尚不存在，价格由曲线决定；迁移初期深度有限，大额卖出仍会严重砸价。深度储备靠加池逐步增厚，需要时间。</p>
+        <p><span className="font-semibold text-black">流动性风险。</span>曲线阶段池子尚不存在，价格由曲线决定；迁移初期深度有限，大额卖出仍会严重砸价。池子深度靠加池逐步增厚，需要时间。</p>
         <p><span className="font-semibold text-black">首发阶段的税。</span>曲线买入同样扣 1% 税，买家实际到手为成交量的 99%，这部分税金在发射日就开始累积，需要同步启动 harvest。</p>
         <p><span className="font-semibold text-black">监管风险。</span>各司法辖区对代币发行与分红的定性不同，可能影响可用性。</p>
       </div>
@@ -456,7 +456,7 @@ function EnBody() {
       </div>
 
       <div className="mt-3 rounded-lg border border-black/10 bg-white/60 px-4 py-3 text-xs leading-6 text-black/60">
-        The liquidity vault draws SOL from two sources: half of the 20% liquidity slice of the FAIR tax (i.e. 10% of all tax) sold for SOL, and the 5% share of every launched token&apos;s tax, sold for SOL into the FAIR vault. Both flow into the same vault, and once the balance passes 20 SOL a top-up is triggered automatically with that batch of LP permanently locked immediately — below 20 SOL a top-up would not meaningfully change the order book, so nothing is triggered. The FAIR side of a top-up comes first from the retained half of the liquidity slice, and only when that runs short from the 450M depth reserve. Total FAIR ever added to pools is hard-capped at 500M (half of supply); once that cap is reached the liquidity slice stops topping up and the FAIR in it is sent to the burn address — pool depth has a point of diminishing return, and past it the supply is better burned than locked.
+        The liquidity vault draws SOL from two sources: half of the 20% liquidity slice of the FAIR tax (i.e. 10% of all tax) sold for SOL, and the 5% share of every launched token&apos;s tax, sold for SOL into the FAIR vault. Both flow into the same vault, and once the balance passes 20 SOL a top-up is triggered automatically with that batch of LP permanently locked immediately — below 20 SOL a top-up would not meaningfully change the order book, so nothing is triggered. The FAIR side of a top-up comes only from the retained half of the liquidity slice; there is no separate reserve account to draw on. Total FAIR ever added to pools is hard-capped on chain (<span className="font-mono text-xs">FAIR_ADD_CAP_TOKENS = 500,000,000</span>, counted in <span className="font-mono text-xs">config.fair_added_to_pools</span>); once that cap is reached the instruction is rejected on chain (<span className="font-mono text-xs">CapReached</span>) and top-ups stop. The FAIR left in the liquidity slice stays in its bucket under the tax split — it is not burned automatically.
       </div>
 
       <h3 className="mt-8 font-semibold text-black">3.3 Distribution Principle</h3>
