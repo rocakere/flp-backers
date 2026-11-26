@@ -155,9 +155,9 @@ const zh = {
   note: {
     audit: {
       title: '审计报告',
-      status: '整理中',
-      lead: '第三方审计正在进行，报告全文与审计机构名称会在完成后发布在这一页。',
-      detail: '当前状态：审计范围已确定（税率计算逻辑、85 / 10 / 5 分账与分红合约、加池与 LP 永久锁定、增发与暂停权限是否已放弃），正式报告与签名文件整理中。在报告发布前，所有合约数据以链上为准。',
+      status: '待第三方审计 · Bug Bounty 开放',
+      lead: '第三方审计尚未签约启动，正式报告与审计机构名称会在完成后发布在这一页。在此之前，链上数据与源码本身就是唯一的验证依据。',
+      detail: '当前已可自行验证的三件事：一、每个代币在发射时即置空 mint 权限与冻结权限，链上可查；二、协议合约不含增发、暂停或提款后门，15 条指令的权限边界见源码与审计清单；三、曲线池与加池 LP 的归属地址由程序派生，调用者无法指定。Bug Bounty 已开放，发现安全问题请通过 @rocake118（Telegram）提交，核实后按报告等级给付赏金。',
     },
     explore: {
       title: '代币广场',
@@ -328,9 +328,9 @@ const en: typeof zh = {
   note: {
     audit: {
       title: 'Audit Report',
-      status: 'In progress',
-      lead: 'The third-party audit is under way; the full report and the auditor name will be published on this page once it is complete.',
-      detail: 'Status: scope is fixed (tax calculation logic, the 85 / 10 / 5 split and dividend contracts, liquidity top-ups with permanently locked LP, and whether mint/pause authorities are revoked). The signed report is being compiled. Until it is published, on-chain data is the source of truth.',
+      status: 'Pending third-party audit · Bug bounty open',
+      lead: 'A third-party audit has not been commissioned yet; the full report and the auditor name will be published here once it is. Until then, on-chain data and the source code are the only basis for verification.',
+      detail: 'Three things you can verify yourself today: the mint authority and freeze authority of every token are revoked at launch and visible on-chain; the protocol has no mint, pause or withdraw backdoor — the permission boundary of all 15 instructions is in the source and the audit checklist; and the curve pool plus the locked LP are derived by the program, so no caller can redirect them. A bug bounty is open — report security issues via @rocake118 (Telegram), paid by severity after confirmation.',
     },
     explore: {
       title: 'Token Explorer',
