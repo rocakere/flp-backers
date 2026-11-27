@@ -403,15 +403,18 @@ function EnBody() {
 
       <h3 className="mt-8 font-semibold text-black">2.1 One-Click Deployment</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        On the Launch page you only enter the name, symbol, image and metadata, the tax destination, and an optional first buy. Total supply (1,000,000,000), tax rates (0.5% each side) and the curve parameters (70/30, 394.0619 SOL migration threshold) are fixed by the protocol template, and there is no editable input for them on the page — not &quot;filled in and then locked&quot;, but &quot;there was never anything to fill in&quot;. All tokens launched through the protocol share the same contract logic, with the parameters hard-coded in the template and unchangeable afterwards.
+        On the Launch page you only enter the name, symbol, image and metadata, the tax destination, and an optional first buy. Total supply (1,000,000,000), the trading fee (0.5%) and the curve parameters (70/30, 394.0 SOL migration threshold) are fixed by the protocol template, and there is no editable input for them on the page — not &quot;filled in and then locked&quot;, but &quot;there was never anything to fill in&quot;. All tokens launched through the protocol share the same contract logic, with the parameters hard-coded in the template and unchangeable afterwards.
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.2 Tax Structure (Two Separate Sets)</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        Buy and sell tax are 0.5% each, charged at protocol level by the Token-2022 transfer fee, with no admin override. On <span className="font-semibold text-black">the FAIR token</span>, fees are split 40 / 30 / 20 / 10 across the burn pool, holder dividend pool, liquidity buyback and operations. On <span className="font-semibold text-black">tokens launched through the protocol</span>, fees are split 85 / 10 / 5: 85% settles to the creator, 10% buys FAIR on the market and burns it immediately, and 5% is sold for SOL into the FAIR liquidity vault (counted together with the 10% of the FAIR tax, a top-up fires at 20 SOL) — see 3.2.
+        Buy and sell fee is 0.5%, charged at the trading layer — first by the bonding curve, then by the DAMM v2 pool after migration — and settled in SOL, with no admin override. On <span className="font-semibold text-black">the FAIR token</span>, fees are split 40 / 30 / 20 / 10 across the burn pool, holder dividend pool, liquidity buyback and operations. On <span className="font-semibold text-black">tokens launched through the protocol</span>, fees are split 85 / 10 / 5: 85% settles to the creator, 10% buys FAIR on the market and burns it immediately, and 5% is sold for SOL into the FAIR liquidity vault (counted together with the 10% of the FAIR tax, a top-up fires at 20 SOL) — see 3.2.
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        The curve also charges a 1% swap fee on every fill: the protocol takes a fixed 20% of it and the remaining 80% goes to the token creator. That stacks on top of the 0.5% transfer tax, so a buy on the curve costs roughly 1.5%.
+        Fee take, stated plainly: the <span className="font-semibold text-black">total trading fee is 50 bps</span>. Meteora&apos;s protocol takes a fixed <span className="font-semibold text-black">20% of it (10 bps)</span>, and FAIR&apos;s protocol keeps the remaining <span className="font-semibold text-black">80% (40 bps)</span>, which is the pool that the 40 / 30 / 20 / 10 and 85 / 10 / 5 splits divide. The platform&apos;s own net take is 40 bps, not 50.
+      </p>
+      <p className="mt-3 text-sm leading-7 text-black/70">
+        The curve charges the same 0.5% on every fill: the protocol takes a fixed 20% of it and the remaining 80% goes to the token creator. Nothing is stacked on top — there is no transfer tax, so moving tokens between wallets, an OTC deal or a CEX deposit costs nothing.
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
         The trading pool charges an additional 0.25% swap fee, deducted by the AMM inside the swap and retained in the pool for LPs. These are two independent mechanisms and they stack: a buy followed by a sell costs roughly 0.5% + 0.5% + 0.25% + 0.25% ≈ 1.5%, plus slippage.
