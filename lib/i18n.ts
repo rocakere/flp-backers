@@ -253,8 +253,8 @@ const en: typeof zh = {
     fWeb: 'Website (optional)',
     fX: 'X / Twitter (optional)',
     fTg: 'Telegram (optional)',
-    taxTitle: 'Trading tax: fixed 0.5%, not editable',
-    taxLine: '0.5% on buys and sells, split 85 / 10 / 5 automatically: 85% settled to the receiver, 10% used to buy back and burn FAIR, 5% sold for SOL into the FAIR liquidity vault.',
+    taxTitle: 'Trading fee: fixed 0.5%, not editable',
+    taxLine: '0.5% is charged on trades only — first on the bonding curve, then on the DAMM v2 pool after migration — settled in SOL and split 85 / 10 / 5 automatically: 85% to the creator, 10% to buy back and burn FAIR, 5% into the FAIR liquidity vault. Plain wallet transfers, OTC deals and CEX deposits cost nothing.',
     fDir: 'Tax destination (receiver of the 85% leg)',
     dirCreator: 'Creator wallet (default)',
     dirVault: 'FAIR liquidity vault (for public-good projects)',
@@ -298,8 +298,8 @@ const en: typeof zh = {
         a: 'The dialog only lists wallets actually installed in your browser. If the list is empty, install a Solana wallet extension such as Phantom, OKX Web3 or Backpack, then refresh the page.',
       },
       {
-        q: 'How is the buy and sell tax allocated?',
-        a: 'Buy and sell tax are 0.5% each, but there are two separate sets. On the FAIR token, fees split 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations. On tokens launched through the protocol, fees belong to the issuer with no platform cut, split 85 / 10 / 5: 85% settles to the creator, 10% buys back and burns FAIR, and 5% is sold for SOL into the FAIR liquidity vault. The pool charges a further 0.25% swap fee, and the curve charges a 1% swap fee (80% to the creator, 20% to the protocol), which stacks on the 0.5% transfer tax — a curve buy costs about 1.5%.',
+        q: 'How is the trading fee allocated?',
+        a: 'The fee is 0.5% per trade and is taken at the trading layer, in SOL, never as a Token-2022 transfer fee — so moving tokens between your own wallets is free. On the FAIR token it splits 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations. On tokens launched through the protocol it splits 85 / 10 / 5: 85% to the creator, 10% to buy back and burn FAIR, 5% into the FAIR liquidity vault. Every lamport is claimed by the protocol program itself through its config PDA, never by an admin wallet.',
       },
       {
         q: 'How is a new token launched? Do I need to buy first?',

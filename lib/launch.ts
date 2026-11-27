@@ -9,14 +9,10 @@ import {
 } from '@solana/web3.js';
 import {
   TOKEN_2022_PROGRAM_ID,
-  ExtensionType,
   getMintLen,
-  createInitializeTransferFeeConfigInstruction,
   createInitializeMintInstruction,
-  createInitializeMetadataPointerInstruction,
   createMintToInstruction,
   createAssociatedTokenAccountInstruction,
-  createAssociatedTokenAccountIdempotentInstruction,
   getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
 import { createInitializeInstruction } from '@solana/spl-token-metadata';
@@ -28,17 +24,16 @@ const WSOL_MINT = new PublicKey('So11111111111111111111111111111111111111112');
 /** 元数据存在 mint 自己的 Token-2022 Metadata 扩展里（旧版 Metaplex 不支持 Token-2022 mint）。 */
 const META_BUFFER_LAMPORTS = 10_000_000; // 0.01 SOL，给 metadata 扩展 realloc 留租金
 
-/** Fixed launch parameters: 9 decimals, 0.5% transfer tax, supply 1,000,000,000. */
+/** Fixed launch parameters: 9 decimals, supply 1,000,000,000. */
 export const LAUNCH_DECIMALS = 9;
-export const LAUNCH_FEE_BPS = 50;
-/**
- * No per-transfer ceiling: the tax is always exactly 0.5% of the amount.
- * u64::MAX is the Token-2022 "unlimited" value — anything lower silently caps the tax
- * on large transfers (with 9 decimals, the old 1e12 = 1,000 tokens, so every transfer
- * above 200,000 tokens effectively paid nothing).
- */
-const MAX_FEE = 18446744073709551615n;
 export const LAUNCH_SUPPLY = 1_000_000_000;
+/**
+ * The 0.5% is a **trading fee**, not a transfer fee: it is taken by the DBC curve and by the
+ * DAMM v2 pool after migration, in SOL, and claimed by the treasury program. There is no
+ * Token-2022 TransferFeeConfig on any launch — that is why a plain wallet transfer, an OTC
+ * deal or a CEX deposit costs nothing.
+ */
+export const LAUNCH_FEE_BPS = 0;
 
 // 浏览器里的 Buffer 是旧版 polyfill，没有 writeBigUInt64LE / writeUInt16LE 这类实例方法
 // （Node 有，所以本地 harness 能跑通、一站到页面上就报 "b.writeBigUInt64LE is not a function"）。
@@ -103,40 +98,7 @@ export async function launchToken(
     programId,
   );
   const [config] = PublicKey.findProgramAddressSync([Buffer.from('config')], programId);
-  // settle_token_tax 的三个收款 ATA（fee 池 + 10% buyback + 5% liquidity）。
-  // buyback/liquidity 的 owner 是 per-mint PDA，地址必须是标准 ATA；任何一处缺失，
-  // settle 的 associated_token 约束会直接失败，85/10/5 永远汇不出去。
-  const [buybackOwner] = PublicKey.findProgramAddressSync(
-    [Buffer.from('buyback'), mintKp.publicKey.toBuffer()],
-    programId,
-  );
-  const [liquidityOwner] = PublicKey.findProgramAddressSync(
-    [Buffer.from('liq'), mintKp.publicKey.toBuffer()],
-    programId,
-  );
-  const settlementAtaIxs = (from: PublicKey) => [
-    createAssociatedTokenAccountIdempotentInstruction(
-      from,
-      getAssociatedTokenAddressSync(mintKp.publicKey, tokenConfig, true, TOKEN_2022_PROGRAM_ID),
-      tokenConfig,
-      mintKp.publicKey,
-      TOKEN_2022_PROGRAM_ID,
-    ),
-    createAssociatedTokenAccountIdempotentInstruction(
-      from,
-      getAssociatedTokenAddressSync(mintKp.publicKey, buybackOwner, true, TOKEN_2022_PROGRAM_ID),
-      buybackOwner,
-      mintKp.publicKey,
-      TOKEN_2022_PROGRAM_ID,
-    ),
-    createAssociatedTokenAccountIdempotentInstruction(
-      from,
-      getAssociatedTokenAddressSync(mintKp.publicKey, liquidityOwner, true, TOKEN_2022_PROGRAM_ID),
-      liquidityOwner,
-      mintKp.publicKey,
-      TOKEN_2022_PROGRAM_ID,
-    ),
-  ];
+  void config; // kept for the PDA derivation record; no transfer-fee authority is set any more
 
   // ============ 第一步：建池（配了 DBC config 时，mint 由 DBC 创建） ============
   //
@@ -155,22 +117,24 @@ export async function launchToken(
   // mint 一旦上链而登记还没落，任何人都能抢先把自己的钱包登记成 `creator`（token_cfg
   // 只能初始化一次），此后这位用户 0.5% 里的 85% 全部流向抢跑者。把「建 mint/建池」与
   // 「登记」压进同一笔交易，中间就没有可插队的窗口。
-  const initTokenConfigIx = new TransactionInstruction({
-    programId,
-    keys: [
-      { pubkey: payer, isSigner: true, isWritable: true },
-      { pubkey: mintKp.publicKey, isSigner: false, isWritable: false },
-      { pubkey: payer, isSigner: false, isWritable: false },
-      { pubkey: tokenConfig, isSigner: false, isWritable: true },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-    ],
-    data: Buffer.concat([
-      ixDisc('init_token_config'),
-      new Uint8Array([params.taxDest]),
-      u16le(LAUNCH_FEE_BPS),
-      u64le(MAX_FEE),
-    ]),
-  });
+    // 0.5% 只在交易端收（DBC 曲线费 + 迁移后 DAMM 池费，全 SOL），mint 本身不带
+    // TransferFeeConfig，所以登记时 fee_bps / max_fee 一律写 0。
+    const initTokenConfigIx = new TransactionInstruction({
+      programId,
+      keys: [
+        { pubkey: payer, isSigner: true, isWritable: true },
+        { pubkey: mintKp.publicKey, isSigner: false, isWritable: false },
+        { pubkey: payer, isSigner: false, isWritable: false },
+        { pubkey: tokenConfig, isSigner: false, isWritable: true },
+        { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      ],
+      data: Buffer.concat([
+        ixDisc('init_token_config'),
+        new Uint8Array([params.taxDest]),
+        u16le(LAUNCH_FEE_BPS),
+        u64le(0n),
+      ]),
+    });
   let registeredInline = false;
   let signature = '';
   let pool: string | undefined;
@@ -190,6 +154,8 @@ export async function launchToken(
     const dbcConfig = new PublicKey(params.dbcConfig);
     const devBuyLamports = lamports(params.devBuySol ?? 0);
     // 建池与首买同一笔成交，池价还是开盘价，没有可被抢跑的窗口
+    // `as unknown as` 只用来桥接 BN 在 anchor 的 CommonJS 导出与 SDK 的 .d.ts 类型，
+    // 运行时就是同一个 BN。
     const tx = await dbc.creator.createPoolWithFirstBuy({
       createPoolParam: {
         name: params.name,
@@ -201,13 +167,13 @@ export async function launchToken(
         baseMint: mintKp.publicKey,
       },
       firstBuyParam: devBuyLamports > 0
-        ? {
+        ? ({
             buyer: payer,
             receiver: payer,
             buyAmount: new BN(devBuyLamports),
             minimumAmountOut: new BN(0),
             referralTokenAccount: null,
-          }
+          } as unknown as Parameters<typeof dbc.creator.createPoolWithFirstBuy>[0]['firstBuyParam'])
         : undefined,
     });
     await prepareTransaction(connection, tx, payer);
@@ -228,29 +194,30 @@ export async function launchToken(
     buySignature = sig;
     pool = dbcSdk.deriveDbcPoolAddress(WSOL_MINT, mintKp.publicKey, dbcConfig).toBase58();
 
-    // ---- 结算收款 ATA 预建：settle_token_tax 会把 85% 打进 creator_ata（CI 断言
-    // owner == token_config.creator），并把 10% / 5% 打进 buyback / liquidity 的 per-mint
-    // ATA。DBC 建池时 mint 才在这笔交易里诞生，ATA 只能在其后补建；idempotent 保证可重入。
-    // 少了任何一个，settle 都会在 associated_token 约束上失败，税一分也汇不出去。
-    const ataTx = new Transaction().add(...settlementAtaIxs(payer));
-    if (params.taxDest === 0) {
-      ataTx.add(
-        createAssociatedTokenAccountIdempotentInstruction(
-          payer,
-          getAssociatedTokenAddressSync(mintKp.publicKey, payer, true, TOKEN_2022_PROGRAM_ID),
-          payer,
-          mintKp.publicKey,
-          TOKEN_2022_PROGRAM_ID,
-        ),
-      );
+    // ---- 把曲线 creator 转给 token_config PDA ----
+    // 迁移前后所有 creator 交易费都只能由这个 PDA 自签领取（claim_token_curve_fee /
+    // 池费 claim），发币人自己、任何第三方都拿不走。这一笔必须由发币人签（他是当前
+    // creator），转完即放弃对费用的直接支配。
+    // set_token_curve（把曲线 pin 进 token_config）只有 distributor 能调，由后台 keeper 补，
+    // 不在用户这笔里。
+    try {
+      const transferTx = await dbc.creator.transferPoolCreator({
+        pool: new PublicKey(pool),
+        creator: payer,
+        newCreator: tokenConfig,
+      });
+      await prepareTransaction(connection, transferTx, payer);
+      const signedTc = await signTransaction(transferTx);
+      const sigTc = await connection.sendRawTransaction(signedTc.serialize(), { maxRetries: 3 });
+      await confirmByPolling(connection, sigTc);
+    } catch (e) {
+      // 不吞掉：creator 没转走，这条曲线的费用就永远锁在用户钱包手里，
+      // 平台 0.5% 直接失效，必须让调用方看到。
+      throw new Error(`transferPoolCreator failed: ${(e as Error).message}`);
     }
-    await prepareTransaction(connection, ataTx, payer);
-    const signedAta = await signTransaction(ataTx);
-    const sigAta = await connection.sendRawTransaction(signedAta.serialize(), { maxRetries: 3 });
-    await confirmByPolling(connection, sigAta);
   } else {
-    // ---- 无 DBC config（本地无池模式）：自己建 mint，行为与旧版一致
-  const mintSpace = getMintLen([ExtensionType.TransferFeeConfig]);
+    // ---- 无 DBC config（本地无池模式）：自己建 mint，不带 TransferFeeConfig ----
+  const mintSpace = getMintLen([]);
   const mintRent = await connection.getMinimumBalanceForRentExemption(mintSpace);
   const creatorAta = getAssociatedTokenAddressSync(mintKp.publicKey, payer, true, TOKEN_2022_PROGRAM_ID);
 
@@ -262,19 +229,8 @@ export async function launchToken(
       lamports: mintRent,
       programId: TOKEN_2022_PROGRAM_ID,
     }),
-    // the withdrawWithheldAuthority is the global config PDA: settle_token_tax signs with
-    // CONFIG_SEED, so anything else here makes every settlement fail with Unauthorized.
-    createInitializeTransferFeeConfigInstruction(
-      mintKp.publicKey,
-      config,
-      config,
-      LAUNCH_FEE_BPS,
-      MAX_FEE,
-      TOKEN_2022_PROGRAM_ID,
-    ),
     createInitializeMintInstruction(mintKp.publicKey, LAUNCH_DECIMALS, payer, null, TOKEN_2022_PROGRAM_ID),
     createAssociatedTokenAccountInstruction(payer, creatorAta, payer, mintKp.publicKey, TOKEN_2022_PROGRAM_ID),
-    ...settlementAtaIxs(payer),
     createMintToInstruction(
       mintKp.publicKey,
       creatorAta,
