@@ -16,6 +16,7 @@ import {
   createInitializeMetadataPointerInstruction,
   createMintToInstruction,
   createAssociatedTokenAccountInstruction,
+  createAssociatedTokenAccountIdempotentInstruction,
   getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
 import { createInitializeInstruction } from '@solana/spl-token-metadata';
@@ -96,6 +97,40 @@ export async function launchToken(
     programId,
   );
   const [config] = PublicKey.findProgramAddressSync([Buffer.from('config')], programId);
+  // settle_token_tax 的三个收款 ATA（fee 池 + 10% buyback + 5% liquidity）。
+  // buyback/liquidity 的 owner 是 per-mint PDA，地址必须是标准 ATA；任何一处缺失，
+  // settle 的 associated_token 约束会直接失败，85/10/5 永远汇不出去。
+  const [buybackOwner] = PublicKey.findProgramAddressSync(
+    [Buffer.from('buyback'), mintKp.publicKey.toBuffer()],
+    programId,
+  );
+  const [liquidityOwner] = PublicKey.findProgramAddressSync(
+    [Buffer.from('liq'), mintKp.publicKey.toBuffer()],
+    programId,
+  );
+  const settlementAtaIxs = (from: PublicKey) => [
+    createAssociatedTokenAccountIdempotentInstruction(
+      from,
+      getAssociatedTokenAddressSync(mintKp.publicKey, tokenConfig, true, TOKEN_2022_PROGRAM_ID),
+      tokenConfig,
+      mintKp.publicKey,
+      TOKEN_2022_PROGRAM_ID,
+    ),
+    createAssociatedTokenAccountIdempotentInstruction(
+      from,
+      getAssociatedTokenAddressSync(mintKp.publicKey, buybackOwner, true, TOKEN_2022_PROGRAM_ID),
+      buybackOwner,
+      mintKp.publicKey,
+      TOKEN_2022_PROGRAM_ID,
+    ),
+    createAssociatedTokenAccountIdempotentInstruction(
+      from,
+      getAssociatedTokenAddressSync(mintKp.publicKey, liquidityOwner, true, TOKEN_2022_PROGRAM_ID),
+      liquidityOwner,
+      mintKp.publicKey,
+      TOKEN_2022_PROGRAM_ID,
+    ),
+  ];
 
   // ============ 第一步：建池（配了 DBC config 时，mint 由 DBC 创建） ============
   //
@@ -158,6 +193,27 @@ export async function launchToken(
     signature = sig;
     buySignature = sig;
     pool = dbcSdk.deriveDbcPoolAddress(WSOL_MINT, mintKp.publicKey, dbcConfig).toBase58();
+
+    // ---- 结算收款 ATA 预建：settle_token_tax 会把 85% 打进 creator_ata（CI 断言
+    // owner == token_config.creator），并把 10% / 5% 打进 buyback / liquidity 的 per-mint
+    // ATA。DBC 建池时 mint 才在这笔交易里诞生，ATA 只能在其后补建；idempotent 保证可重入。
+    // 少了任何一个，settle 都会在 associated_token 约束上失败，税一分也汇不出去。
+    const ataTx = new Transaction().add(...settlementAtaIxs(payer));
+    if (params.taxDest === 0) {
+      ataTx.add(
+        createAssociatedTokenAccountIdempotentInstruction(
+          payer,
+          getAssociatedTokenAddressSync(mintKp.publicKey, payer, true, TOKEN_2022_PROGRAM_ID),
+          payer,
+          mintKp.publicKey,
+          TOKEN_2022_PROGRAM_ID,
+        ),
+      );
+    }
+    await prepareTransaction(connection, ataTx, payer);
+    const signedAta = await signTransaction(ataTx);
+    const sigAta = await connection.sendRawTransaction(signedAta.serialize(), { maxRetries: 3 });
+    await confirmByPolling(connection, sigAta);
   } else {
     // ---- 无 DBC config（本地无池模式）：自己建 mint，行为与旧版一致
   const mintSpace = getMintLen([ExtensionType.TransferFeeConfig]);
@@ -172,17 +228,19 @@ export async function launchToken(
       lamports: mintRent,
       programId: TOKEN_2022_PROGRAM_ID,
     }),
-    // the fee authority is the token_config PDA, so only the protocol can ever touch the fee
+    // the withdrawWithheldAuthority is the global config PDA: settle_token_tax signs with
+    // CONFIG_SEED, so anything else here makes every settlement fail with Unauthorized.
     createInitializeTransferFeeConfigInstruction(
       mintKp.publicKey,
-      tokenConfig,
-      tokenConfig,
+      config,
+      config,
       LAUNCH_FEE_BPS,
       MAX_FEE,
       TOKEN_2022_PROGRAM_ID,
     ),
     createInitializeMintInstruction(mintKp.publicKey, LAUNCH_DECIMALS, payer, null, TOKEN_2022_PROGRAM_ID),
     createAssociatedTokenAccountInstruction(payer, creatorAta, payer, mintKp.publicKey, TOKEN_2022_PROGRAM_ID),
+    ...settlementAtaIxs(payer),
     createMintToInstruction(
       mintKp.publicKey,
       creatorAta,
