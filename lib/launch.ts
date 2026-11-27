@@ -31,7 +31,13 @@ const META_BUFFER_LAMPORTS = 10_000_000; // 0.01 SOL，给 metadata 扩展 reall
 /** Fixed launch parameters: 9 decimals, 0.5% transfer tax, supply 1,000,000,000. */
 export const LAUNCH_DECIMALS = 9;
 export const LAUNCH_FEE_BPS = 50;
-const MAX_FEE = (BigInt(10) ** BigInt(12));
+/**
+ * No per-transfer ceiling: the tax is always exactly 0.5% of the amount.
+ * u64::MAX is the Token-2022 "unlimited" value — anything lower silently caps the tax
+ * on large transfers (with 9 decimals, the old 1e12 = 1,000 tokens, so every transfer
+ * above 200,000 tokens effectively paid nothing).
+ */
+const MAX_FEE = 18446744073709551615n;
 export const LAUNCH_SUPPLY = 1_000_000_000;
 
 // 浏览器里的 Buffer 是旧版 polyfill，没有 writeBigUInt64LE / writeUInt16LE 这类实例方法
