@@ -151,6 +151,27 @@ export async function launchToken(
     // decimals / 1% fee / maxFee / metadata 全部取自 DBC config（实测复现：9 位、
   // 100bps、u64::MAX、withdrawWithheldAuthority = 协议 config PDA）。
   const useDbc = Boolean(params.dbcConfig);
+  // ---- init_token_config 必须与 mint 的创建落在同一笔交易里 ----
+  // mint 一旦上链而登记还没落，任何人都能抢先把自己的钱包登记成 `creator`（token_cfg
+  // 只能初始化一次），此后这位用户 0.5% 里的 85% 全部流向抢跑者。把「建 mint/建池」与
+  // 「登记」压进同一笔交易，中间就没有可插队的窗口。
+  const initTokenConfigIx = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: payer, isSigner: true, isWritable: true },
+      { pubkey: mintKp.publicKey, isSigner: false, isWritable: false },
+      { pubkey: payer, isSigner: false, isWritable: false },
+      { pubkey: tokenConfig, isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.concat([
+      ixDisc('init_token_config'),
+      new Uint8Array([params.taxDest]),
+      u16le(LAUNCH_FEE_BPS),
+      u64le(MAX_FEE),
+    ]),
+  });
+  let registeredInline = false;
   let signature = '';
   let pool: string | undefined;
   let buySignature: string | undefined;
@@ -190,6 +211,13 @@ export async function launchToken(
         : undefined,
     });
     await prepareTransaction(connection, tx, payer);
+    // 原子化：DBC 的 CPI 先创建 mint，同一笔里随后的 init_token_config 读到的就是它。
+    // 交易逼近 1232 字节上限时退回分开发送（功能优先），返回结果里 registeredInline=false。
+    const probeLen = Buffer.from(tx.serializeMessage()).length;
+    if (probeLen + 110 <= 1232) {
+      tx.add(initTokenConfigIx);
+      registeredInline = true;
+    }
     // DBC 建池指令把 baseMint 列为 signer（createAccount 需要新账户签名），
     // mint 私钥只在本地，必须在这笔交易里补签名，否则 serialize 报 Missing signature。
     tx.partialSign(mintKp);
@@ -256,6 +284,9 @@ export async function launchToken(
       TOKEN_2022_PROGRAM_ID,
     ),
   );
+  // 同一个理由：mint 在这笔里刚被创建，登记紧跟着发出，中间没有窗口。
+  tx1.add(initTokenConfigIx);
+  registeredInline = true;
   params.onStep?.('mint');
   await prepareTransaction(connection, tx1, payer);
   tx1.partialSign(mintKp);
@@ -266,32 +297,17 @@ export async function launchToken(
   if (lamports(params.devBuySol ?? 0) > 0) poolSkipped = true;
   }
 
-  // ---- transaction 2: register the token on the protocol
-  const initIx = new TransactionInstruction({
-    programId,
-    keys: [
-      { pubkey: payer, isSigner: true, isWritable: true },
-      { pubkey: mintKp.publicKey, isSigner: false, isWritable: false },
-      { pubkey: payer, isSigner: false, isWritable: false },
-      { pubkey: tokenConfig, isSigner: false, isWritable: true },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-    ],
-    data: Buffer.concat([
-      ixDisc('init_token_config'),
-      new Uint8Array([params.taxDest]),
-      u16le(LAUNCH_FEE_BPS),
-      u64le(MAX_FEE),
-    ]),
-  });
-  // record_launch 只允许 config.distributor 调用（programs/flp-treasury/src/lib.rs:140
-  // require!(authority == config.distributor)），普通发币人必然 Unauthorized(0x177b)。
+  // ---- 兜底：只有原子化没做成（交易体积超 1232 字节）时才单独发登记 ----
+  // record_launch 只允许 config.distributor 调用，普通发币人必然 Unauthorized，
   // 所以用户这笔只发 init_token_config；发币统计由 distributor/keeper 另行记账。
-  params.onStep?.('register');
-  const tx2 = new Transaction().add(initIx);
-  await prepareTransaction(connection, tx2, payer);
-  const signed2 = await signTransaction(tx2);
-  const sig2 = await connection.sendRawTransaction(signed2.serialize(), { maxRetries: 3 });
-  await confirmByPolling(connection, sig2);
+  if (!registeredInline) {
+    params.onStep?.('register');
+    const tx2 = new Transaction().add(initTokenConfigIx);
+    await prepareTransaction(connection, tx2, payer);
+    const signed2 = await signTransaction(tx2);
+    const sig2 = await connection.sendRawTransaction(signed2.serialize(), { maxRetries: 3 });
+    await confirmByPolling(connection, sig2);
+  }
 
   return {
     mint: mintKp.publicKey.toBase58(),
