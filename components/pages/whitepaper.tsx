@@ -16,13 +16,14 @@ function ZhBody() {
     ['代币名称', 'FAIR'],
     ['代币符号', 'FAIR'],
     ['总供应量', '1,000,000,000 FAIR（总量固定、不可调；权限锁死、不可增发，随销毁逐步通缩）'],
-    ['买入税 / 卖出税', '各 1%（FAIR 母币与发射的新币一致）'],
+    ['买入税 / 卖出税', '各 0.5%（FAIR 母币与发射的新币一致）'],
     ['FAIR 母币税收分配', '销毁 40% / 分红 30% / 流动性 20% / 运营 10%'],
     ['发射新币税收分配', '创作者 85% / 回购并销毁 FAIR 10% / 卖成 SOL 进 FAIR 加池金库 5%'],
-    ['交易池手续费', '0.25%（与 1% 转账税叠加，一次往返合计约 2.5%）'],
+    ['交易池手续费', '0.25%（与 0.5% 转账税叠加，一次往返合计约 1.5%）'],
     ['曲线手续费', '1%（协议固定抽 20%，其余 80% 归创作者）'],
     ['分红触发', '分红金库累计 20 SOL，到线即触发，与时间周期无关；单次金额取决于当期交易量与税收规模'],
-    ['发行方式', '链上曲线首发：曲线可售 70%、迁移进池 30%、无深度储备（项目方不持币）；无预售、无私募、无团队预留'],
+    ['开发者预留', '仅 FAIR 母币：固定 5%（50,000,000 枚），发币时刻起 180 天 cliff，之后每 30 天释放 10%，第 480 天（约 16 个月）释放完毕，全部进入公开的硬件钱包单签地址；平台后续发射的新币无任何预留'],
+    ['发行方式', '链上曲线首发：FAIR 母币 95%（9.5 亿枚）进曲线与迁移池、5% 按上述预留计划释放；平台后续新币 100% 进曲线与迁移池（曲线可售 70%、迁移 30%）；母币与子币均无深度储备、无预售、无私募、无白名单'],
   ];
 
   return (
@@ -65,18 +66,18 @@ function ZhBody() {
 
       <h3 className="mt-8 font-semibold text-black">2.1 一键部署</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        在 Launch 页面只需填写名称、符号、图片与元数据、税权归属，以及可选的首次买入。总量（10 亿枚）、税率（买卖各 1%）与曲线参数（70/30、394.0619 SOL 迁移阈值）由协议模板固定，页面上没有可改的输入框——不是"填了不许改"，是"从一开始就没有可填的地方"。所有通过协议发射的代币共享同一套合约逻辑，参数写死在模板里，之后不可修改。
+        在 Launch 页面只需填写名称、符号、图片与元数据、税权归属，以及可选的首次买入。总量（10 亿枚）、税率（买卖各 0.5%）与曲线参数（70/30、394.0619 SOL 迁移阈值）由协议模板固定，页面上没有可改的输入框——不是"填了不许改"，是"从一开始就没有可填的地方"。所有通过协议发射的代币共享同一套合约逻辑，参数写死在模板里，之后不可修改。
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.2 税率结构（分两套，别混）</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        买入税与卖出税各 1%，由 Token-2022 的转账费在协议层自动扣除，没有管理员修改入口。<span className="font-semibold text-black">FAIR 母币</span>的税按 40 / 30 / 20 / 10 四档分配至销毁池、持币者分红池、流动性回购与运营开发；<span className="font-semibold text-black">通过协议发射的新币</span>，按 85 / 10 / 5 分配：85% 结算给创作者、10% 买入 FAIR 并立即销毁、5% 卖成 SOL 进入 FAIR 加池金库（与母币税的 10% 合并计数，凑够 20 SOL 才加池），详见 3.2。
+        买入税与卖出税各 0.5%，由 Token-2022 的转账费在协议层自动扣除，没有管理员修改入口。<span className="font-semibold text-black">FAIR 母币</span>的税按 40 / 30 / 20 / 10 四档分配至销毁池、持币者分红池、流动性回购与运营开发；<span className="font-semibold text-black">通过协议发射的新币</span>，按 85 / 10 / 5 分配：85% 结算给创作者、10% 买入 FAIR 并立即销毁、5% 卖成 SOL 进入 FAIR 加池金库（与母币税的 10% 合并计数，凑够 20 SOL 才加池），详见 3.2。
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        曲线阶段另有一笔 1% 的 swap 手续费，由曲线程序在成交时扣除：协议固定抽走 20%，其余 80% 归代币创作者。它与 1% 转账税叠加，所以曲线阶段每笔买入的实际成本约 2%。
+        曲线阶段另有一笔 1% 的 swap 手续费，由曲线程序在成交时扣除：协议固定抽走 20%，其余 80% 归代币创作者。它与 0.5% 转账税叠加，所以曲线阶段每笔买入的实际成本约 1.5%。
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        交易池本身另收 0.25% 手续费，由做市程序在 swap 里直接扣，计入池内供 LP 提取。这笔钱和 1% 转账税是两套独立机制，会叠加：一次买入再卖出，用户实际损耗约 1% + 1% + 0.25% + 0.25% ≈ 2.5%，另加滑点。
+        交易池本身另收 0.25% 手续费，由做市程序在 swap 里直接扣，计入池内供 LP 提取。这笔钱和 0.5% 转账税是两套独立机制，会叠加：一次买入再卖出，用户实际损耗约 0.5% + 0.5% + 0.25% + 0.25% ≈ 1.5%，另加滑点。
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.3 自动销毁</h3>
@@ -108,7 +109,7 @@ function ZhBody() {
 
       <h3 className="mt-8 font-semibold text-black">2.7 税金如何真正到手</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        1% 的税在每一笔代币转账时由协议扣下，但不会自动进任何人的钱包，而是先记录在收款方账户的 withheld 余额里（包括交易池的金库账户）。协议由 keeper 定时执行 harvest：每 10 分钟全量扫描该 mint 名下所有 Token-2022 账户（含交易池金库）的 withheld 余额，批量搬进税金金库，再按分配比例处理。整个过程由多签地址持有的签名权执行，每一步在浏览器上都能查到指令与金额。
+        0.5% 的税在每一笔代币转账时由协议扣下，但不会自动进任何人的钱包，而是先记录在收款方账户的 withheld 余额里（包括交易池的金库账户）。协议由 keeper 定时执行 harvest：每 10 分钟全量扫描该 mint 名下所有 Token-2022 账户（含交易池金库）的 withheld 余额，批量搬进税金金库，再按分配比例处理。整个过程由多签地址持有的签名权执行，每一步在浏览器上都能查到指令与金额。
       </p>
       <h4 className="mt-6 font-semibold text-black">2.7.1 税权只有一把钥匙</h4>
       <p className="mt-2 text-sm leading-7 text-black/70">
@@ -116,13 +117,31 @@ function ZhBody() {
         <span className="font-mono text-xs">feeClaimer = PDA([b&quot;token_cfg&quot;, mint_pubkey], program_id)</span>，并与 mint 的
         <span className="font-mono text-xs">withdrawWithheldAuthority</span> 是同一地址。全局 config PDA（由 <span className="font-mono text-xs">[b&quot;config&quot;]</span> 派生）与它是两把不同的钥匙，混用会出现&quot;能填进去、提不出来&quot;：代币照常建池、税照常累积，但结算时 <span className="font-mono text-xs">invoke_signed</span> 签不过，税金永远锁在 withheld 余额里。审计方用上式即可独立验算，无需读合约源码。
       </p>
-      <h4 className="mt-6 font-semibold text-black">2.7.2 提现环节的 1% 与 99%</h4>
+      <h4 className="mt-6 font-semibold text-black">2.7.2 提现环节的 0.5% 与 99.5%</h4>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        Token-2022 的费率变更按 epoch 生效，所以结算当轮仍按 1% 计税：每轮实际回收源账户 withheld 余额的 99%，剩余 1% 留在源账户，下一轮自动滚入。实测衰减为 8,088,300 → 80,883 → 808.83 → 8.0883 枚（每轮严格 ×1%）。这是提现通道的属性，不改变 85 / 10 / 5 的分配比例——三腿到账恒等于&quot;本轮抽入中转金额&quot;的 85% / 10% / 5%，内部再分配不再被扣费。
+        Token-2022 的费率变更按 epoch 生效，所以结算当轮仍按 0.5% 计税：每轮实际回收源账户 withheld 余额的 99.5%，剩余 0.5% 留在源账户，下一轮自动滚入。实测衰减为 8,088,300 → 40,441 → 202 → 1 枚（每轮严格 ×0.5%）。这是提现通道的属性，不改变 85 / 10 / 5 的分配比例——三腿到账恒等于&quot;本轮抽入中转金额&quot;的 85% / 10% / 5%，内部再分配不再被扣费。
       </p>
       <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
         税是代币，分红是 SOL，中间必须卖出。发射新币的税中约 15% 需要卖成 SOL（10% 回购 FAIR、5% 卖成 SOL 进 FAIR 加池金库）；FAIR 母币的税中约 50% 同样需要卖出。为避免形成可预测的砸盘时间点，卖出会拆成 8–12 笔在数小时内完成（TWAP），harvest 触发同样看余额阈值，不按固定日结算。
       </div>
+
+      <h3 className="mt-8 font-semibold text-black">2.8 FAIR 母币的开发者预留</h3>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        FAIR 是 FLP 的母币，总量 10 亿枚。与平台后续发行的所有新币不同，FAIR 为覆盖审计、前端托管与初期开发，预留 <span className="font-semibold text-black">5%（50,000,000 枚）</span>给开发者，其余 95%（950,000,000 枚）全部进入曲线与迁移池。
+      </p>
+      <p className="mt-3 text-sm leading-7 text-black/70">
+        这 5% 不走转账，而是在发币交易发生的那一刻直接铸入链上的 <span className="font-mono text-xs">dev_vault</span> 账户（PDA：<span className="font-mono text-xs">[b&quot;dev_vault&quot;]</span>），因此进库数量是足额的 50,000,000 枚，不会在入库环节被扣税。此后它只能通过 <span className="font-mono text-xs">claim_dev_vested</span> 指令流向初始化时写死的收款地址——该地址写入合约配置后不可更改，任何人（包括开发者本人）都无法把钱改投他处，第三方也可以代为触发释放，资金去向由合约固定。
+      </p>
+      <p className="mt-3 text-sm leading-7 text-black/70">释放规则：</p>
+      <ul className="mt-2 space-y-1.5 pl-5 text-sm leading-7 text-black/70">
+        <li className="list-disc">发币时刻起 <span className="font-semibold text-black">180 天</span>为 cliff（全部锁定），期间可领取数量为 0</li>
+        <li className="list-disc">cliff 结束后每 30 天释放总量的 10%，共 10 期，每期 5,000,000 枚</li>
+        <li className="list-disc">第 <span className="font-semibold text-black">480 天（约 16 个月）</span>释放完毕；任一时刻可领取的累计量 = floor((已过天数 − 180) / 30) × 10%，重复领取不会超发</li>
+        <li className="list-disc">每次释放是一笔普通的 Token-2022 转账，同样按 0.5% 计税，因此实际到手略低于名义数量，这部分税进入母币 40 / 30 / 20 / 10 的分账</li>
+      </ul>
+      <p className="mt-3 text-sm leading-7 text-black/70">
+        该收款地址在主网是一个硬件钱包单签地址，链上公开可查。不设多签、不设解锁后门、不设任何二次调整或追加预留的入口；与常见的 20% 团队份额相比，这里只有 5%、有明确时间表、有可查地址。平台后续发射的子币一律零预留，创作者收入只来自 85% 的交易税分成——两套规则的完整差异见第三章对照表。
+      </p>
 
       <h2 className="mt-12 text-xl font-bold text-black">三、代币经济</h2>
       <div className="mt-4 overflow-x-auto wp-card">
@@ -132,6 +151,38 @@ function ZhBody() {
               <tr key={k} className="border-b border-black/5 last:border-0">
                 <td className="w-40 px-4 py-3 align-top text-black/50">{k}</td>
                 <td className="px-4 py-3 font-semibold text-black">{v}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mt-8 font-semibold text-black">母币与子币：两套规则对照</h3>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        FAIR 是平台母币，为覆盖审计、前端托管与初期开发设有开发者预留；平台上线的每一个新币沿用零预留的公平发射标准。这不是两套标准，而是分层的设计选择——下表把差异一次写清，不留任何需要&quot;事后发现&quot;的隐含份额。
+      </p>
+      <div className="mt-3 overflow-x-auto wp-card">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-black/10">
+              <th className="w-32 px-4 py-2 text-left text-xs font-normal text-black/40">项目</th>
+              <th className="px-4 py-2 text-left text-xs font-normal text-black/40">FAIR 母币</th>
+              <th className="px-4 py-2 text-left text-xs font-normal text-black/40">平台发射的新币</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ['总量', '1,000,000,000 FAIR（固定）', '1,000,000,000（固定）'],
+              ['开发者预留', '固定 5%（50,000,000 枚）：180 天 cliff + 10 期月度释放，第 480 天释放完毕', '0（无任何预留，项目方不持币）'],
+              ['进曲线与迁移池', '95%（950,000,000 枚）', '100%（曲线 70% / 迁移 30%）'],
+              ['转账税', '0.5%', '0.5%'],
+              ['税收分配', '销毁 40% / 分红 30% / 流动性 20% / 运营 10%', '创作者 85% / 回购销毁 FAIR 10% / FAIR 加池 5%'],
+              ['开发者收入来源', '运营档 10% + 预留份额的月度释放', '85% 交易税分成（平台不抽成）'],
+            ].map(([k, a, b]) => (
+              <tr key={k} className="border-b border-black/5 last:border-0">
+                <td className="w-32 px-4 py-3 align-top text-black/50">{k}</td>
+                <td className="px-4 py-3 align-top font-semibold text-black">{a}</td>
+                <td className="px-4 py-3 align-top font-semibold text-black">{b}</td>
               </tr>
             ))}
           </tbody>
@@ -153,7 +204,7 @@ function ZhBody() {
 
       <h3 className="mt-8 font-semibold text-black">3.2 通过协议发射的新币：85 / 10 / 5</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        任何人在协议上一键发币，该代币收到的 1% 买卖税按以下方式分配：<span className="font-semibold text-black">85% 结算给创作者</span>，<span className="font-semibold text-black">10% 在市场上买入 FAIR 并立即销毁</span>，<span className="font-semibold text-black">5% 卖掉换成 SOL 直接进 FAIR 加池金库</span>（与母币税的 10% 合并计数，凑够 20 SOL 才加池，加完立即永久锁定 LP）。
+        任何人在协议上一键发币，该代币收到的 0.5% 买卖税按以下方式分配：<span className="font-semibold text-black">85% 结算给创作者</span>，<span className="font-semibold text-black">10% 在市场上买入 FAIR 并立即销毁</span>，<span className="font-semibold text-black">5% 卖掉换成 SOL 直接进 FAIR 加池金库</span>（与母币税的 10% 合并计数，凑够 20 SOL 才加池，加完立即永久锁定 LP）。
       </p>
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-lg border border-black/10 bg-white/60 p-4">
@@ -188,10 +239,10 @@ function ZhBody() {
 
       <h3 className="mt-8 font-semibold text-black">3.3 发行原则</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        公平发射意味着没有预售轮、没有私募折扣、没有团队预留。首发不设白名单、不设额度、不设内部价：任何人在同一时刻、以同一个起点价格买入，价格由链上曲线按买入量自动抬升，规则写死在合约里，发币方无法在过程中改价或插队。
+        公平发射意味着没有预售轮、没有私募折扣、没有白名单、没有内部价。平台发射的每一个新币都是零预留：任何人在同一时刻、以同一个起点价格买入，价格由链上曲线按买入量自动抬升，规则写死在合约里，发币方无法在过程中改价或插队。
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        协议自身不抽取代币作为费用，运营成本从交易税中的运营部分支出。团队不预留份额，也不参与曲线首发的前排购买。
+        协议自身不抽取代币作为费用，运营成本从交易税中的运营部分支出。唯一的例外是 FAIR 母币自身为覆盖审计与初期开发预留的 5%（见 2.8）——该份额在发币时即铸入链上金库、180 天后按月度释放、收款地址写死且公开可查；开发者不参与曲线首发的前排购买，也不在二级市场自买自卖制造成交量。
       </p>
 
       <h3 className="mt-8 font-semibold text-black">3.4 首发机制与流动性安排</h3>
@@ -206,8 +257,8 @@ function ZhBody() {
               ['起始 FDV', '约 241 SOL（按 SOL = $68 计约 $16,400，开盘单价 $0.0000164）'],
               ['曲线总募资', '394.0619 SOL（等于迁移阈值，达到即毕业，非人为设定）'],
               ['迁移进池数量', '300,000,000 枚（30%）+ 全部 394.0619 SOL'],
-              ['主池实收', '约 296,406,000 枚（先扣 1% 转账税、再扣 0.2% 协议迁移费）+ 约 389.34 SOL'],
-              ['协议迁移费', '0.2%，约 594,000 枚，以独立锁仓 LP 头寸留存，不归项目方'],
+              ['主池实收', '约 297,903,000 枚（先扣 0.5% 转账税、再扣 0.2% 协议迁移费）+ 约 389.34 SOL'],
+              ['协议迁移费', '0.2%，约 597,000 枚，以独立锁仓 LP 头寸留存，不归项目方'],
               ['主池开盘价', '约 1.3135e-6 SOL/枚（≈ $0.000089，FDV ≈ 1,314 SOL），为起始价的 5.44 倍，与曲线迁移价完全连续'],
               ['曲线手续费', '1%（协议固定抽 20%，其余 80% 归创作者）'],
               ['深度储备', '0 枚（不设储备条款，项目方不持币）'],
@@ -222,15 +273,15 @@ function ZhBody() {
         </table>
       </div>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        曲线卖满后自动迁移成交易池，流动性就是曲线筹到的 SOL，发币方不需要先垫付建池资金。供给怎么切由参数写死，不靠人定：<span className="font-semibold text-black">percentageSupplyOnMigration = 30</span> 的含义是&quot;迁移进 DAMM 的供给比例&quot;，曲线可售部分自动互补到 70%，两者严格相加等于 100%，没有 leftover、也没有第三方预留。实测（本地测试网毕业快照）：swapBaseAmount = 700,000,000 枚（70%）、migrationBaseThreshold = 300,000,000 枚（30%），两者相加恰等于总量 10 亿枚；migrationQuoteThreshold = 394.0619 SOL。注入侧不会全额到账，扣减是可复算的：先经 1% 转账税（Token-2022 在转账时扣）剩 297,000,000 枚，再扣 0.2% 协议流动性迁移费 594,000 枚，主池金库实收 296,406,000 枚。两笔合计 3,594,000 枚都不归任何人——1% 进税权分账，0.2% 以独立锁仓 LP 头寸留存，不在任何人可撤回的账户中。税收由 keeper 定时结算：每 10 分钟全量扫描该 mint 名下所有 Token-2022 账户的 withheld 余额，批量 harvest 后按协议比例自动拆分到销毁、分红、流动性与运营四档；池子金库自身的 withheld 也在这张扫描名单里，买入、卖出、加池产生的税都不会漏在池子里。
+        曲线卖满后自动迁移成交易池，流动性就是曲线筹到的 SOL，发币方不需要先垫付建池资金。供给怎么切由参数写死，不靠人定：<span className="font-semibold text-black">percentageSupplyOnMigration = 30</span> 的含义是&quot;迁移进 DAMM 的供给比例&quot;，曲线可售部分自动互补到 70%，两者严格相加等于 100%，没有 leftover、也没有第三方预留。实测（本地测试网毕业快照）：swapBaseAmount = 700,000,000 枚（70%）、migrationBaseThreshold = 300,000,000 枚（30%），两者相加恰等于总量 10 亿枚；migrationQuoteThreshold = 394.0619 SOL。注入侧不会全额到账，扣减是可复算的：先经 0.5% 转账税（Token-2022 在转账时扣）剩 298,500,000 枚，再扣 0.2% 协议流动性迁移费 597,000 枚，主池金库实收 297,903,000 枚。两笔合计 2,097,000 枚都不归任何人——0.5% 进税权分账，0.2% 以独立锁仓 LP 头寸留存，不在任何人可撤回的账户中。税收由 keeper 定时结算：每 10 分钟全量扫描该 mint 名下所有 Token-2022 账户的 withheld 余额，批量 harvest 后按协议比例自动拆分到销毁、分红、流动性与运营四档；池子金库自身的 withheld 也在这张扫描名单里，买入、卖出、加池产生的税都不会漏在池子里。
       </p>
       <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
-        两个必须知道的细节。第一，0.2% 协议迁移费与 1% 转账税是两套独立机制，但在迁移这笔转账上会叠加：1% 转账税在代币转入池子的那一刻由 Token-2022 扣掉（300,000,000 → 297,000,000），0.2% 协议迁移费再从到账额里扣（297,000,000 → 296,406,000），实测金库实收 296,406,000 枚，与两级扣减完全对得上。第二，池子金库账户自己也在被收税（买入时进金库扣一次、卖出时出金库再扣一次），这部分记在金库的 withheld 余额里，必须纳入 harvest 扫描名单，否则池子的实际余额与做市程序的记账会对不上。
+        两个必须知道的细节。第一，0.2% 协议迁移费与 0.5% 转账税是两套独立机制，但在迁移这笔转账上会叠加：0.5% 转账税在代币转入池子的那一刻由 Token-2022 扣掉（300,000,000 → 298,500,000），0.2% 协议迁移费再从到账额里扣（298,500,000 → 297,903,000），实测金库实收 297,903,000 枚，与两级扣减完全对得上。第二，池子金库账户自己也在被收税（买入时进金库扣一次、卖出时出金库再扣一次），这部分记在金库的 withheld 余额里，必须纳入 harvest 扫描名单，否则池子的实际余额与做市程序的记账会对不上。
       </div>
 
       <h4 className="mt-6 font-semibold text-black">3.4.1 迁移阶段的四条硬约束（实测）</h4>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        第一，迁移费档位必须是 <span className="font-mono text-xs">Customizable</span>，它对应官方常量 <span className="font-mono text-xs break-all">A8gMrEPJkacWkcb3DGwtJwTe16HktSEfvwtuDh2MCtck</span>；档位与该地址强绑定，换成 FixedBps100 会被链上直接拒绝（<span className="font-mono text-xs">InvalidMigrationFeeOption</span>）。第二，带税币迁移后的池费必须用 <span className="font-mono text-xs">Compounding</span> 计费模式，否则 SDK 在创建 config 阶段即报错。第三，协议固定抽 0.2% 的流动性迁移费，从注入池子的代币侧扣除，且这笔转账同时受 1% 转账税约束：实测注入 300,000,000 枚，转账时先扣 1% 税剩 297,000,000 枚，再扣 0.2% 迁移费 594,000 枚，金库实收 296,406,000 枚，与两级扣减逐枚对得上（差额 3,594,000 = 3,000,000 转账税 + 594,000 迁移费），与供给分配比例无关。第四，迁移前必须给曲线池的 pool authority PDA 预充 ≥0.2 SOL 支付新建池账户的租金；付款钱包只付交易费，漏充会在建池那一步以 <span className="font-mono text-xs">insufficient lamports</span> 中断。
+        第一，迁移费档位必须是 <span className="font-mono text-xs">Customizable</span>，它对应官方常量 <span className="font-mono text-xs break-all">A8gMrEPJkacWkcb3DGwtJwTe16HktSEfvwtuDh2MCtck</span>；档位与该地址强绑定，换成 FixedBps100 会被链上直接拒绝（<span className="font-mono text-xs">InvalidMigrationFeeOption</span>）。第二，带税币迁移后的池费必须用 <span className="font-mono text-xs">Compounding</span> 计费模式，否则 SDK 在创建 config 阶段即报错。第三，协议固定抽 0.2% 的流动性迁移费，从注入池子的代币侧扣除，且这笔转账同时受 0.5% 转账税约束：实测注入 300,000,000 枚，转账时先扣 0.5% 税剩 298,500,000 枚，再扣 0.2% 迁移费 597,000 枚，金库实收 297,903,000 枚，与两级扣减逐枚对得上（差额 2,097,000 = 1,500,000 转账税 + 597,000 迁移费），与供给分配比例无关。第四，迁移前必须给曲线池的 pool authority PDA 预充 ≥0.2 SOL 支付新建池账户的租金；付款钱包只付交易费，漏充会在建池那一步以 <span className="font-mono text-xs">insufficient lamports</span> 中断。
       </p>
       <h4 className="mt-6 font-semibold text-black">3.4.2 曲线收尾必须用 PartialFill</h4>
       <p className="mt-2 text-sm leading-7 text-black/70">
@@ -266,15 +317,15 @@ function ZhBody() {
 
       <h2 className="mt-12 text-xl font-bold text-black">六、风险披露</h2>
       <div className="mt-4 space-y-2 text-sm leading-7 text-black/70">
-        <p><span className="font-semibold text-black">税收即滑点。</span>每笔交易都会被扣 1% 的买入税或卖出税，高频交易者的实际损耗显著高于名义税率。加上 0.25% 池子手续费，一次往返的综合损耗约 2.5%，另加滑点。</p>
+        <p><span className="font-semibold text-black">税收即滑点。</span>每笔交易都会被扣 0.5% 的买入税或卖出税，高频交易者的实际损耗显著高于名义税率。加上 0.25% 池子手续费，一次往返的综合损耗约 1.5%，另加滑点。</p>
         <p><span className="font-semibold text-black">分红不确定。</span>分红来自交易税，交易冷淡时分红趋近于零。</p>
         <p><span className="font-semibold text-black">税收卖出压力。</span>发射新币的税中约 15%、母币税中约 50% 需卖出换成 SOL 才能回购加池与分红，这会持续形成卖出压力；已用 TWAP 拆单与随机窗口削弱影响，但无法消除。</p>
         <p><span className="font-semibold text-black">销毁即通缩。</span>新币税中的 10% 用于买入并销毁 FAIR，母币总量会逐轮减少；通缩不等于上涨，价格仍由买卖决定。</p>
-        <p><span className="font-semibold text-black">曲线手续费抽成。</span>曲线阶段 1% 的 swap 手续费中，协议固定抽 20%，创作者拿 80%，这部分成本与 1% 转账税叠加。</p>
+        <p><span className="font-semibold text-black">曲线手续费抽成。</span>曲线阶段 1% 的 swap 手续费中，协议固定抽 20%，创作者拿 80%，这部分成本与 0.5% 转账税叠加。</p>
         <p><span className="font-semibold text-black">MEV 无法根除。</span>Bundle 只能降低概率，不能消除。</p>
         <p><span className="font-semibold text-black">合约风险。</span>未经审计的合约存在未知漏洞，可能造成资金损失。</p>
         <p><span className="font-semibold text-black">流动性风险。</span>曲线阶段池子尚不存在，价格由曲线决定；迁移初期深度有限，大额卖出仍会严重砸价。池子深度靠加池逐步增厚，需要时间。</p>
-        <p><span className="font-semibold text-black">首发阶段的税。</span>曲线买入同样扣 1% 税，买家实际到手为成交量的 99%，这部分税金在发射日就开始累积，需要同步启动 harvest。</p>
+        <p><span className="font-semibold text-black">首发阶段的税。</span>曲线买入同样扣 0.5% 税，买家实际到手为成交量的 99.5%，这部分税金在发射日就开始累积，需要同步启动 harvest。</p>
         <p><span className="font-semibold text-black">监管风险。</span>各司法辖区对代币发行与分红的定性不同，可能影响可用性。</p>
       </div>
 
@@ -302,13 +353,14 @@ function EnBody() {
     ['Token Name', 'FAIR'],
     ['Symbol', 'FAIR'],
     ['Total Supply', '1,000,000,000 FAIR (fixed, not adjustable; authorities locked, no minting, supply shrinks only through burns)'],
-    ['Buy / Sell Tax', '1% each (same for FAIR and launched tokens)'],
+    ['Buy / Sell Tax', '0.5% each (same for FAIR and launched tokens)'],
     ['FAIR Fee Allocation', 'Burn 40% / Dividends 30% / Liquidity 20% / Operations 10%'],
     ['Launched Token Fees', 'Creator 85% / FAIR buyback-and-burn 10% / 5% sold to SOL into the FAIR liquidity vault'],
-    ['Pool Swap Fee', '0.25% (stacks on the 1% transfer tax — round trip is about 2.5%)'],
+    ['Pool Swap Fee', '0.25% (stacks on the 0.5% transfer tax — round trip is about 1.5%)'],
     ['Curve Swap Fee', '1% (protocol takes a fixed 20%, the other 80% goes to the creator)'],
     ['Dividend Trigger', '20 SOL in the dividend vault; payout size depends on the tax collected that period'],
-    ['Distribution', 'On-chain bonding curve launch: 70% sellable on the curve, 30% migrated into the pool, no depth reserve (the issuer holds no tokens). No presale, no private round, no team allocation'],
+    ['Developer Allocation', 'FAIR mother coin only: a fixed 5% (50,000,000 tokens). 180-day cliff from the launch transaction, then 10% of the total every 30 days, fully released on day 480 (about 16 months) into a publicly disclosed hardware-wallet address. Every token launched on the platform afterwards carries no allocation at all'],
+    ['Distribution', 'On-chain bonding curve launch: the FAIR mother coin puts 95% (950,000,000 tokens) into the curve and the migration pool and releases the 5% on the schedule above; every token launched afterwards puts 100% into the curve and pool (70% sellable, 30% migrated). Neither the mother coin nor launched tokens carry a depth reserve, presale, private round or allowlist'],
   ];
 
   return (
@@ -351,18 +403,18 @@ function EnBody() {
 
       <h3 className="mt-8 font-semibold text-black">2.1 One-Click Deployment</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        On the Launch page you only enter the name, symbol, image and metadata, the tax destination, and an optional first buy. Total supply (1,000,000,000), tax rates (1% each side) and the curve parameters (70/30, 394.0619 SOL migration threshold) are fixed by the protocol template, and there is no editable input for them on the page — not &quot;filled in and then locked&quot;, but &quot;there was never anything to fill in&quot;. All tokens launched through the protocol share the same contract logic, with the parameters hard-coded in the template and unchangeable afterwards.
+        On the Launch page you only enter the name, symbol, image and metadata, the tax destination, and an optional first buy. Total supply (1,000,000,000), tax rates (0.5% each side) and the curve parameters (70/30, 394.0619 SOL migration threshold) are fixed by the protocol template, and there is no editable input for them on the page — not &quot;filled in and then locked&quot;, but &quot;there was never anything to fill in&quot;. All tokens launched through the protocol share the same contract logic, with the parameters hard-coded in the template and unchangeable afterwards.
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.2 Tax Structure (Two Separate Sets)</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        Buy and sell tax are 1% each, charged at protocol level by the Token-2022 transfer fee, with no admin override. On <span className="font-semibold text-black">the FAIR token</span>, fees are split 40 / 30 / 20 / 10 across the burn pool, holder dividend pool, liquidity buyback and operations. On <span className="font-semibold text-black">tokens launched through the protocol</span>, fees are split 85 / 10 / 5: 85% settles to the creator, 10% buys FAIR on the market and burns it immediately, and 5% is sold for SOL into the FAIR liquidity vault (counted together with the 10% of the FAIR tax, a top-up fires at 20 SOL) — see 3.2.
+        Buy and sell tax are 0.5% each, charged at protocol level by the Token-2022 transfer fee, with no admin override. On <span className="font-semibold text-black">the FAIR token</span>, fees are split 40 / 30 / 20 / 10 across the burn pool, holder dividend pool, liquidity buyback and operations. On <span className="font-semibold text-black">tokens launched through the protocol</span>, fees are split 85 / 10 / 5: 85% settles to the creator, 10% buys FAIR on the market and burns it immediately, and 5% is sold for SOL into the FAIR liquidity vault (counted together with the 10% of the FAIR tax, a top-up fires at 20 SOL) — see 3.2.
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        The curve also charges a 1% swap fee on every fill: the protocol takes a fixed 20% of it and the remaining 80% goes to the token creator. That stacks on top of the 1% transfer tax, so a buy on the curve costs roughly 2%.
+        The curve also charges a 1% swap fee on every fill: the protocol takes a fixed 20% of it and the remaining 80% goes to the token creator. That stacks on top of the 0.5% transfer tax, so a buy on the curve costs roughly 1.5%.
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        The trading pool charges an additional 0.25% swap fee, deducted by the AMM inside the swap and retained in the pool for LPs. These are two independent mechanisms and they stack: a buy followed by a sell costs roughly 1% + 1% + 0.25% + 0.25% ≈ 2.5%, plus slippage.
+        The trading pool charges an additional 0.25% swap fee, deducted by the AMM inside the swap and retained in the pool for LPs. These are two independent mechanisms and they stack: a buy followed by a sell costs roughly 0.5% + 0.5% + 0.25% + 0.25% ≈ 1.5%, plus slippage.
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.3 Auto Burn</h3>
@@ -394,7 +446,7 @@ function EnBody() {
 
       <h3 className="mt-8 font-semibold text-black">2.7 How the Tax Actually Reaches the Treasury</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        The 1% is deducted by the protocol on every token transfer, but it does not land in anyone&apos;s wallet automatically: it is recorded as a withheld balance on the receiving token account, including the pool&apos;s vault accounts. The protocol periodically runs a harvest that sweeps all withheld amounts into the fee treasury, then splits them by the allocation. The sweep is driven by a keeper: every 10 minutes it scans every Token-2022 account holding the mint for a non-zero withheld balance — including the pool&apos;s own vault — harvests them in batches, then splits by the protocol ratio. Every step is signed by an authority held in a multisig and every instruction and amount is verifiable in a block explorer.
+        The 0.5% is deducted by the protocol on every token transfer, but it does not land in anyone&apos;s wallet automatically: it is recorded as a withheld balance on the receiving token account, including the pool&apos;s vault accounts. The protocol periodically runs a harvest that sweeps all withheld amounts into the fee treasury, then splits them by the allocation. The sweep is driven by a keeper: every 10 minutes it scans every Token-2022 account holding the mint for a non-zero withheld balance — including the pool&apos;s own vault — harvests them in batches, then splits by the protocol ratio. Every step is signed by an authority held in a multisig and every instruction and amount is verifiable in a block explorer.
       </p>
       <h4 className="mt-6 font-semibold text-black">2.7.1 There Is Exactly One Key to the Tax</h4>
       <p className="mt-2 text-sm leading-7 text-black/70">
@@ -402,13 +454,31 @@ function EnBody() {
         <span className="font-mono text-xs">feeClaimer = PDA([b&quot;token_cfg&quot;, mint_pubkey], program_id)</span>, the same address as the mint&apos;s
         <span className="font-mono text-xs">withdrawWithheldAuthority</span>. The global config PDA (derived from <span className="font-mono text-xs">[b&quot;config&quot;]</span>) is a different key, and mixing them produces &quot;accepted but never withdrawable&quot;: the pool is created and the tax accrues, yet settlement fails at <span className="font-mono text-xs">invoke_signed</span> and the withheld balance stays locked forever. Auditors can verify the formula themselves without reading the contract.
       </p>
-      <h4 className="mt-6 font-semibold text-black">2.7.2 The 1% That Stays Behind on Withdrawal</h4>
+      <h4 className="mt-6 font-semibold text-black">2.7.2 The 0.5% That Stays Behind on Withdrawal</h4>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        Token-2022 applies fee changes only at the next epoch, so the withdrawal still pays the 1% rate in force: each round sweeps 99% of the withheld balance from the source accounts and leaves 1% behind for the next round. Measured decay: 8,088,300 → 80,883 → 808.83 → 8.0883 tokens, exactly ×1% each round. This is a property of the withdrawal path, not of the split: the three legs always receive 85% / 10% / 5% of what the round actually pulled in, and the internal redistribution is never taxed again.
+        Token-2022 applies fee changes only at the next epoch, so the withdrawal still pays the 0.5% rate in force: each round sweeps 99.5% of the withheld balance from the source accounts and leaves 0.5% behind for the next round. Measured decay: 8,088,300 → 40,441 → 202 → 1 tokens, exactly ×0.5% each round. This is a property of the withdrawal path, not of the split: the three legs always receive 85% / 10% / 5% of what the round actually pulled in, and the internal redistribution is never taxed again.
       </p>
       <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
         Tax arrives as tokens, dividends are paid in SOL, so a sale in between is unavoidable: about 15% of a launched token&apos;s tax and roughly 50% of the FAIR tax must be sold for SOL (10% FAIR buyback, 5% sold into the FAIR liquidity vault). To avoid handing the market a predictable dump schedule, the sale is split into 8–12 orders over several hours (TWAP) and the harvest window is randomized across 6–9 days rather than fixed on day 7.
       </div>
+
+      <h3 className="mt-8 font-semibold text-black">2.8 The FAIR Developer Allocation</h3>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        FAIR is the platform&apos;s mother coin, 1 billion tokens. Unlike every token the platform launches afterwards, FAIR reserves <span className="font-semibold text-black">5% (50,000,000 tokens)</span> for the developer to cover audits, frontend hosting and initial development; the other 95% (950,000,000 tokens) goes into the curve and the migration pool.
+      </p>
+      <p className="mt-3 text-sm leading-7 text-black/70">
+        That 5% is not transferred but minted directly into an on-chain <span className="font-mono text-xs">dev_vault</span> account (PDA <span className="font-mono text-xs">[b&quot;dev_vault&quot;]</span>) in the launch transaction, so the vault receives the full 50,000,000 — no transfer tax at intake. From then on it can only move through the <span className="font-mono text-xs">claim_dev_vested</span> instruction, and only to the beneficiary address fixed in the config at initialisation. That address cannot be changed afterwards: nobody, the developer included, can redirect the funds, and any third party can trigger a release — the destination is enforced by the program, not by trust.
+      </p>
+      <p className="mt-3 text-sm leading-7 text-black/70">Release schedule:</p>
+      <ul className="mt-2 space-y-1.5 pl-5 text-sm leading-7 text-black/70">
+        <li className="list-disc">A <span className="font-semibold text-black">180-day</span> cliff from the launch transaction: nothing is claimable during it</li>
+        <li className="list-disc">After the cliff, 10% of the total every 30 days, ten releases of 5,000,000 each</li>
+        <li className="list-disc">Fully released on <span className="font-semibold text-black">day 480 (about 16 months)</span>; at any moment the cumulative claimable amount is floor((days elapsed − 180) / 30) × 10%, and repeated claims can never over-issue</li>
+        <li className="list-disc">Each release is an ordinary Token-2022 transfer of a taxed mint, so it pays the 0.5% fee too; that fee joins the mother coin&apos;s 40 / 30 / 20 / 10 split</li>
+      </ul>
+      <p className="mt-3 text-sm leading-7 text-black/70">
+        On mainnet the beneficiary is a single-signature hardware-wallet address, publicly verifiable on chain. There is no multisig, no unlock backdoor and no entry point to adjust or add to the allocation. Against the usual 20% team slice this is 5%, with a published schedule and a verifiable address. Every token launched later on the platform carries zero allocation and its creator earns only the 85% tax share — the full side-by-side is in section 3.
+      </p>
 
       <h2 className="mt-12 text-xl font-bold text-black">3. Token Economics</h2>
       <div className="mt-4 overflow-x-auto wp-card">
@@ -418,6 +488,38 @@ function EnBody() {
               <tr key={k} className="border-b border-black/5 last:border-0">
                 <td className="w-44 px-4 py-3 align-top text-black/50">{k}</td>
                 <td className="px-4 py-3 font-semibold text-black">{v}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mt-8 font-semibold text-black">FAIR vs Launched Tokens: Side by Side</h3>
+      <p className="mt-2 text-sm leading-7 text-black/70">
+        FAIR is the mother coin and carries a developer allocation to cover audits, frontend hosting and initial development. Every token the platform launches afterwards follows the zero-allocation fair-launch standard. This is one layered design, not two standards — the table below states every difference up front, so nothing has to be discovered after the fact.
+      </p>
+      <div className="mt-3 overflow-x-auto wp-card">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-black/10">
+              <th className="w-32 px-4 py-2 text-left text-xs font-normal text-black/40">Item</th>
+              <th className="px-4 py-2 text-left text-xs font-normal text-black/40">FAIR mother coin</th>
+              <th className="px-4 py-2 text-left text-xs font-normal text-black/40">Tokens launched on the platform</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ['Total supply', '1,000,000,000 FAIR (fixed)', '1,000,000,000 (fixed)'],
+              ['Developer allocation', 'Fixed 5% (50,000,000): 180-day cliff, then ten monthly releases, complete on day 480', '0 (no allocation; the issuer holds no tokens)'],
+              ['Into curve and pool', '95% (950,000,000)', '100% (70% curve / 30% migrated)'],
+              ['Transfer tax', '0.5%', '0.5%'],
+              ['Fee split', 'Burn 40% / Dividends 30% / Liquidity 20% / Operations 10%', 'Creator 85% / FAIR buyback-and-burn 10% / FAIR liquidity 5%'],
+              ['Developer revenue', '10% operations leg + the monthly allocation releases', '85% of the trading tax (no platform cut)'],
+            ].map(([k, a, b]) => (
+              <tr key={k} className="border-b border-black/5 last:border-0">
+                <td className="w-32 px-4 py-3 align-top text-black/50">{k}</td>
+                <td className="px-4 py-3 align-top font-semibold text-black">{a}</td>
+                <td className="px-4 py-3 align-top font-semibold text-black">{b}</td>
               </tr>
             ))}
           </tbody>
@@ -439,7 +541,7 @@ function EnBody() {
 
       <h3 className="mt-8 font-semibold text-black">3.2 Tokens Launched Through the Protocol: 85 / 10 / 5</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        Anyone can launch a token here. The 1% tax it collects is split as follows: <span className="font-semibold text-black">85% settles to the creator</span>, <span className="font-semibold text-black">10% buys FAIR on the market and burns it immediately</span>, and <span className="font-semibold text-black">5% goes into the FAIR liquidity vault</span> (counted together with the 10% of the FAIR tax — a top-up fires once 20 SOL accumulates, and that batch of LP is permanently locked as soon as liquidity is added).
+        Anyone can launch a token here. The 0.5% tax it collects is split as follows: <span className="font-semibold text-black">85% settles to the creator</span>, <span className="font-semibold text-black">10% buys FAIR on the market and burns it immediately</span>, and <span className="font-semibold text-black">5% goes into the FAIR liquidity vault</span> (counted together with the 10% of the FAIR tax — a top-up fires once 20 SOL accumulates, and that batch of LP is permanently locked as soon as liquidity is added).
       </p>
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-lg border border-black/10 bg-white/60 p-4">
@@ -474,10 +576,10 @@ function EnBody() {
 
       <h3 className="mt-8 font-semibold text-black">3.3 Distribution Principle</h3>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        A fair launch means no presale round, no private discount and no team allocation. There is no allowlist, no cap and no insider price: everyone buys at the same starting price at the same moment, and the price rises with purchases along an on-chain curve whose rules are fixed in the contract, so the issuer cannot reprice mid-way or jump the queue.
+        A fair launch means no presale round, no private discount, no allowlist and no insider price. Every token the platform launches is zero-allocation: everyone buys at the same starting price at the same moment, and the price rises with purchases along an on-chain curve whose rules are fixed in the contract, so the issuer cannot reprice mid-way or jump the queue.
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        The protocol does not skim tokens as a fee; operating costs are paid from the operations share of trading tax. The team reserves no allocation and does not take a position at the front of the curve.
+        The protocol does not skim tokens as a fee; operating costs are paid from the operations share of trading tax. The single exception is the 5% that FAIR itself reserves to cover audits and initial development (see 2.8) — minted into an on-chain vault at launch, released monthly after a 180-day cliff, to an address fixed in the contract and publicly verifiable. The developer does not take a position at the front of the curve and does not trade against the book to manufacture volume.
       </p>
 
       <h3 className="mt-8 font-semibold text-black">3.4 Launch Mechanics and Liquidity Plan</h3>
@@ -492,8 +594,8 @@ function EnBody() {
               ['Starting FDV', '≈ 241 SOL (≈ $16,400 at SOL = $68, opening price $0.0000164)'],
               ['Total raised on curve', '394.0619 SOL (equal to the migration threshold — reaching it graduates the token)'],
               ['Migrated into pool', '300,000,000 tokens (30%) + the full 394.0619 SOL'],
-              ['Received by the pool', '≈ 296,406,000 tokens (1% transfer tax first, then the 0.2% protocol fee) + ≈ 389.34 SOL'],
-              ['Protocol migration fee', '0.2%, ≈ 594,000 tokens, retained as a separate locked LP position — not issuer revenue'],
+              ['Received by the pool', '≈ 297,903,000 tokens (0.5% transfer tax first, then the 0.2% protocol fee) + ≈ 389.34 SOL'],
+              ['Protocol migration fee', '0.2%, ≈ 597,000 tokens, retained as a separate locked LP position — not issuer revenue'],
               ['Main pool opening price', '≈ 1.3135e-6 SOL/token (≈ $0.000089, FDV ≈ 1,314 SOL) — 5.44× the start price, fully continuous with the migration price'],
               ['Curve swap fee', '1% (protocol takes a fixed 20%, the other 80% goes to the creator)'],
               ['Depth reserve', '0 tokens (no reserve clause; the issuer holds no supply)'],
@@ -508,15 +610,15 @@ function EnBody() {
         </table>
       </div>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        When the curve sells out it migrates into a trading pool automatically, and that liquidity is the SOL the curve raised — the issuer never has to fund the pool upfront. The supply split is fixed by a parameter, not by hand: <span className="font-semibold text-black">percentageSupplyOnMigration = 30</span> means &quot;share of supply migrated into DAMM v2&quot;, and the curve sellable side is the complement, 70% — the two sum to exactly 100%, with no leftover and no third-party allocation. Measured on a graduated testnet pool: swapBaseAmount = 700,000,000 tokens (70%) and migrationBaseThreshold = 300,000,000 tokens (30%), summing to the full 1B supply, with migrationQuoteThreshold = 394.0619 SOL. The injected side does not arrive in full, and the deduction is reproducible: the 1% transfer tax is taken by Token-2022 as the tokens enter the pool (300,000,000 → 297,000,000), then the 0.2% protocol liquidity migration fee is deducted (594,000 tokens), so the main vault receives 296,406,000 tokens. Both deductions — 3,594,000 tokens in total — belong to no one: the 1% goes to the tax split, the 0.2% is retained as a separate locked LP position. Tax is settled by a keeper on a fixed cadence: every 10 minutes it scans every Token-2022 account of that mint for a non-zero withheld balance, harvests them in batches, then splits by the protocol ratio into burn, dividend, liquidity and operations. The pool&apos;s own vault is on that scan list, so tax charged on buys, sells and liquidity additions never stays stranded inside the pool.
+        When the curve sells out it migrates into a trading pool automatically, and that liquidity is the SOL the curve raised — the issuer never has to fund the pool upfront. The supply split is fixed by a parameter, not by hand: <span className="font-semibold text-black">percentageSupplyOnMigration = 30</span> means &quot;share of supply migrated into DAMM v2&quot;, and the curve sellable side is the complement, 70% — the two sum to exactly 100%, with no leftover and no third-party allocation. Measured on a graduated testnet pool: swapBaseAmount = 700,000,000 tokens (70%) and migrationBaseThreshold = 300,000,000 tokens (30%), summing to the full 1B supply, with migrationQuoteThreshold = 394.0619 SOL. The injected side does not arrive in full, and the deduction is reproducible: the 0.5% transfer tax is taken by Token-2022 as the tokens enter the pool (300,000,000 → 298,500,000), then the 0.2% protocol liquidity migration fee is deducted (597,000 tokens), so the main vault receives 297,903,000 tokens. Both deductions — 2,097,000 tokens in total — belong to no one: the 0.5% goes to the tax split, the 0.2% is retained as a separate locked LP position. Tax is settled by a keeper on a fixed cadence: every 10 minutes it scans every Token-2022 account of that mint for a non-zero withheld balance, harvests them in batches, then splits by the protocol ratio into burn, dividend, liquidity and operations. The pool&apos;s own vault is on that scan list, so tax charged on buys, sells and liquidity additions never stays stranded inside the pool.
       </p>
       <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
-        Two details worth knowing. First, the 0.2% protocol migration fee and the 1% transfer tax are separate mechanisms, but they stack on this one transfer: the 1% is charged by Token-2022 as the tokens enter the pool (300,000,000 → 297,000,000) and the 0.2% protocol fee is then taken from the received amount (297,000,000 → 296,406,000); the measured vault balance of 296,406,000 reconciles exactly against that two-stage deduction. Second, the pool vault itself pays the tax (charged on the way in and again on the way out), and that amount sits in the vault&apos;s withheld balance too; the vault must be included in the harvest scan, otherwise the AMM accounting no longer matches the real balance.
+        Two details worth knowing. First, the 0.2% protocol migration fee and the 0.5% transfer tax are separate mechanisms, but they stack on this one transfer: the 0.5% is charged by Token-2022 as the tokens enter the pool (300,000,000 → 298,500,000) and the 0.2% protocol fee is then taken from the received amount (298,500,000 → 297,903,000); the measured vault balance of 297,903,000 reconciles exactly against that two-stage deduction. Second, the pool vault itself pays the tax (charged on the way in and again on the way out), and that amount sits in the vault&apos;s withheld balance too; the vault must be included in the harvest scan, otherwise the AMM accounting no longer matches the real balance.
       </div>
 
       <h4 className="mt-6 font-semibold text-black">3.4.1 Four Hard Constraints at Migration (measured)</h4>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        First, the migration fee tier must be <span className="font-mono text-xs">Customizable</span>, whose official constant is <span className="font-mono text-xs break-all">A8gMrEPJkacWkcb3DGwtJwTe16HktSEfvwtuDh2MCtck</span>; the tier is bound to that address, and FixedBps100 is rejected on chain (<span className="font-mono text-xs">InvalidMigrationFeeOption</span>). Second, a taxed token&apos;s post-migration pool fee must use the <span className="font-mono text-xs">Compounding</span> collect mode, otherwise the SDK rejects the config at creation time. Third, the protocol charges a fixed 0.2% liquidity migration fee deducted from the token side entering the pool, and this transfer also pays the 1% transfer tax: measured 300,000,000 injected, 1% tax taken on transfer leaving 297,000,000, then the 0.2% fee of 594,000 leaving 296,406,000 received — a 3,594,000 difference that reconciles token-for-token (3,000,000 tax + 594,000 fee) and is unrelated to the supply split. Fourth, the curve pool&apos;s authority PDA must be pre-funded with ≥0.2 SOL before migration to pay rent for the accounts created during pool initialisation; the paying wallet only covers the transaction fee, and skipping this aborts the migration with <span className="font-mono text-xs">insufficient lamports</span>.
+        First, the migration fee tier must be <span className="font-mono text-xs">Customizable</span>, whose official constant is <span className="font-mono text-xs break-all">A8gMrEPJkacWkcb3DGwtJwTe16HktSEfvwtuDh2MCtck</span>; the tier is bound to that address, and FixedBps100 is rejected on chain (<span className="font-mono text-xs">InvalidMigrationFeeOption</span>). Second, a taxed token&apos;s post-migration pool fee must use the <span className="font-mono text-xs">Compounding</span> collect mode, otherwise the SDK rejects the config at creation time. Third, the protocol charges a fixed 0.2% liquidity migration fee deducted from the token side entering the pool, and this transfer also pays the 0.5% transfer tax: measured 300,000,000 injected, 0.5% tax taken on transfer leaving 298,500,000, then the 0.2% fee of 597,000 leaving 297,903,000 received — a 2,097,000 difference that reconciles token-for-token (1,500,000 tax + 597,000 fee) and is unrelated to the supply split. Fourth, the curve pool&apos;s authority PDA must be pre-funded with ≥0.2 SOL before migration to pay rent for the accounts created during pool initialisation; the paying wallet only covers the transaction fee, and skipping this aborts the migration with <span className="font-mono text-xs">insufficient lamports</span>.
       </p>
       <h4 className="mt-6 font-semibold text-black">3.4.2 The Curve Must Be Finished with PartialFill</h4>
       <p className="mt-2 text-sm leading-7 text-black/70">
@@ -552,15 +654,15 @@ function EnBody() {
 
       <h2 className="mt-12 text-xl font-bold text-black">6. Risk Disclosure</h2>
       <div className="mt-4 space-y-2 text-sm leading-7 text-black/70">
-        <p><span className="font-semibold text-black">Tax is slippage.</span> Every trade pays 1% on the way in or out; high-frequency traders lose far more than the headline rate suggests. With the 0.25% swap fee, a full round trip costs about 2.5% plus slippage.</p>
+        <p><span className="font-semibold text-black">Tax is slippage.</span> Every trade pays 0.5% on the way in or out; high-frequency traders lose far more than the headline rate suggests. With the 0.25% swap fee, a full round trip costs about 1.5% plus slippage.</p>
         <p><span className="font-semibold text-black">Dividends are variable.</span> Payouts come from trading fees, so they approach zero when volume is thin.</p>
         <p><span className="font-semibold text-black">Fee-driven sell pressure.</span> About 15% of a launched token&apos;s tax and roughly 50% of the FAIR tax must be sold for SOL to fund buybacks, liquidity and dividends, which creates continuous sell pressure. TWAP splitting and a randomized window reduce the impact; they cannot remove it.</p>
         <p><span className="font-semibold text-black">Burns mean deflation, not gains.</span> The 10% buyback-and-burn shrinks FLP&apos;s supply round after round; a shrinking supply is not a rising price, which is still set by buyers and sellers.</p>
-        <p><span className="font-semibold text-black">Curve fee cut.</span> On the curve, the protocol takes a fixed 20% of the 1% swap fee and the creator keeps 80%; that cost stacks on top of the 1% transfer tax.</p>
+        <p><span className="font-semibold text-black">Curve fee cut.</span> On the curve, the protocol takes a fixed 20% of the 1% swap fee and the creator keeps 80%; that cost stacks on top of the 0.5% transfer tax.</p>
         <p><span className="font-semibold text-black">MEV is not removable.</span> Bundles reduce the odds, they do not eliminate it.</p>
         <p><span className="font-semibold text-black">Contract risk.</span> An unaudited contract may hold unknown vulnerabilities that cause loss of funds.</p>
         <p><span className="font-semibold text-black">Liquidity risk.</span> During the curve there is no pool at all and the price is set by the curve; early after migration depth is still thin and large sells will move price hard. Depth grows only as the reserve is added over time.</p>
-        <p><span className="font-semibold text-black">Tax during launch.</span> Curve buys also pay the 1% tax, so buyers receive 99% of their fill. That tax starts accruing on launch day and harvesting must start at the same time.</p>
+        <p><span className="font-semibold text-black">Tax during launch.</span> Curve buys also pay the 0.5% tax, so buyers receive 99.5% of their fill. That tax starts accruing on launch day and harvesting must start at the same time.</p>
         <p><span className="font-semibold text-black">Regulatory risk.</span> Jurisdictions treat token issuance and dividends differently, which may limit availability.</p>
       </div>
 

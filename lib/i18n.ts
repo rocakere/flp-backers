@@ -56,8 +56,8 @@ const zh = {
   },
   launch: {
     title: '发起代币',
-    sub: '在 Solana 上一键部署内置 1% 税、85 / 10 / 5 分账与自动加池的代币',
-    notice: '发射会真实创建 Token-2022 代币：9 位小数、1% 转账税、总量 10 亿。这三项由协议模板固定，页面上不可修改；名称/符号/URI 与税权归属由你填，写在代币自身的 Metadata 扩展里，账户租金与手续费由你的钱包支付。建池与首次买入在同一笔交易内原子执行（需配置 DBC partner config）。',
+    sub: '在 Solana 上一键部署内置 0.5% 税、85 / 10 / 5 分账与自动加池的代币',
+    notice: '发射会真实创建 Token-2022 代币：9 位小数、0.5% 转账税、总量 10 亿。这三项由协议模板固定，页面上不可修改；名称/符号/URI 与税权归属由你填，写在代币自身的 Metadata 扩展里，账户租金与手续费由你的钱包支付。建池与首次买入在同一笔交易内原子执行（需配置 DBC partner config）。',
     fName: '代币名称 Name',
     phName: '例如 Fair Token',
     fSymbol: '代币符号 Symbol',
@@ -80,8 +80,8 @@ const zh = {
     fWeb: '官网（可选）',
     fX: 'X / Twitter（可选）',
     fTg: 'Telegram（可选）',
-    taxTitle: '交易税：固定 1%，不可修改',
-    taxLine: '买卖各 1%，按 85 / 10 / 5 自动分账：85% 结算给收款方、10% 回购并销毁 FAIR、5% 卖成 SOL 进入 FAIR 加池金库。',
+    taxTitle: '交易税：固定 0.5%，不可修改',
+    taxLine: '买卖各 0.5%，按 85 / 10 / 5 自动分账：85% 结算给收款方、10% 回购并销毁 FAIR、5% 卖成 SOL 进入 FAIR 加池金库。',
     fDir: '税收流向（85% 这一路的收款方）',
     dirCreator: '创作者钱包（默认）',
     dirVault: 'FAIR 加池金库（公益类可选）',
@@ -126,7 +126,7 @@ const zh = {
       },
       {
         q: '买入税和卖出税的税金怎么分配？',
-        a: '买卖税各为 1%，但要分两套看：FAIR 母币的税按 4:3:2:1 拆分——40% 进入销毁池、30% 进入持币者分红池、20% 用于流动性回购与加深、10% 用于运营与开发；通过协议发射的新币，税归发币者、平台不抽成，按 85 / 10 / 5 分配——85% 结算给创作者、10% 用于回购并销毁 FAIR、5% 卖成 SOL 进入 FAIR 加池金库（不为该币单独建池）。交易池另收 0.25% 手续费，曲线阶段另收 1% swap 手续费（其中 80% 归创作者、20% 归协议），与 1% 转账税叠加，曲线阶段买入成本约 2%。',
+        a: '买卖税各为 0.5%，但要分两套看：FAIR 母币的税按 4:3:2:1 拆分——40% 进入销毁池、30% 进入持币者分红池、20% 用于流动性回购与加深、10% 用于运营与开发；通过协议发射的新币，税归发币者、平台不抽成，按 85 / 10 / 5 分配——85% 结算给创作者、10% 用于回购并销毁 FAIR、5% 卖成 SOL 进入 FAIR 加池金库（不为该币单独建池）。交易池另收 0.25% 手续费，曲线阶段另收 1% swap 手续费（其中 80% 归创作者、20% 归协议），与 0.5% 转账税叠加，曲线阶段买入成本约 1.5%。',
       },
       {
         q: '新币是怎么发的？要不要先买？',
@@ -229,8 +229,8 @@ const en: typeof zh = {
   },
   launch: {
     title: 'Launch a Token',
-    sub: 'Deploy a Solana token with a fixed 1% tax, 85 / 10 / 5 split and auto-liquidity',
-    notice: 'This launch really creates a Token-2022 token: 9 decimals, 1% transfer tax, 1 billion supply. All three are fixed by the protocol template and cannot be edited on this page. You choose the name/symbol/URI and the tax destination; they are stored in the token\'s own Metadata extension. Rent and fees are paid by your wallet. Pool creation and the first buy run atomically in one transaction (requires a DBC partner config).',
+    sub: 'Deploy a Solana token with a fixed 0.5% tax, 85 / 10 / 5 split and auto-liquidity',
+    notice: 'This launch really creates a Token-2022 token: 9 decimals, 0.5% transfer tax, 1 billion supply. All three are fixed by the protocol template and cannot be edited on this page. You choose the name/symbol/URI and the tax destination; they are stored in the token\'s own Metadata extension. Rent and fees are paid by your wallet. Pool creation and the first buy run atomically in one transaction (requires a DBC partner config).',
     fName: 'Token Name',
     phName: 'e.g. Fair Token',
     fSymbol: 'Token Symbol',
@@ -253,8 +253,8 @@ const en: typeof zh = {
     fWeb: 'Website (optional)',
     fX: 'X / Twitter (optional)',
     fTg: 'Telegram (optional)',
-    taxTitle: 'Trading tax: fixed 1%, not editable',
-    taxLine: '1% on buys and sells, split 85 / 10 / 5 automatically: 85% settled to the receiver, 10% used to buy back and burn FAIR, 5% sold for SOL into the FAIR liquidity vault.',
+    taxTitle: 'Trading tax: fixed 0.5%, not editable',
+    taxLine: '0.5% on buys and sells, split 85 / 10 / 5 automatically: 85% settled to the receiver, 10% used to buy back and burn FAIR, 5% sold for SOL into the FAIR liquidity vault.',
     fDir: 'Tax destination (receiver of the 85% leg)',
     dirCreator: 'Creator wallet (default)',
     dirVault: 'FAIR liquidity vault (for public-good projects)',
@@ -299,7 +299,7 @@ const en: typeof zh = {
       },
       {
         q: 'How is the buy and sell tax allocated?',
-        a: 'Buy and sell tax are 1% each, but there are two separate sets. On the FAIR token, fees split 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations. On tokens launched through the protocol, fees belong to the issuer with no platform cut, split 85 / 10 / 5: 85% settles to the creator, 10% buys back and burns FAIR, and 5% is sold for SOL into the FAIR liquidity vault. The pool charges a further 0.25% swap fee, and the curve charges a 1% swap fee (80% to the creator, 20% to the protocol), which stacks on the 1% transfer tax — a curve buy costs about 2%.',
+        a: 'Buy and sell tax are 0.5% each, but there are two separate sets. On the FAIR token, fees split 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations. On tokens launched through the protocol, fees belong to the issuer with no platform cut, split 85 / 10 / 5: 85% settles to the creator, 10% buys back and burns FAIR, and 5% is sold for SOL into the FAIR liquidity vault. The pool charges a further 0.25% swap fee, and the curve charges a 1% swap fee (80% to the creator, 20% to the protocol), which stacks on the 0.5% transfer tax — a curve buy costs about 1.5%.',
       },
       {
         q: 'How is a new token launched? Do I need to buy first?',

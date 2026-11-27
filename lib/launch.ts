@@ -28,9 +28,9 @@ const WSOL_MINT = new PublicKey('So11111111111111111111111111111111111111112');
 /** 元数据存在 mint 自己的 Token-2022 Metadata 扩展里（旧版 Metaplex 不支持 Token-2022 mint）。 */
 const META_BUFFER_LAMPORTS = 10_000_000; // 0.01 SOL，给 metadata 扩展 realloc 留租金
 
-/** Fixed launch parameters: 9 decimals, 1% transfer tax, supply 1,000,000,000. */
+/** Fixed launch parameters: 9 decimals, 0.5% transfer tax, supply 1,000,000,000. */
 export const LAUNCH_DECIMALS = 9;
-export const LAUNCH_FEE_BPS = 100;
+export const LAUNCH_FEE_BPS = 50;
 const MAX_FEE = (BigInt(10) ** BigInt(12));
 export const LAUNCH_SUPPLY = 1_000_000_000;
 
