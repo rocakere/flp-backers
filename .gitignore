@@ -46,3 +46,6 @@ next-env.d.ts
 
 # TS launch harness build output
 /.tmp-launch/
+
+# ad-hoc debug scripts stay out of the repo
+/_*
