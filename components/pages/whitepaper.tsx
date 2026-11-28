@@ -38,7 +38,7 @@ function ZhBody() {
       </p>
       <div className="mt-6 print:hidden">
         <a
-          href="/whitepaper.pdf"
+          href="/whitepaper.pdf?v=20261128"
           download="FLP-Whitepaper-zh-v0.3.pdf"
           className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-purple-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-purple-500/25 active:translate-y-0 active:scale-[0.98]"
         >
@@ -373,7 +373,7 @@ function EnBody() {
       </p>
       <div className="mt-6 print:hidden">
         <a
-          href="/whitepaper-en.pdf"
+          href="/whitepaper-en.pdf?v=20261128"
           download="FLP-Whitepaper-en-v0.3.pdf"
           className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-purple-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-purple-500/25 active:translate-y-0 active:scale-[0.98]"
         >
