@@ -21,6 +21,8 @@ export default function Navbar() {
   const switchLang = (next: string) => {
     const nextLang = next as Lang;
     if (nextLang === lang) return;
+    // Remember the choice so the middleware stops redirecting this visitor to /en.
+    document.cookie = `flp_lang=${nextLang}; path=/; max-age=31536000; samesite=lax`;
     if (nextLang === 'en') {
       router.push(pathname === '/' ? '/en' : `/en${pathname}`);
     } else {

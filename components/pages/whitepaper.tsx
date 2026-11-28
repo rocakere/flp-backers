@@ -29,7 +29,7 @@ function ZhBody() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-purple-700">WHITEPAPER · v0.3</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-purple-700">WHITEPAPER · v2.2</p>
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
         <span className="block sm:inline">FairLaunch Protocol</span>
         <span className="block sm:ml-2 sm:inline">白皮书</span>
@@ -39,12 +39,12 @@ function ZhBody() {
       </p>
       <div className="mt-6 print:hidden">
         <a
-          href="/whitepaper.pdf?v=20261128"
-          download="FLP-Whitepaper-zh-v0.3.pdf"
+          href="/whitepaper.pdf?v=2.2"
+          download="FLP-Whitepaper-zh-v2.2.pdf"
           className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-purple-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-purple-500/25 active:translate-y-0 active:scale-[0.98]"
         >
           ↓ 下载 PDF 版本
-          <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wide">v0.3 最新</span>
+          <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wide">v2.2 最新</span>
         </a>
       </div>
 
@@ -173,7 +173,7 @@ function ZhBody() {
             {[
               ['总量', '1,000,000,000 FAIR（固定）', '1,000,000,000（固定）'],
               ['开发者预留', '固定 5%（50,000,000 枚），创世锁定归属 dev_vault、迁移时一次性到账；到账后 180 天 cliff + 10 期月度释放，第 480 天释放完毕', '0（无任何预留，项目方不持币）'],
-              ['供给切分', '5% 锁定 / 余 9.5 亿按 75% 曲线 + 25% 迁移池（7.125 亿 / 2.375 亿）', '与母币相同：5% 锁定进 dev_vault，余下 75% 曲线 / 25% 迁移池'],
+              ['供给切分', '5% 锁定 / 余 9.5 亿按 75% 曲线 + 25% 迁移池（7.125 亿 / 2.375 亿）', '0 预留：10 亿全部进曲线与迁移，71.25% 曲线 / 23.75% 迁移池（7.125 亿 / 2.375 亿）'],
               ['曲线阶段费率（SOL 侧结算）', '1.5%（协议抽 20%，项目方 80%）', '1.5%（协议抽 20%，创作者 80%）'],
               ['迁移后池费率（SOL 侧结算）', '0.5%（OnlyB）', '0.5%（OnlyB）'],
               ['费用分配', '销毁 40% / 分红 30% / 加池 20% / 运营 10%', '创作者 85% / 回购销毁 FAIR 10% / FAIR 加池 5%'],
@@ -335,7 +335,7 @@ function ZhBody() {
       </p>
 
       <p className="mt-12 border-t border-black/10 pt-6 text-xs text-black/40 print:hidden">
-        最后更新：2026 年 11 月 · 本文档随协议开发进度修订，以本页最新版本为准
+        最后更新：2026 年 11 月 · v2.2 · 本文档随协议开发进度修订，以本页最新版本为准
       </p>
     </main>
   );
@@ -366,7 +366,7 @@ function EnBody() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-purple-700">WHITEPAPER · v0.3</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-purple-700">WHITEPAPER · v2.2</p>
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
         <span className="block sm:inline">FairLaunch Protocol</span>
         <span className="block sm:ml-2 sm:inline">Whitepaper</span>
@@ -376,12 +376,12 @@ function EnBody() {
       </p>
       <div className="mt-6 print:hidden">
         <a
-          href="/whitepaper-en.pdf?v=20261128"
-          download="FLP-Whitepaper-en-v0.3.pdf"
+          href="/whitepaper-en.pdf?v=2.2"
+          download="FLP-Whitepaper-en-v2.2.pdf"
           className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-purple-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-purple-500/25 active:translate-y-0 active:scale-[0.98]"
         >
           ↓ Download PDF
-          <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wide">v0.3 latest</span>
+          <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wide">v2.2 latest</span>
         </a>
       </div>
 
@@ -513,7 +513,7 @@ function EnBody() {
             {[
               ['Total supply', '1,000,000,000 FAIR (fixed)', '1,000,000,000 (fixed)'],
               ['Developer allocation', 'Fixed 5% (50,000,000), locked to dev_vault at genesis and delivered at graduation; then 180-day cliff and ten monthly releases, complete on day 480', '0 (no allocation; the issuer holds no tokens)'],
-              ['Supply split', '5% locked / the other 950M as 75% curve + 25% migration pool (712.5M / 237.5M)', 'Same as the mother coin: the first 5% locked at genesis, then 75% curve / 25% pool'],
+              ['Supply split', '5% locked / the other 950M as 75% curve + 25% migration pool (712.5M / 237.5M)', 'No allocation: the full 1B goes to the curve and the migration pool — 71.25% curve / 23.75% pool (712.5M / 237.5M)'],
               ['Curve-stage fee (SOL side)', '1.5% (protocol 20%, project 80%)', '1.5% (protocol 20%, creator 80%)'],
               ['Post-migration pool fee (SOL side)', '0.5% (OnlyB)', '0.5% (OnlyB)'],
               ['Fee split', 'Burn 40% / Dividends 30% / Liquidity 20% / Operations 10%', 'Creator 85% / FAIR buyback-and-burn 10% / FAIR liquidity 5%'],
@@ -675,7 +675,7 @@ function EnBody() {
       </p>
 
       <p className="mt-12 border-t border-black/10 pt-6 text-xs text-black/40 print:hidden">
-        Last updated: November 2026 · This document is revised as the protocol develops; the current version on this page prevails
+        Last updated: November 2026 · v2.2 · This document is revised as the protocol develops; the current version on this page prevails
       </p>
     </main>
   );
