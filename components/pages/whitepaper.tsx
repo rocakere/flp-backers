@@ -19,8 +19,8 @@ function ZhBody() {
     ['买入税 / 卖出税', '各 0.5%，在池子成交时以 SOL 一侧结算（FAIR 母币与发射的新币一致；钱包互转免费）'],
     ['FAIR 母币税收分配', '销毁 40% / 分红 30% / 流动性 20% / 运营 10%'],
     ['发射新币税收分配', '创作者 85% / 以 SOL 买 FAIR 并销毁 10% / 以 SOL 结算进 FAIR 加池金库 5%'],
-    ['交易池手续费', '0.25%（与 0.5% 交易税叠加，一次往返合计约 1.5%）'],
-    ['曲线手续费', '1%（协议固定抽 20%，其余 80% 归创作者）'],
+    ['交易池手续费', '0.5%（OnlyB，仅 SOL 侧，不叠加在税之上；单程 0.5%，往返约 1%）'],
+    ['曲线手续费', '0.5%（协议固定抽 20%，其余 80% 归项目方，不叠加）'],
     ['分红触发', '分红金库累计 20 SOL，到线即触发，与时间周期无关；单次金额取决于当期交易量与税收规模'],
     ['开发者预留', '仅 FAIR 母币：固定 5%（50,000,000 枚），发币时刻起 180 天 cliff，之后每 30 天释放 10%，第 480 天（约 16 个月）释放完毕，全部进入公开的硬件钱包单签地址；平台后续发射的新币无任何预留'],
     ['发行方式', '链上曲线首发：FAIR 母币 95%（9.5 亿枚）进曲线与迁移池、5% 按上述预留计划释放；平台后续新币 100% 进曲线与迁移池（曲线可售 70%、迁移 25%、开发者预留 5%）；母币与子币均无深度储备、无预售、无私募、无白名单'],
@@ -74,10 +74,10 @@ function ZhBody() {
         买入税与卖出税各 0.5%，在池子 swap 成交时于 SOL 一侧结算扣除，钱包之间互相转账免费，没有管理员修改入口。<span className="font-semibold text-black">FAIR 母币</span>的税按 40 / 30 / 20 / 10 四档分配至销毁池、持币者分红池、流动性回购与运营开发；<span className="font-semibold text-black">通过协议发射的新币</span>，按 85 / 10 / 5 分配：85% 结算给创作者、10% 买入 FAIR 并立即销毁、5% 以 SOL 结算直接进入 FAIR 加池金库（与母币税的 10% 合并计数，凑够 20 SOL 才加池），详见 3.2。
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        曲线阶段另有一笔 1% 的 swap 手续费，由曲线程序在成交时扣除：协议固定抽走 20%，其余 80% 归代币创作者。它与 0.5% 交易税（SOL 侧结算）叠加，所以曲线阶段每笔买入的实际成本约 1.5%。
+        曲线阶段同样只有一笔 0.5%，由曲线程序在成交时于 SOL 一侧扣除：其中 20% 归 Meteora / DBC 协议，80% 归项目方。没有转账税，也没有第二笔叠加，曲线阶段每笔买入的实际成本就是 0.5%。
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        交易池本身另收 0.25% 手续费，由做市程序在 swap 里直接扣。迁移后的池以 <span className="font-semibold text-black">OnlyB 模式</span>运行：无论买入还是卖出，手续费只在 SOL 一侧累积，FAIR 一侧始终为零，所以这笔钱全部以 SOL 结算、全额可领。其中 20% 由 Meteora 协议直接收取，<span className="font-semibold text-black">不进入 FAIR 的分账</span>；剩下的 80% 归协议持有的永久锁定 position。这笔钱和 0.5% 交易税是两套独立机制，会叠加：一次买入再卖出，用户实际损耗约 0.5% + 0.5% + 0.25% + 0.25% ≈ 1.5%，另加滑点。
+        迁移后的池同样是 0.5%，以 <span className="font-semibold text-black">OnlyB 模式</span>运行：无论买入还是卖出，都只在 SOL 一侧扣，FAIR 一侧始终为零，所以这笔钱全部以 SOL 结算、全额可领。其中 20% 由 Meteora 协议直接收取、<span className="font-semibold text-black">不进入 FAIR 的分账</span>；剩下的 80%（40 bps SOL）归协议持有的永久锁定 position。它不是叠在税上的第二笔：用户单程只付 0.5%，一次买入再卖出往返约 1%，另加正常滑点，不存在双向重复扣费。
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.3 自动销毁</h3>
@@ -258,9 +258,9 @@ function ZhBody() {
               ['主池实收', '约 249,500,001 枚（只扣 0.2% 协议迁移费，迁移不经过转账税）+ 约 394 SOL'],
               ['协议迁移费', '0.2%，约 500,000 枚，以独立锁仓 LP 头寸留存，不归项目方'],
               ['主池开盘价', '约 1.579e-6 SOL/枚（≈ $0.000107，FDV ≈ 1,579 SOL），为起始价的 6.55 倍，与曲线迁移价完全连续'],
-              ['曲线手续费', '1%（协议固定抽 20%，其余 80% 归创作者）'],
+              ['曲线手续费', '0.5%（协议固定抽 20%，其余 80% 归项目方，不叠加）'],
               ['深度储备', '0 枚进池；开发者预留 5%（50,000,000 枚）单列，毕业时提起，不进池、不抛售'],
-              ['交易池手续费', '0.25%'],
+              ['交易池手续费', '0.5%（OnlyB，仅 SOL 侧）'],
             ].map(([k, v]) => (
               <tr key={k} className="border-b border-black/5 last:border-0">
                 <td className="w-40 px-4 py-3 align-top text-black/50">{k}</td>
@@ -279,7 +279,7 @@ function ZhBody() {
 
       <h4 className="mt-6 font-semibold text-black">3.4.1 迁移阶段的四条硬约束（实测）</h4>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        第一，迁移费档位必须是 <span className="font-mono text-xs">Customizable</span>，它对应官方常量 <span className="font-mono text-xs break-all">A8gMrEPJkacWkcb3DGwtJwTe16HktSEfvwtuDh2MCtck</span>；档位与该地址强绑定，换成 FixedBps100 会被链上直接拒绝（<span className="font-mono text-xs">InvalidMigrationFeeOption</span>）。第二，迁移后的池费模式为 <span className="font-mono text-xs">OutputToken</span>（费用以输出币结算），<span className="font-mono text-xs">compounding_fee_bps = 0</span>，与转账税机制完全解耦。第三，协议固定抽 0.2% 的流动性迁移费，从注入池子的代币侧扣除，且迁移全程不再有转账税：实测注入 250,000,000 枚，只扣 0.2% 迁移费 500,000 枚，金库实收约 249,500,001 枚，与扣减逐枚对得上，与供给分配比例无关。第四，迁移前必须给曲线池的 pool authority PDA 预充 ≥0.2 SOL 支付新建池账户的租金；付款钱包只付交易费，漏充会在建池那一步以 <span className="font-mono text-xs">insufficient lamports</span> 中断。
+        第一，迁移费档位必须是 <span className="font-mono text-xs">Customizable</span>，它对应官方常量 <span className="font-mono text-xs break-all">A8gMrEPJkacWkcb3DGwtJwTe16HktSEfvwtuDh2MCtck</span>；档位与该地址强绑定，换成 FixedBps100 会被链上直接拒绝（<span className="font-mono text-xs">InvalidMigrationFeeOption</span>）。第二，迁移后的池费模式为 <span className="font-mono text-xs">OnlyB</span>（DBC config 传 <span className="font-mono text-xs">QuoteToken</span>，迁移后 DAMM 池 <span className="font-mono text-xs">collectFeeMode = 1</span>，费用只在 SOL 侧计收，FAIR 侧恒为零），<span className="font-mono text-xs">compounding_fee_bps = 0</span>，与转账税机制完全解耦。第三，协议固定抽 0.2% 的流动性迁移费，从注入池子的代币侧扣除，且迁移全程不再有转账税：实测注入 250,000,000 枚，只扣 0.2% 迁移费 500,000 枚，金库实收约 249,500,001 枚，与扣减逐枚对得上，与供给分配比例无关。第四，迁移前必须给曲线池的 pool authority PDA 预充 ≥0.2 SOL 支付新建池账户的租金；付款钱包只付交易费，漏充会在建池那一步以 <span className="font-mono text-xs">insufficient lamports</span> 中断。
       </p>
       <h4 className="mt-6 font-semibold text-black">3.4.2 曲线收尾必须用 PartialFill</h4>
       <p className="mt-2 text-sm leading-7 text-black/70">
@@ -288,7 +288,7 @@ function ZhBody() {
 
       <h4 className="mt-6 font-semibold text-black">3.4.3 锁仓 LP 与池费归属</h4>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        迁移锁仓 LP 的 position NFT 由协议 config PDA 持有，0.25% 池费结算后进入 <span className="font-mono text-xs">sol_buffer</span>，不归项目方或任何私人钱包；LP 份额永久锁定，费用收益同步归协议所有。
+        迁移锁仓 LP 的 position NFT 由协议 config PDA 持有，0.5% 池费在 OnlyB 下只以 SOL 结算，结算后进入 <span className="font-mono text-xs">sol_buffer</span>，不归项目方或任何私人钱包；LP 份额永久锁定，费用收益同步归协议所有。
       </p>
 
       <h2 className="mt-12 text-xl font-bold text-black">四、可验证性与审计</h2>
@@ -315,11 +315,11 @@ function ZhBody() {
 
       <h2 className="mt-12 text-xl font-bold text-black">六、风险披露</h2>
       <div className="mt-4 space-y-2 text-sm leading-7 text-black/70">
-        <p><span className="font-semibold text-black">税收即滑点。</span>每笔链上交易都会被扣 0.5% 的买入税或卖出税（钱包互转不扣），高频交易者的实际损耗显著高于名义税率。加上 0.25% 池子手续费，一次往返的综合损耗约 1.5%，另加滑点。</p>
+        <p><span className="font-semibold text-black">税即滑点。</span>每笔链上成交在 SOL 一侧扣 0.5%（钱包互转不扣），高频交易者的实际损耗显著高于名义税率。池费也是同一笔 0.5%，不叠加，所以一次往返的综合损耗约 1%，另加滑点。</p>
         <p><span className="font-semibold text-black">分红不确定。</span>分红来自交易税，交易冷淡时分红趋近于零。</p>
         <p><span className="font-semibold text-black">卖出压力（已消除）。</span>税本身就是 SOL，不需要任何卖出换仓；协议层面不存在持续卖出压力。</p>
         <p><span className="font-semibold text-black">销毁即通缩。</span>新币税中的 10% 用于买入并销毁 FAIR，母币总量会逐轮减少；通缩不等于上涨，价格仍由买卖决定。</p>
-        <p><span className="font-semibold text-black">曲线手续费抽成。</span>曲线阶段 1% 的 swap 手续费中，协议固定抽 20%，创作者拿 80%，这部分成本与 0.5% 交易税（SOL 侧）叠加。</p>
+        <p><span className="font-semibold text-black">曲线手续费抽成。</span>曲线阶段同样是 0.5% 的 swap 手续费，协议固定抽 20%、项目方拿 80%；它就是那 0.5%，不与任何税叠加。</p>
         <p><span className="font-semibold text-black">MEV 无法根除。</span>Bundle 只能降低概率，不能消除。</p>
         <p><span className="font-semibold text-black">合约风险。</span>未经审计的合约存在未知漏洞，可能造成资金损失。</p>
         <p><span className="font-semibold text-black">流动性风险。</span>曲线阶段池子尚不存在，价格由曲线决定；迁移初期深度有限，大额卖出仍会严重砸价。池子深度靠加池逐步增厚，需要时间。</p>
@@ -354,8 +354,8 @@ function EnBody() {
     ['Buy / Sell Tax', '0.5% each (same for FAIR and launched tokens)'],
     ['FAIR Fee Allocation', 'Burn 40% / Dividends 30% / Liquidity 20% / Operations 10%'],
     ['Launched Token Fees', 'Creator 85% / FAIR buyback-and-burn 10% / 5% sold to SOL into the FAIR liquidity vault'],
-    ['Pool Swap Fee', '0.25% (stacks on the 0.5% trading tax — round trip is about 1.5%)'],
-    ['Curve Swap Fee', '1% (protocol takes a fixed 20%, the other 80% goes to the creator)'],
+    ['Pool Swap Fee', '0.5% (OnlyB, SOL side only — not stacked; round trip about 1%)'],
+    ['Curve Swap Fee', '0.5% (protocol takes a fixed 20%, the other 80% goes to the project, not stacked)'],
     ['Dividend Trigger', '20 SOL in the dividend vault; payout size depends on the tax collected that period'],
     ['Developer Allocation', 'FAIR mother coin only: a fixed 5% (50,000,000 tokens). 180-day cliff from the launch transaction, then 10% of the total every 30 days, fully released on day 480 (about 16 months) into a publicly disclosed hardware-wallet address. Every token launched on the platform afterwards carries no allocation at all'],
     ['Distribution', 'On-chain bonding curve launch: the FAIR mother coin puts 95% (950,000,000 tokens) into the curve and the migration pool and releases the 5% on the schedule above; every token launched afterwards puts 100% into the curve and pool (70% sellable, 25% migrated, 5% dev reserve). Neither the mother coin nor launched tokens carry a depth reserve, presale, private round or allowlist'],
@@ -415,7 +415,7 @@ function EnBody() {
         The curve charges the same 0.5% on every fill: the protocol takes a fixed 20% of it and the remaining 80% goes to the token creator. Nothing is stacked on top — there is no transfer tax, so moving tokens between wallets, an OTC deal or a CEX deposit costs nothing.
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        The trading pool charges an additional 0.25% swap fee, deducted by the AMM inside the swap. The migrated pool runs in OnlyB mode: the fee is charged on the SOL side only, in both directions, and never accrues on the FAIR side. 20% of it is taken by the Meteora protocol and does not enter FAIR&apos;s split; the remaining 80% goes to the protocol-owned permanently locked position. These are two independent mechanisms and they stack: a buy followed by a sell costs roughly 0.5% + 0.5% + 0.25% + 0.25% ≈ 1.5%, plus slippage.
+        The migrated pool charges the same 0.5%, not an additional layer. It runs in OnlyB mode: the fee is charged on the SOL side only, in both directions, and never accrues on the FAIR side. 20% of it is taken by the Meteora protocol and does not enter FAIR&apos;s split; the remaining 80% (40 bps in SOL) goes to the protocol-owned permanently locked position. A user pays 0.5% one way and about 1% for a full round trip, plus normal slippage — there is no double charge.
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.3 Auto Burn</h3>
@@ -596,9 +596,9 @@ function EnBody() {
               ['Received by the pool', '≈ 249,500,001 tokens (0.2% protocol fee only, no transfer tax on migration) + ≈ 394 SOL'],
               ['Protocol migration fee', '0.2%, ≈ 500,000 tokens, retained as a separate locked LP position — not issuer revenue'],
               ['Main pool opening price', '≈ 1.3135e-6 SOL/token (≈ $0.000089, FDV ≈ 1,314 SOL) — 5.44× the start price, fully continuous with the migration price'],
-              ['Curve swap fee', '1% (protocol takes a fixed 20%, the other 80% goes to the creator)'],
+              ['Curve swap fee', '0.5% (protocol takes a fixed 20%, the other 80% goes to the project)'],
               ['Depth reserve', '0 tokens (no reserve clause; the issuer holds no supply)'],
-              ['Pool swap fee', '0.25%'],
+              ['Pool swap fee', '0.5% (OnlyB, SOL side only)'],
             ].map(([k, v]) => (
               <tr key={k} className="border-b border-black/5 last:border-0">
                 <td className="w-44 px-4 py-3 align-top text-black/50">{k}</td>
@@ -626,7 +626,7 @@ function EnBody() {
 
       <h4 className="mt-6 font-semibold text-black">3.4.3 Locked LP and Who Receives the Pool Fee</h4>
       <p className="mt-2 text-sm leading-7 text-black/70">
-        The locked LP position NFT created at migration is held by the protocol&apos;s config PDA; the 0.25% pool fee, once settled, is paid into <span className="font-mono text-xs">sol_buffer</span> and belongs to neither the project team nor any private wallet — the LP share stays permanently locked and the fee income belongs to the protocol as well.
+        The locked LP position NFT created at migration is held by the protocol&apos;s config PDA; the 0.5% pool fee is charged in SOL only (OnlyB), and once settled is paid into <span className="font-mono text-xs">sol_buffer</span> and belongs to neither the project team nor any private wallet — the LP share stays permanently locked and the fee income belongs to the protocol as well.
       </p>
 
       <h2 className="mt-12 text-xl font-bold text-black">4. Verifiability and Audit</h2>
@@ -653,11 +653,11 @@ function EnBody() {
 
       <h2 className="mt-12 text-xl font-bold text-black">6. Risk Disclosure</h2>
       <div className="mt-4 space-y-2 text-sm leading-7 text-black/70">
-        <p><span className="font-semibold text-black">Tax is slippage.</span> Every trade pays 0.5% on the way in or out; high-frequency traders lose far more than the headline rate suggests. With the 0.25% swap fee, a full round trip costs about 1.5% plus slippage.</p>
+        <p><span className="font-semibold text-black">Tax is slippage.</span> Every trade pays 0.5% on the SOL side; high-frequency traders lose far more than the headline rate suggests. The pool fee is the same 0.5%, not an extra layer, so a full round trip costs about 1% plus slippage.</p>
         <p><span className="font-semibold text-black">Dividends are variable.</span> Payouts come from trading fees, so they approach zero when volume is thin.</p>
         <p><span className="font-semibold text-black">Fee-driven sell pressure.</span> About 15% of a launched token&apos;s tax and roughly 50% of the FAIR tax must be sold for SOL to fund buybacks, liquidity and dividends, which creates continuous sell pressure. TWAP splitting and a randomized window reduce the impact; they cannot remove it.</p>
         <p><span className="font-semibold text-black">Burns mean deflation, not gains.</span> The 10% buyback-and-burn shrinks FLP&apos;s supply round after round; a shrinking supply is not a rising price, which is still set by buyers and sellers.</p>
-        <p><span className="font-semibold text-black">Curve fee cut.</span> On the curve, the protocol takes a fixed 20% of the 1% swap fee and the creator keeps 80%; that cost stacks on top of the 0.5% transfer tax.</p>
+        <p><span className="font-semibold text-black">Curve fee cut.</span> The curve charges the same 0.5% swap fee: the protocol takes a fixed 20% of it and the project keeps the remaining 80%. It is that 0.5% and nothing stacks on top.</p>
         <p><span className="font-semibold text-black">MEV is not removable.</span> Bundles reduce the odds, they do not eliminate it.</p>
         <p><span className="font-semibold text-black">Contract risk.</span> An unaudited contract may hold unknown vulnerabilities that cause loss of funds.</p>
         <p><span className="font-semibold text-black">Liquidity risk.</span> During the curve there is no pool at all and the price is set by the curve; early after migration depth is still thin and large sells will move price hard. Depth grows only as the reserve is added over time.</p>

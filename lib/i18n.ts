@@ -126,7 +126,7 @@ const zh = {
       },
       {
         q: '买入税和卖出税的税金怎么分配？',
-        a: '买卖税各为 0.5%，但要分两套看：FAIR 母币的税按 4:3:2:1 拆分——40% 进入销毁池、30% 进入持币者分红池、20% 用于流动性回购与加深、10% 用于运营与开发；通过协议发射的新币，税归发币者、平台不抽成，按 85 / 10 / 5 分配——85% 结算给创作者、10% 用于回购并销毁 FAIR、5% 以 SOL 结算直接进入 FAIR 加池金库（不为该币单独建池）。交易池另收 0.25% 手续费（迁移后池为 OnlyB，只在 SOL 侧累积，FAIR 侧为零；其中 20% 由 Meteora 协议收走、不进入 FAIR 分账），曲线阶段另收 1% swap 手续费（其中 80% 归创作者、20% 归协议），与 0.5% 交易税叠加，曲线阶段买入成本约 1.5%。',
+        a: '买卖各 0.5%，全程只收这一笔，在成交时于 SOL 一侧结算扣除，钱包之间互转免费，没有转账税、也没有第二笔池费叠加。FAIR 母币的税按 4:3:2:1 拆分——40% 进入销毁池、30% 进入持币者分红池、20% 用于流动性回购与加深、10% 用于运营与开发；通过协议发射的新币按 85 / 10 / 5 分配——85% 结算给创作者、10% 用于回购并销毁 FAIR、5% 以 SOL 结算直接进入 FAIR 加池金库（不为该币单独建池）。曲线阶段与迁移后的 DAMM 池都是 0.5%：其中 20% 由 Meteora / DBC 协议收走、不进入 FAIR 分账，80%（40 bps SOL）归项目方。单程 0.5%，往返约 1%，另加正常滑点。',
       },
       {
         q: '新币是怎么发的？要不要先买？',
@@ -299,7 +299,7 @@ const en: typeof zh = {
       },
       {
         q: 'How is the trading fee allocated?',
-        a: 'The fee is 0.5% per trade and is taken at the trading layer, in SOL, never as a Token-2022 transfer fee — so moving tokens between your own wallets is free. On the FAIR token it splits 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations. On tokens launched through the protocol it splits 85 / 10 / 5: 85% to the creator, 10% to buy back and burn FAIR, 5% into the FAIR liquidity vault. Every lamport is claimed by the protocol program itself through its config PDA, never by an admin wallet. The pool adds a separate 0.25% swap fee: the migrated pool runs in OnlyB, so it accrues on the SOL side only in both directions, never on FAIR; 20% of it is collected by the Meteora protocol and does not enter FAIR&apos;s split.',
+        a: 'The fee is 0.5% per trade and is taken at the trading layer, in SOL, never as a Token-2022 transfer fee — so moving tokens between your own wallets is free. On the FAIR token it splits 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations. On tokens launched through the protocol it splits 85 / 10 / 5: 85% to the creator, 10% to buy back and burn FAIR, 5% into the FAIR liquidity vault. Every lamport is claimed by the protocol program itself through its config PDA, never by an admin wallet. It is one single 0.5% all the way through — the curve and the migrated DAMM pool charge the same rate, on the SOL side only (the pool runs in OnlyB, so nothing accrues on FAIR). 20% is collected by the Meteora / DBC protocol and does not enter FAIR&apos;s split; 80% (40 bps in SOL) goes to the project. One way costs 0.5%, a round trip about 1%, plus normal slippage.',
       },
       {
         q: 'How is a new token launched? Do I need to buy first?',
