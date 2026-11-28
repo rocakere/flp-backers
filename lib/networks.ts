@@ -33,7 +33,13 @@ export const NETWORKS: Record<NetworkId, NetworkInfo> = {
     rpc: process.env.NEXT_PUBLIC_RPC_DEVNET || 'https://api.devnet.solana.com',
     programId: process.env.NEXT_PUBLIC_PROGRAM_ID_DEVNET || '',
     statsPda: process.env.NEXT_PUBLIC_STATS_DEVNET || '',
-    dbcConfig: process.env.NEXT_PUBLIC_DBC_CONFIG_DEVNET || process.env.NEXT_PUBLIC_DBC_CONFIG || '',
+    // Devnet 的曲线参数表是公开信息，写成兜底值可以避免"变量没配好就发不出曲线池"这个坑。
+    // 这是一套小额演练配置：毕业阈值 5 SOL，其余（150bps 曲线 / 23.75% 迁移 / 迁移后 50bps / 0 迁移费）
+    // 与主网口径一致，方便先跑通全链路再切主网。
+    dbcConfig:
+      process.env.NEXT_PUBLIC_DBC_CONFIG_DEVNET ||
+      process.env.NEXT_PUBLIC_DBC_CONFIG ||
+      'CW7myrfgRucA2q7hqyAR7q4RyMWDGKrHEEEpNQUsmnnq',
   },
   mainnet: {
     id: 'mainnet',
