@@ -5,6 +5,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { dict, pathFor, type Lang } from '@/lib/i18n';
 import { useNetwork } from '@/components/solana-provider';
+import TradePanel from '@/components/trade-panel';
 
 const TABS = ['最新发射', '即将毕业', '已迁移', '我的持仓'];
 const TABS_EN = ['Newest', 'Graduating', 'Migrated', 'My Holdings'];
@@ -52,6 +53,8 @@ export default function ExplorePage({ lang }: { lang: Lang }) {
   const [data, setData] = useState<Payload | null>(null);
   const [loading, setLoading] = useState(true);
   const [held, setHeld] = useState<Set<string>>(new Set());
+  const [trade, setTrade] = useState<Pool | null>(null);
+  const [toast, setToast] = useState('');
   const tabs = lang === 'en' ? TABS_EN : TABS;
 
   const load = useCallback(() => {
@@ -218,6 +221,17 @@ export default function ExplorePage({ lang }: { lang: Lang }) {
                   mint {p.mint.slice(0, 4)}…{p.mint.slice(-4)}
                 </a>
               </div>
+
+              {!p.isMigrated && data && (
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => setTrade(p)}
+                    className="flex-1 rounded-lg bg-purple-700 py-1.5 text-xs font-semibold text-white transition hover:bg-purple-800"
+                  >
+                    {lang === 'en' ? 'Buy / Sell' : '买入 / 卖出'}
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -233,6 +247,32 @@ export default function ExplorePage({ lang }: { lang: Lang }) {
           {lang === 'en' ? 'Launch a token →' : '去发一个 →'}
         </Link>
       </div>
+
+      {toast && (
+        <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs text-emerald-700">
+          {toast}
+        </div>
+      )}
+
+      {trade && data && (
+        <TradePanel
+          pool={trade.pool}
+          mint={trade.mint}
+          dbcConfig={data.dbcConfig}
+          name={trade.name}
+          symbol={trade.symbol}
+          lang={lang === 'en' ? 'en' : 'zh'}
+          onClose={() => setTrade(null)}
+          onDone={(sig) => {
+            setTrade(null);
+            setToast(
+              lang === 'en' ? `Swap confirmed: ${sig.slice(0, 10)}…` : `交易已确认：${sig.slice(0, 10)}…`,
+            );
+            setTimeout(() => setToast(''), 8000);
+            load();
+          }}
+        />
+      )}
     </main>
   );
 }
