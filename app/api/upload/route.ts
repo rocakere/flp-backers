@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
+import { put } from '@vercel/blob';
 
 const EXT: Record<string, string> = {
   'image/png': 'png',
@@ -49,10 +50,45 @@ function sniff(buf: Buffer): 'png' | 'jpg' | 'webp' | 'gif' | null {
 
 const clip = (v: FormDataEntryValue | null, max: number) => String(v ?? '').slice(0, max);
 
+const MIME: Record<string, string> = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  webp: 'image/webp',
+  gif: 'image/gif',
+};
+
 /**
- * Uploads a token image plus its off-chain metadata JSON.
- * Files land in `public/uploads` and `public/meta`; on Vercel that storage is ephemeral,
- * so production needs a real bucket (S3/R2/IPFS) behind this endpoint.
+ * 存一份二进制，返回可公开访问的 URL。
+ *
+ * 线上（Vercel）运行时文件系统只读，必须落到对象存储；这里用 Vercel Blob。
+ * 本地 `npm run dev` 没有 BLOB_READ_WRITE_TOKEN 时退回写 public/ 目录，
+ * 保证本地链路也能跑通。
+ */
+async function store(bytes: Buffer, key: string, contentType: string, origin: string): Promise<string> {
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const blob = await put(key, bytes, {
+      access: 'public',
+      contentType,
+      addRandomSuffix: false,
+      allowOverwrite: true,
+    });
+    return blob.url;
+  }
+  if (process.env.VERCEL) {
+    throw new Error('BLOB_READ_WRITE_TOKEN missing');
+  }
+  const localPath = path.join(process.cwd(), 'public', key);
+  await fs.mkdir(path.dirname(localPath), { recursive: true });
+  await fs.writeFile(localPath, bytes);
+  return `${origin}/${key}`;
+}
+
+/**
+ * 上传代币图片与链下 metadata JSON。
+ *
+ * 图片和 JSON 都存到 Vercel Blob（公开可读），返回的 `uri` 直接写进
+ * Token-2022 的 metadata 扩展 —— 所以这个 URL 必须是长期有效的，
+ * 不能指向临时文件或只读文件系统。
  */
 export async function POST(req: Request) {
   const ip =
@@ -73,7 +109,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'request too large (max 3MB)' }, { status: 413 });
   }
 
-  const form = await req.formData();
+  let form: FormData;
+  try {
+    form = await req.formData();
+  } catch {
+    return NextResponse.json({ error: 'bad form body' }, { status: 400 });
+  }
   const file = form.get('file');
   if (!(file instanceof File)) {
     return NextResponse.json({ error: 'no file' }, { status: 400 });
@@ -93,24 +134,37 @@ export async function POST(req: Request) {
   const origin = req.headers.get('origin') || new URL(req.url).origin;
   const id = crypto.randomBytes(8).toString('hex');
 
-  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-  await fs.mkdir(uploadsDir, { recursive: true });
-  const fileName = `${id}.${ext}`;
-  await fs.writeFile(path.join(uploadsDir, fileName), buf);
-  const image = `${origin}/uploads/${fileName}`;
+  let image: string;
+  let uri: string;
+  try {
+    image = await store(buf, `uploads/${id}.${ext}`, MIME[ext], origin);
 
-  const meta = {
-    name: clip(form.get('name'), 64),
-    symbol: clip(form.get('symbol'), 16),
-    description: clip(form.get('description'), 600),
-    image,
-    website: clip(form.get('website'), 200),
-    twitter: clip(form.get('x'), 200),
-    telegram: clip(form.get('telegram'), 200),
-  };
-  const metaDir = path.join(process.cwd(), 'public', 'meta');
-  await fs.mkdir(metaDir, { recursive: true });
-  await fs.writeFile(path.join(metaDir, `${id}.json`), JSON.stringify(meta, null, 2), 'utf8');
+    const meta = {
+      name: clip(form.get('name'), 64),
+      symbol: clip(form.get('symbol'), 16),
+      description: clip(form.get('description'), 600),
+      image,
+      website: clip(form.get('website'), 200),
+      twitter: clip(form.get('x'), 200),
+      telegram: clip(form.get('telegram'), 200),
+    };
+    uri = await store(
+      Buffer.from(JSON.stringify(meta, null, 2), 'utf8'),
+      `meta/${id}.json`,
+      'application/json',
+      origin,
+    );
+  } catch (e) {
+    const msg = (e as Error).message;
+    if (msg === 'BLOB_READ_WRITE_TOKEN missing') {
+      return NextResponse.json(
+        { error: '图片存储未配置（缺 BLOB_READ_WRITE_TOKEN），暂时无法发射' },
+        { status: 503 },
+      );
+    }
+    console.error('upload failed', e);
+    return NextResponse.json({ error: `upload failed: ${msg}` }, { status: 500 });
+  }
 
-  return NextResponse.json({ image, uri: `${origin}/meta/${id}.json` });
+  return NextResponse.json({ image, uri });
 }
