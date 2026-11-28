@@ -142,7 +142,7 @@ const zh = {
       },
       {
         q: '总量会增发吗？会通缩吗？',
-        a: '总量固定 10 亿枚、不可调：发射时即置空 mint 权限、参数写死不可修改，任何人都无法增发；销毁会让总量单向减少，所以是"总量固定、逐步通缩"。供给切分同样写死：5% 创世锁定、迁移时到账 dev_vault，余下 9.5 亿按 75% 曲线 / 25% 迁移池；迁移不收费，2.375 亿枚全额进主池。',
+        a: '总量固定 10 亿枚、不可调：发射时即置空 mint 权限、参数写死不可修改，任何人都无法增发；销毁会让总量单向减少，所以是"总量固定、逐步通缩"。供给切分同样写死：5% 创世锁定、迁移时到账 dev_vault，余下 9.5 亿按 75% 曲线 / 25% 迁移池；迁移由 DBC 协议固定扣 0.2%（双向，约 47.5 万枚 + 0.80 SOL，关不掉），主池实收 237,025,001 枚，FAIR 不额外收费。',
       },
       {
         q: '怎么确认合约是安全的？',
@@ -315,7 +315,7 @@ const en: typeof zh = {
       },
       {
         q: 'Will supply ever be inflated, or burned?',
-        a: 'Supply is hard-capped at 1,000,000,000: the mint authority is revoked at launch and all parameters are hard-coded with no admin entry point, so nobody can ever mint more. Burns make total supply move down only, so the cap is fixed but the supply is deflationary. Genesis: 5% is locked to dev_vault and delivered at graduation, and the remaining 950M splits 75% curve / 25% migration pool — there is no depth reserve and the issuer holds no supply; migration is free, and all 237.5M tokens land in the pool.',
+        a: 'Supply is hard-capped at 1,000,000,000: the mint authority is revoked at launch and all parameters are hard-coded with no admin entry point, so nobody can ever mint more. Burns make total supply move down only, so the cap is fixed but the supply is deflationary. Genesis: 5% is locked to dev_vault and delivered at graduation, and the remaining 950M splits 75% curve / 25% migration pool — there is no depth reserve and the issuer holds no supply; migration carries the DBC program&apos;s fixed 0.2% fee (both sides, ≈475,000 tokens + ≈0.80 SOL, cannot be disabled), so the pool receives 237,025,001 tokens and FAIR charges nothing extra.',
       },
       {
         q: 'How can I verify the contract is safe?',
