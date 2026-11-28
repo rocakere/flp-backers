@@ -26,6 +26,7 @@ type Pool = {
   activationPoint: number;
   isMother: boolean;
   priceSol: number;
+  dammPool: string;
 };
 
 type Payload = {
@@ -222,13 +223,21 @@ export default function ExplorePage({ lang }: { lang: Lang }) {
                 </a>
               </div>
 
-              {!p.isMigrated && data && (
+              {((!p.isMigrated && data) || (p.isMigrated && p.dammPool)) && (
                 <div className="mt-3 flex gap-2">
                   <button
                     onClick={() => setTrade(p)}
-                    className="flex-1 rounded-lg bg-purple-700 py-1.5 text-xs font-semibold text-white transition hover:bg-purple-800"
+                    className={`flex-1 rounded-lg py-1.5 text-xs font-semibold text-white transition ${
+                      p.isMigrated ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-purple-700 hover:bg-purple-800'
+                    }`}
                   >
-                    {lang === 'en' ? 'Buy / Sell' : '买入 / 卖出'}
+                    {p.isMigrated
+                      ? lang === 'en'
+                        ? 'Buy / Sell (DAMM v2)'
+                        : '买入 / 卖出（毕业池）'
+                      : lang === 'en'
+                        ? 'Buy / Sell'
+                        : '买入 / 卖出'}
                   </button>
                 </div>
               )}
@@ -259,6 +268,8 @@ export default function ExplorePage({ lang }: { lang: Lang }) {
           pool={trade.pool}
           mint={trade.mint}
           dbcConfig={data.dbcConfig}
+          kind={trade.isMigrated && trade.dammPool ? 'damm' : 'curve'}
+          dammPool={trade.dammPool}
           name={trade.name}
           symbol={trade.symbol}
           lang={lang === 'en' ? 'en' : 'zh'}

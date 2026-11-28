@@ -4,6 +4,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { getAssociatedTokenAddressSync, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import { executeSwap, quoteSwap, type SwapDirection } from '@/lib/trade';
+import { executeDammSwap, quoteDammSwap } from '@/lib/damm-trade';
 
 type Props = {
   pool: string;
@@ -12,6 +13,10 @@ type Props = {
   name: string;
   symbol: string;
   lang: 'zh' | 'en';
+  /** curve = 未毕业的 DBC 曲线池；damm = 已迁移到 DAMM v2 的池 */
+  kind?: 'curve' | 'damm';
+  /** kind=damm 时必填：迁移后的 CP-AMM 池地址 */
+  dammPool?: string;
   onClose: () => void;
   onDone: (sig: string) => void;
 };
@@ -19,7 +24,7 @@ type Props = {
 const LAMPORTS = 1_000_000_000n;
 const TOKEN_UNIT = 1_000_000n; // 模板固定 6 位小数
 
-export default function TradePanel({ pool, mint, dbcConfig, name, symbol, lang, onClose, onDone }: Props) {
+export default function TradePanel({ pool, mint, dbcConfig, name, symbol, lang, kind = 'curve', dammPool, onClose, onDone }: Props) {
   const { connection } = useConnection();
   const { connected, publicKey, signTransaction } = useWallet();
   const [dir, setDir] = useState<SwapDirection>('buy');
@@ -67,7 +72,10 @@ export default function TradePanel({ pool, mint, dbcConfig, name, symbol, lang, 
       setQuoting(true);
       try {
         const amountIn = dir === 'buy' ? BigInt(Math.round(v * 1e9)) : BigInt(Math.round(v * 1e6));
-        const q = await quoteSwap({ connection, pool, dbcConfig, direction: dir, amountIn, slippageBps: slip });
+        const q =
+          kind === 'damm' && dammPool
+            ? await quoteDammSwap({ connection, pool: dammPool, direction: dir, amountIn, slippageBps: slip })
+            : await quoteSwap({ connection, pool, dbcConfig, direction: dir, amountIn, slippageBps: slip });
         if (!dead) setQuote({ out: q.outAmount, min: q.minOut });
       } catch (e) {
         if (!dead) {
@@ -82,7 +90,7 @@ export default function TradePanel({ pool, mint, dbcConfig, name, symbol, lang, 
       dead = true;
       clearTimeout(t);
     };
-  }, [input, dir, slip, connection, pool, dbcConfig]);
+  }, [input, dir, slip, connection, pool, dbcConfig, kind, dammPool]);
 
   const submit = async () => {
     setMsg('');
@@ -93,15 +101,26 @@ export default function TradePanel({ pool, mint, dbcConfig, name, symbol, lang, 
     setBusy(true);
     try {
       const amountIn = dir === 'buy' ? BigInt(Math.round(v * 1e9)) : BigInt(Math.round(v * 1e6));
-      const sig = await executeSwap({
-        connection,
-        wallet: publicKey,
-        signTransaction,
-        pool,
-        direction: dir,
-        amountIn,
-        minOut: quote.min,
-      });
+      const sig =
+        kind === 'damm' && dammPool
+          ? await executeDammSwap({
+              connection,
+              wallet: publicKey,
+              signTransaction,
+              pool: dammPool,
+              direction: dir,
+              amountIn,
+              minOut: quote.min,
+            })
+          : await executeSwap({
+              connection,
+              wallet: publicKey,
+              signTransaction,
+              pool,
+              direction: dir,
+              amountIn,
+              minOut: quote.min,
+            });
       onDone(sig);
       await loadBalance();
       setMsg(zh ? `成功：${sig.slice(0, 8)}…` : `Done: ${sig.slice(0, 8)}…`);
@@ -127,6 +146,11 @@ export default function TradePanel({ pool, mint, dbcConfig, name, symbol, lang, 
         <div className="flex items-center justify-between">
           <div className="font-semibold text-black">
             {name} <span className="text-xs text-black/40">${symbol}</span>
+            {kind === 'damm' && (
+              <div className="mt-0.5 text-[10px] font-normal text-emerald-700">
+                {zh ? '已毕业 · DAMM v2 池交易' : 'Graduated · trading on the DAMM v2 pool'}
+              </div>
+            )}
           </div>
           <button onClick={onClose} className="text-sm text-black/40 hover:text-black">✕</button>
         </div>

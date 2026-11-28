@@ -9,6 +9,34 @@ export const maxDuration = 30;
 const DBC_PROGRAM_ID = new PublicKey('dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN');
 /** DBC Pool 账户大小（实测 devnet 上的池子都是 424 字节）。 */
 const DBC_POOL_SIZE = 424;
+/** Meteora DAMM v2（CP-AMM）程序，毕业后池子搬到这里。 */
+const CP_AMM_PROGRAM_ID = new PublicKey('cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG');
+const CP_AMM_POOL_SIZE = 1112;
+const CP_AMM_TOKEN_A_MINT_OFFSET = 168;
+
+/**
+ * 迁移后 DBC Pool 里的 `dammV2Pool` 字段仍为 null，只能反过来在 CP-AMM 程序里按 base mint 找池。
+ * 只有已迁移的池才会调用（数量很少），结果按 mint 缓存 5 分钟。
+ */
+const dammPoolCache = new Map<string, { at: number; pool: string }>();
+async function findDammPool(conn: Connection, mint: string): Promise<string> {
+  const hit = dammPoolCache.get(mint);
+  if (hit && Date.now() - hit.at < 300_000) return hit.pool;
+  try {
+    const accs = await conn.getProgramAccounts(CP_AMM_PROGRAM_ID, {
+      filters: [
+        { dataSize: CP_AMM_POOL_SIZE },
+        { memcmp: { offset: CP_AMM_TOKEN_A_MINT_OFFSET, bytes: mint } },
+      ],
+      dataSlice: { offset: 0, length: 0 },
+    });
+    const pool = accs[0]?.pubkey.toBase58() ?? '';
+    dammPoolCache.set(mint, { at: Date.now(), pool });
+    return pool;
+  } catch {
+    return '';
+  }
+}
 
 /** 每个网络的 FLP 程序地址（PDA 依赖它，所以要跟着网络变）。 */
 function flpProgramId(net: NetworkId): string {
@@ -36,6 +64,8 @@ type PoolCard = {
   isMother: boolean;
   priceSol: number; // SOL per whole token
   ownerConfig: string;
+  /** 毕业后的 DAMM v2 池地址；没迁移或反查不到就是空串 */
+  dammPool: string;
 };
 
 type PlatformPayload = {
@@ -234,7 +264,13 @@ export async function GET(req: Request) {
         isMother: fairMint !== '' && mint.toBase58() === fairMint,
         priceSol,
         ownerConfig: cfg.dbcConfig,
+        dammPool: '',
       });
+    }
+
+    // 已迁移的池补上 DAMM v2 池地址，前端才能给出毕业后买卖入口
+    for (const p of pools) {
+      if (p.isMigrated) p.dammPool = await findDammPool(conn, p.mint);
     }
 
     // 新的在前；母币钉在列表末尾之外的独立字段里，不在列表里重复
