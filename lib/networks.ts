@@ -31,8 +31,14 @@ export const NETWORKS: Record<NetworkId, NetworkInfo> = {
     id: 'devnet',
     label: 'Devnet',
     rpc: process.env.NEXT_PUBLIC_RPC_DEVNET || 'https://api.devnet.solana.com',
-    programId: process.env.NEXT_PUBLIC_PROGRAM_ID_DEVNET || '',
-    statsPda: process.env.NEXT_PUBLIC_STATS_DEVNET || '',
+    // Devnet 部署地址与 localnet 同一套程序（同一 program id），写成兜底值，
+    // 避免 Vercel 变量没生效时页面误判"该网络还没部署合约"而拦住发射。
+    programId:
+      process.env.NEXT_PUBLIC_PROGRAM_ID_DEVNET ||
+      '3uvGiB1BshLcuLBtGk6bJceYGoYruPo3mxLs39tc4vGT',
+    statsPda:
+      process.env.NEXT_PUBLIC_STATS_DEVNET ||
+      '5uaGmaVsmVFLytgpK9FeNfGMPTLM1Z4igVV6Wp3eDuG5',
     // Devnet 的曲线参数表是公开信息，写成兜底值可以避免"变量没配好就发不出曲线池"这个坑。
     // 这是一套小额演练配置：毕业阈值 5 SOL，其余（150bps 曲线 / 23.75% 迁移 / 迁移后 50bps / 0 迁移费）
     // 与主网口径一致，方便先跑通全链路再切主网。
