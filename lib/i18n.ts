@@ -56,8 +56,8 @@ const zh = {
   },
   launch: {
     title: '发起代币',
-    sub: '在 Solana 上一键部署内置 0.5% 税、85 / 10 / 5 分账与自动加池的代币',
-    notice: '发射会真实创建 Token-2022 代币：9 位小数、0.5% 交易税（成交时以 SOL 一侧结算，钱包互转免费、没有转账费）、总量 10 亿。这三项由协议模板固定，页面上不可修改；名称/符号/URI 与税权归属由你填，写在代币自身的 Metadata 扩展里，账户租金与手续费由你的钱包支付。建池与首次买入在同一笔交易内原子执行（需配置 DBC partner config）。',
+    sub: '在 Solana 上一键部署内置固定费率、85 / 10 / 5 分账与自动加池的代币',
+    notice: '发射会真实创建 Token-2022 代币：9 位小数、总量 10 亿、固定费率（曲线阶段 1.5%、迁移后池 0.5%，均在成交时以 SOL 一侧结算，钱包互转免费、没有转账费）。费率由协议模板固定，页面上不可修改；名称/符号/URI 与税权归属由你填，写在代币自身的 Metadata 扩展里，账户租金与手续费由你的钱包支付。建池与首次买入在同一笔交易内原子执行（需配置 DBC partner config）。',
     fName: '代币名称 Name',
     phName: '例如 Fair Token',
     fSymbol: '代币符号 Symbol',
@@ -80,8 +80,8 @@ const zh = {
     fWeb: '官网（可选）',
     fX: 'X / Twitter（可选）',
     fTg: 'Telegram（可选）',
-    taxTitle: '交易税：固定 0.5%，不可修改',
-    taxLine: '买卖各 0.5%，按 85 / 10 / 5 自动分账：85% 结算给收款方、10% 回购并销毁 FAIR、5% 卖成 SOL 进入 FAIR 加池金库。',
+    taxTitle: '成交费：曲线 1.5% / 迁移后 0.5%，均不可修改',
+    taxLine: '曲线阶段 1.5%、迁移到 DAMM 池后 0.5%，都只在 SOL 一侧收取，按 85 / 10 / 5 自动分账：85% 结算给收款方、10% 回购并销毁 FAIR、5% 卖成 SOL 进入 FAIR 加池金库。',
     fDir: '税收流向（85% 这一路的收款方）',
     dirCreator: '创作者钱包（默认）',
     dirVault: 'FAIR 加池金库（公益类可选）',
@@ -125,16 +125,16 @@ const zh = {
         a: '弹窗里只会列出你浏览器中已安装的钱包插件。如果列表是空的，请先安装 Phantom、OKX Web3 或 Backpack 等 Solana 钱包插件，再刷新页面重试。',
       },
       {
-        q: '买入税和卖出税的税金怎么分配？',
-        a: '买卖各 0.5%，全程只收这一笔，在成交时于 SOL 一侧结算扣除，钱包之间互转免费，没有转账税、也没有第二笔池费叠加。FAIR 母币的税按 4:3:2:1 拆分——40% 进入销毁池、30% 进入持币者分红池、20% 用于流动性回购与加深、10% 用于运营与开发；通过协议发射的新币按 85 / 10 / 5 分配——85% 结算给创作者、10% 用于回购并销毁 FAIR、5% 以 SOL 结算直接进入 FAIR 加池金库（不为该币单独建池）。曲线阶段与迁移后的 DAMM 池都是 0.5%：其中 20% 由 Meteora / DBC 协议收走、不进入 FAIR 分账，80%（40 bps SOL）归项目方。单程 0.5%，往返约 1%，另加正常滑点。',
+        q: '成交费怎么收、怎么分配？',
+        a: '两段费率，都在成交时于 SOL 一侧结算，钱包互转免费（没有转账税）：曲线阶段 1.5%，迁移到 DAMM 池后 0.5%。曲线阶段那 1.5% 里，20%（0.3%）由 Meteora / DBC 收走、不进入 FAIR 分账，80%（1.2%）归项目方；迁移后 0.5% 里 20%（0.1%）归 Meteora，80%（0.4%）进协议永久锁定 LP。FAIR 母币的费用按 4:3:2:1 拆分——40% 销毁、30% 分红、20% 加池、10% 运营；通过协议发射的新币按 85 / 10 / 5 分配——85% 给创作者、10% 回购销毁 FAIR、5% 进 FAIR 加池金库（运营桶只吃母币那 10%，子币不进运营）。迁移后单程 0.5%，往返约 1%，另加正常滑点。',
       },
       {
         q: '新币是怎么发的？要不要先买？',
-        a: '走链上曲线首发，不设预售、白名单、额度或内部价。总量固定 10 亿枚、不可调，其中 70%（7 亿枚）在曲线上公开定价，价格随买入自动抬升，规则写死在合约里；曲线卖满（募资达 394.000000001 SOL 迁移阈值）后自动迁移成交易池，流动性就是曲线筹到的 SOL，发币方不需要先垫建池资金。',
+        a: '走链上曲线首发，不设预售、白名单、额度或内部价。总量固定 10 亿枚、不可调：5%（5,000 万枚）创世即锁定归属 dev_vault、迁移时一次性到账，剩余 9.5 亿按 75 / 25 切分（曲线 7.125 亿、迁移池 2.375 亿），规则写死在合约里；曲线卖满（募资达约 401.0366 SOL 迁移阈值）后自动迁移成交易池，流动性就是曲线筹到的 SOL，发币方不需要先垫建池资金。',
       },
       {
-        q: '税金什么时候会被卖出？',
-        a: '税从来不需要卖出。0.5% 在池子成交的那一刻就在 SOL 一侧结算，进金库的本身就是 SOL，分红、运营、加池全部是纯 SOL 转账，协议不会把任何代币卖成 SOL。因此不存在可被狙击的砸盘时点，也没有 TWAP 拆单这一步。',
+        q: '费用什么时候会被卖出？',
+        a: '费用从来不需要卖出。成交费在成交那一刻就在 SOL 一侧结算，进金库的本身就是 SOL，分红、运营、加池全部是纯 SOL 转账，协议不会把任何代币卖成 SOL。因此不存在可被狙击的砸盘时点，也没有 TWAP 拆单这一步。',
       },
       {
         q: '分红什么时候发放？',
@@ -142,7 +142,7 @@ const zh = {
       },
       {
         q: '总量会增发吗？会通缩吗？',
-        a: '总量固定 10 亿枚、不可调：发射时即置空 mint 权限、参数写死不可修改，任何人都无法增发；销毁会让总量单向减少，所以是"总量固定、逐步通缩"。首发时 70% 在曲线上卖出、30% 与曲线筹集到的 394.000000001 SOL 组成主交易池，无深度储备、项目方不持币；迁移时协议另抽 0.2% 流动性迁移费（以独立锁仓 LP 留存）。',
+        a: '总量固定 10 亿枚、不可调：发射时即置空 mint 权限、参数写死不可修改，任何人都无法增发；销毁会让总量单向减少，所以是"总量固定、逐步通缩"。供给切分同样写死：5% 创世锁定、迁移时到账 dev_vault，余下 9.5 亿按 75% 曲线 / 25% 迁移池；迁移时协议另抽 0.2% 流动性迁移费（以独立锁仓 LP 留存）。',
       },
       {
         q: '怎么确认合约是安全的？',
@@ -229,8 +229,8 @@ const en: typeof zh = {
   },
   launch: {
     title: 'Launch a Token',
-    sub: 'Deploy a Solana token with a fixed 0.5% tax, 85 / 10 / 5 split and auto-liquidity',
-    notice: 'This launch really creates a Token-2022 token: 9 decimals, a 0.5% trading tax settled in SOL at fill time (wallet-to-wallet transfers are free, with no transfer fee), 1 billion supply. All three are fixed by the protocol template and cannot be edited on this page. You choose the name/symbol/URI and the tax destination; they are stored in the token\'s own Metadata extension. Rent and fees are paid by your wallet. Pool creation and the first buy run atomically in one transaction (requires a DBC partner config).',
+    sub: 'Deploy a Solana token with fixed fees, an 85 / 10 / 5 split and auto-liquidity',
+    notice: 'This launch really creates a Token-2022 token: 9 decimals, 1 billion supply, fixed fees (1.5% on the curve, 0.5% in the post-migration pool, both settled in SOL at fill time — wallet-to-wallet transfers are free). The fees are fixed by the protocol template and cannot be edited on this page. You choose the name/symbol/URI and the fee destination; they are stored in the token\'s own Metadata extension. Rent and fees are paid by your wallet. Pool creation and the first buy run atomically in one transaction (requires a DBC partner config).',
     fName: 'Token Name',
     phName: 'e.g. Fair Token',
     fSymbol: 'Token Symbol',
@@ -253,8 +253,8 @@ const en: typeof zh = {
     fWeb: 'Website (optional)',
     fX: 'X / Twitter (optional)',
     fTg: 'Telegram (optional)',
-    taxTitle: 'Trading fee: fixed 0.5%, not editable',
-    taxLine: '0.5% is charged on trades only — first on the bonding curve, then on the DAMM v2 pool after migration — settled in SOL and split 85 / 10 / 5 automatically: 85% to the creator, 10% to buy back and burn FAIR, 5% into the FAIR liquidity vault. Plain wallet transfers, OTC deals and CEX deposits cost nothing.',
+    taxTitle: 'Trade fee: 1.5% on the curve, 0.5% after migration — not editable',
+    taxLine: 'The curve charges 1.5%, the DAMM v2 pool charges 0.5% after graduation — both on the SOL side only, split 85 / 10 / 5 automatically: 85% to the creator, 10% to buy back and burn FAIR, 5% into the FAIR liquidity vault. Plain wallet transfers, OTC deals and CEX deposits cost nothing.',
     fDir: 'Tax destination (receiver of the 85% leg)',
     dirCreator: 'Creator wallet (default)',
     dirVault: 'FAIR liquidity vault (for public-good projects)',
@@ -299,15 +299,15 @@ const en: typeof zh = {
       },
       {
         q: 'How is the trading fee allocated?',
-        a: 'The fee is 0.5% per trade and is taken at the trading layer, in SOL, never as a Token-2022 transfer fee — so moving tokens between your own wallets is free. On the FAIR token it splits 4:3:2:1 — 40% to the burn pool, 30% to the holder dividend pool, 20% to liquidity buyback and deepening, 10% to operations. On tokens launched through the protocol it splits 85 / 10 / 5: 85% to the creator, 10% to buy back and burn FAIR, 5% into the FAIR liquidity vault. Every lamport is claimed by the protocol program itself through its config PDA, never by an admin wallet. It is one single 0.5% all the way through — the curve and the migrated DAMM pool charge the same rate, on the SOL side only (the pool runs in OnlyB, so nothing accrues on FAIR). 20% is collected by the Meteora / DBC protocol and does not enter FAIR&apos;s split; 80% (40 bps in SOL) goes to the project. One way costs 0.5%, a round trip about 1%, plus normal slippage.',
+        a: 'Two fee regimes, both taken at the trading layer in SOL, never as a Token-2022 transfer fee — moving tokens between your own wallets is free. The curve charges 1.5%: Meteora / DBC takes 20% of it (0.3%), the project keeps 80% (1.2%). After migration the pool charges 0.5% in OnlyB mode: Meteora takes 20% (0.1%), 80% (0.4%) goes to the permanently locked LP. On the FAIR token the fee splits 4:3:2:1 — 40% burn, 30% dividends, 20% liquidity top-up, 10% operations. On launched tokens it splits 85 / 10 / 5: 85% to the creator, 10% to buy back and burn FAIR, 5% into the FAIR liquidity vault (the operations bucket only ever takes the mother coin&apos;s 10%). A round trip after migration costs about 1%, plus normal slippage.',
       },
       {
         q: 'How is a new token launched? Do I need to buy first?',
-        a: 'Through an on-chain bonding curve — no presale, allowlist, cap or insider price. Total supply is fixed at 1,000,000,000 and cannot be changed; 70% of it (700 million tokens) is priced publicly on the curve and the price rises automatically with purchases, with the rules fixed in the contract. Once the curve fills and 394.000000001 SOL has been raised — the migration threshold — it graduates into a trading pool automatically, and that liquidity is the SOL the curve raised, so the issuer never has to fund the pool upfront.',
+        a: 'Through an on-chain bonding curve — no presale, allowlist, cap or insider price. Total supply is fixed at 1,000,000,000: 5% (50 million) is locked to dev_vault from genesis and delivered in one transfer at graduation, and the remaining 950M splits 75 / 25 (712.5M on the curve, 237.5M into the migration pool), with the rules fixed in the contract. Once the curve fills and about 401.0366 SOL has been raised — the migration threshold — it graduates into a trading pool automatically, and that liquidity is the SOL the curve raised, so the issuer never has to fund the pool upfront.',
       },
       {
-        q: 'When does the tax get sold?',
-        a: 'Tax arrives as tokens while dividends are paid in SOL, so a sale in between is unavoidable. Roughly 50% of the FAIR tax is sold for SOL (dividends 30%, operations 10%, liquidity pairing 10%). To avoid a predictable dump schedule, sales are split into 8–12 orders over several hours and the harvest window is randomized across 6–9 days.',
+        q: 'When does the fee get sold?',
+        a: 'It never has to be sold. The fee is settled in SOL the moment a trade fills, so what lands in the treasury is already SOL; dividends, operations and liquidity top-up are all plain SOL transfers and the protocol never sells a token for SOL. There is no predictable dump point to front-run and no TWAP-style order splitting.',
       },
       {
         q: 'When are dividends paid?',
@@ -315,7 +315,7 @@ const en: typeof zh = {
       },
       {
         q: 'Will supply ever be inflated, or burned?',
-        a: 'Supply is hard-capped at 1,000,000,000: the mint authority is revoked at launch and all parameters are hard-coded with no admin entry point, so nobody can ever mint more. Burns make total supply move down only, so the cap is fixed but the supply is deflationary. At launch 70% is sold on the curve and 30% forms the main pool together with the 394.000000001 SOL raised — there is no depth reserve and the issuer holds no supply; migration also carries a 0.2% protocol fee retained as a separate locked LP position.',
+        a: 'Supply is hard-capped at 1,000,000,000: the mint authority is revoked at launch and all parameters are hard-coded with no admin entry point, so nobody can ever mint more. Burns make total supply move down only, so the cap is fixed but the supply is deflationary. Genesis: 5% is locked to dev_vault and delivered at graduation, and the remaining 950M splits 75% curve / 25% migration pool — there is no depth reserve and the issuer holds no supply; migration also carries a 0.2% protocol fee retained as a separate locked LP position.',
       },
       {
         q: 'How can I verify the contract is safe?',

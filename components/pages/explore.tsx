@@ -46,7 +46,7 @@ export default function ExplorePage({ lang }: { lang: Lang }) {
           <p className="mt-2 text-xs leading-6 text-black/60">
             {lang === 'en'
               ? 'Sorting will follow 24h volume by default; progress bars show how far a curve has filled.'
-              : '默认按 24 小时成交量排序；卡片上显示曲线进度条、0.5% 税标识与官网 / X / TG 三个入口。'}
+              : '默认按 24 小时成交量排序；卡片上显示曲线进度条、费率标识与官网 / X / TG 三个入口。'}
           </p>
           <Link href={pathFor(lang, '/launch')} className="mt-4 inline-block text-xs font-semibold text-purple-700 underline">
             {lang === 'en' ? 'Launch a token →' : '去发一个 →'}
