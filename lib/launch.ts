@@ -295,7 +295,10 @@ async function confirmByPolling(connection: Connection, signature: string) {
 /** 补齐 feePayer + recentBlockhash：钱包适配器不会替我们补，缺失时 partialSign 会直接报错。 */
 async function prepareTransaction(connection: Connection, tx: Transaction, feePayer: PublicKey) {
   if (!tx.feePayer) tx.feePayer = feePayer;
-  if (!tx.recentBlockhash) {
-    tx.recentBlockhash = (await connection.getLatestBlockhash('confirmed')).blockhash;
-  }
+  // 无条件刷新 blockhash。DBC SDK 建池时会自带一个它自己取的 blockhash，而用户从
+  // 上传图片到在钱包里点确认可能要一两分钟，Devnet 的 blockhash 只活约 150 个 slot
+  // （≈1 分钟），带着旧 hash 发出去就是 "Blockhash not found"。
+  // 顺序很关键：这里刷新之后才做 partialSign / 钱包签名，所以不会作废任何签名。
+  tx.recentBlockhash = (await connection.getLatestBlockhash('confirmed')).blockhash;
 }
+
