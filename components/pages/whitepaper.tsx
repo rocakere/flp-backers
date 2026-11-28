@@ -77,7 +77,7 @@ function ZhBody() {
         曲线阶段另有一笔 1% 的 swap 手续费，由曲线程序在成交时扣除：协议固定抽走 20%，其余 80% 归代币创作者。它与 0.5% 交易税（SOL 侧结算）叠加，所以曲线阶段每笔买入的实际成本约 1.5%。
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        交易池本身另收 0.25% 手续费，由做市程序在 swap 里直接扣，计入池内供 LP 提取。这笔钱和 0.5% 交易税是两套独立机制，会叠加：一次买入再卖出，用户实际损耗约 0.5% + 0.5% + 0.25% + 0.25% ≈ 1.5%，另加滑点。
+        交易池本身另收 0.25% 手续费，由做市程序在 swap 里直接扣。迁移后的池以 <span className="font-semibold text-black">OnlyB 模式</span>运行：无论买入还是卖出，手续费只在 SOL 一侧累积，FAIR 一侧始终为零，所以这笔钱全部以 SOL 结算、全额可领。其中 20% 由 Meteora 协议直接收取，<span className="font-semibold text-black">不进入 FAIR 的分账</span>；剩下的 80% 归协议持有的永久锁定 position。这笔钱和 0.5% 交易税是两套独立机制，会叠加：一次买入再卖出，用户实际损耗约 0.5% + 0.5% + 0.25% + 0.25% ≈ 1.5%，另加滑点。
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.3 自动销毁</h3>
@@ -409,13 +409,13 @@ function EnBody() {
         Buy and sell fee is 0.5%, charged at the trading layer — first by the bonding curve, then by the DAMM v2 pool after migration — and settled in SOL, with no admin override. On <span className="font-semibold text-black">the FAIR token</span>, fees are split 40 / 30 / 20 / 10 across the burn pool, holder dividend pool, liquidity buyback and operations. On <span className="font-semibold text-black">tokens launched through the protocol</span>, fees are split 85 / 10 / 5: 85% settles to the creator, 10% buys FAIR on the market and burns it immediately, and 5% is sold for SOL into the FAIR liquidity vault (counted together with the 10% of the FAIR tax, a top-up fires at 20 SOL) — see 3.2.
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        Fee take, stated plainly: the <span className="font-semibold text-black">total trading fee is 50 bps</span>. Meteora&apos;s protocol takes a fixed <span className="font-semibold text-black">20% of it (10 bps)</span>, and FAIR&apos;s protocol keeps the remaining <span className="font-semibold text-black">80% (40 bps)</span>, which is the pool that the 40 / 30 / 20 / 10 and 85 / 10 / 5 splits divide. On the bonding curve this split is measured on-chain. After migration the same split holds: the LP-side 80% (40 bps) accrues to the FAIR config PDA, which owns the pool position. If the pool runs in compounding mode, the share set by compounding_fee_bps is reinvested into the pool&apos;s reserves and only the remainder is claimable — our launch configuration sets that share to zero, so the full 40 bps is claimable. The deployed config&apos;s collect_fee_mode and compounding_fee_bps are published before launch.
+        Fee take, stated plainly: the <span className="font-semibold text-black">total trading fee is 50 bps</span>. Meteora&apos;s protocol takes a fixed <span className="font-semibold text-black">20% of it (10 bps)</span> — collected by the Meteora protocol itself, never entering FAIR&apos;s split. FAIR&apos;s protocol keeps the remaining <span className="font-semibold text-black">80% (40 bps)</span>, which is the pool that the 40 / 30 / 20 / 10 and 85 / 10 / 5 splits divide. On the bonding curve this split is measured on-chain, settled in SOL. After migration the pool runs in <span className="font-semibold text-black">OnlyB mode</span>: the fee accrues on the SOL side only, in both the buy and the sell direction, so the FAIR side never accrues and the full 40 bps is claimable in SOL by the FAIR config PDA that owns the locked position. compounding_fee_bps is zero, so nothing is reinvested into reserves.
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
         The curve charges the same 0.5% on every fill: the protocol takes a fixed 20% of it and the remaining 80% goes to the token creator. Nothing is stacked on top — there is no transfer tax, so moving tokens between wallets, an OTC deal or a CEX deposit costs nothing.
       </p>
       <p className="mt-3 text-sm leading-7 text-black/70">
-        The trading pool charges an additional 0.25% swap fee, deducted by the AMM inside the swap and retained in the pool for LPs. These are two independent mechanisms and they stack: a buy followed by a sell costs roughly 0.5% + 0.5% + 0.25% + 0.25% ≈ 1.5%, plus slippage.
+        The trading pool charges an additional 0.25% swap fee, deducted by the AMM inside the swap. The migrated pool runs in OnlyB mode: the fee is charged on the SOL side only, in both directions, and never accrues on the FAIR side. 20% of it is taken by the Meteora protocol and does not enter FAIR&apos;s split; the remaining 80% goes to the protocol-owned permanently locked position. These are two independent mechanisms and they stack: a buy followed by a sell costs roughly 0.5% + 0.5% + 0.25% + 0.25% ≈ 1.5%, plus slippage.
       </p>
 
       <h3 className="mt-8 font-semibold text-black">2.3 Auto Burn</h3>
